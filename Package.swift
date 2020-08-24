@@ -5,8 +5,8 @@ import PackageDescription
 let package = Package(
     name: "Networking",
     platforms: [
-        .macOS(.v10_15),
-        .iOS(.v13),
+        .macOS(.v10_10),
+        .iOS(.v10),
         .tvOS(.v13),
         .watchOS(.v6)
     ],

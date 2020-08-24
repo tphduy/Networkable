@@ -9,36 +9,36 @@ import XCTest
 @testable import Networking
 
 final class DefaultURLRequestFactoryTests: XCTestCase {
-    var rawURL: String!
+    var host: String!
     var endpoint: SpyEndpoint!
     var sut: DefaultURLRequestFactory!
 
     override func setUpWithError() throws {
-        rawURL = "https://test.com"
+        host = "https://test.com"
         endpoint = SpyEndpoint()
         endpoint.stubbedHeaders = ["key": "value"]
         endpoint.stubbedPath = "/path?string=\"String\"&int=0&bool=true"
         endpoint.stubbedMethod = .get
         endpoint.stubbedBodyResult = "data".data(using: .utf8)!
 
-        sut = DefaultURLRequestFactory(rawURL: rawURL)
+        sut = DefaultURLRequestFactory(host: host)
     }
 
     override func tearDownWithError() throws {
-        rawURL = nil
+        host = nil
         endpoint = nil
         sut = nil
     }
 
     func testInit() {
         XCTAssertEqual(
-            sut.rawURL,
-            rawURL)
+            sut.host,
+            host)
     }
 
     func testMakeWithEndpointResultURL() throws {
         let request = try sut.make(endpoint: endpoint)
-        let expected = rawURL
+        let expected = host
             + endpoint
                 .path
                 .addingPercentEncoding(withAllowedCharacters: .urlPathAllowed)!
@@ -49,8 +49,8 @@ final class DefaultURLRequestFactoryTests: XCTestCase {
     }
 
     func testMakeWithEndpointResultURLWhenURLIsInvalid() throws {
-        rawURL = ""
-        sut = DefaultURLRequestFactory(rawURL: rawURL)
+        host = ""
+        sut = DefaultURLRequestFactory(host: host)
         let expectedError = NetworkingError.invalidURL("")
 
         XCTAssertThrowsError(

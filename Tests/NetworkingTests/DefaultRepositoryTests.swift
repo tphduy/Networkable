@@ -9,6 +9,7 @@ import Combine
 import XCTest
 @testable import Networking
 
+@available(iOS 13.0, OSX 10.15, *)
 final class DefaultRepositoryTests: XCTestCase {
     var endpoint: SpyEndpoint!
     var codes: HTTPCodes!
@@ -202,6 +203,7 @@ final class DefaultRepositoryTests: XCTestCase {
     }
 }
 
+@available(iOS 13.0, OSX 10.15, *)
 extension DefaultRepositoryTests {
     
     private func call(throwingError expected: DummyError) {

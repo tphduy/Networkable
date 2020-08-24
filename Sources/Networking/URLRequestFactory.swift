@@ -8,20 +8,20 @@
 import Foundation
 
 public protocol URLRequestFactory {
-    var rawURL: String { get }
-    func make(endpoint: Enpoint) throws -> URLRequest
+    var host: String { get }
+    func make(endpoint: Endpoint) throws -> URLRequest
 }
 
 public struct DefaultURLRequestFactory: URLRequestFactory {
-    public let rawURL: String
+    public let host: String
 
-    public init(rawURL: String) {
-        self.rawURL = rawURL
+    public init(host: String) {
+        self.host = host
     }
 
-    public func make(endpoint: Enpoint) throws -> URLRequest {
-        guard var url = URL(string: rawURL) else {
-            throw NetworkingError.invalidURL(rawURL)
+    public func make(endpoint: Endpoint) throws -> URLRequest {
+        guard var url = URL(string: host) else {
+            throw NetworkingError.invalidURL(host)
         }
         url.appendPathComponent(endpoint.path)
         var request = URLRequest(url: url)

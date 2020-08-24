@@ -8,7 +8,7 @@
 import Foundation
 @testable import Networking
 
-final class SpyEndpoint: Enpoint {
+final class SpyEndpoint: Endpoint {
     var invokedHeadersGetter = false
     var invokedHeadersGetterCount = 0
     var stubbedHeaders: [String: String]!

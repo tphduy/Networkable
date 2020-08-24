@@ -8,6 +8,7 @@
 import Foundation
 import os.log
 
+@available(iOS 12.0, *)
 public protocol LoggingMiddleware: Middleware {
     var log: OSLog { get }
     func log(request: URLRequest)
@@ -15,6 +16,7 @@ public protocol LoggingMiddleware: Middleware {
     func log(data: Data)
 }
 
+@available(iOS 12.0, OSX 10.14, *)
 public struct DefaultLoggingMiddleware: LoggingMiddleware {
     public let type: OSLogType
     public let log: OSLog

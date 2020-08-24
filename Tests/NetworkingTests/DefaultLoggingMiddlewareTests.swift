@@ -9,6 +9,7 @@ import XCTest
 import os.log
 @testable import Networking
 
+@available(iOS 12.0, OSX 10.14, *)
 final class DefaultLoggingMiddlewareTests: XCTestCase {
     var url: URL!
     var request: URLRequest!

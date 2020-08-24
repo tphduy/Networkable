@@ -13,7 +13,7 @@ final class SpyURLRequestFactory: URLRequestFactory {
     var invokedRawURLGetterCount = 0
     var stubbedRawURL: String! = ""
 
-    var rawURL: String {
+    var host: String {
         invokedRawURLGetter = true
         invokedRawURLGetterCount += 1
         return stubbedRawURL
@@ -21,12 +21,12 @@ final class SpyURLRequestFactory: URLRequestFactory {
 
     var invokedMake = false
     var invokedMakeCount = 0
-    var invokedMakeParameters: (endpoint: Enpoint, Void)?
-    var invokedMakeParametersList = [(endpoint: Enpoint, Void)]()
+    var invokedMakeParameters: (endpoint: Endpoint, Void)?
+    var invokedMakeParametersList = [(endpoint: Endpoint, Void)]()
     var stubbedMakeError: Error?
     var stubbedMakeResult: URLRequest!
 
-    func make(endpoint: Enpoint) throws -> URLRequest {
+    func make(endpoint: Endpoint) throws -> URLRequest {
         invokedMake = true
         invokedMakeCount += 1
         invokedMakeParameters = (endpoint, ())
