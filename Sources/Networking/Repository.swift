@@ -9,19 +9,26 @@
 import Foundation
 import Combine
 
-@available(OSX 10.15, *)
 public protocol Repository {
     var requestFactory: URLRequestFactory { get }
     var middlewares: [Middleware] { get }
     var session: URLSession { get }
-    var executionQueue: DispatchQueue { get }
-
-    func call(to endpoint: Enpoint,
-              acceptedInRange codes: HTTPCodes,
-              resulttQueue: DispatchQueue) -> AnyPublisher<Data, Error>
+    
+    func call<T: Decodable>(
+        to endpoint: Enpoint,
+        acceptedInRange codes: HTTPCodes,
+        executionQueue: DispatchQueue,
+        resulttQueue: DispatchQueue,
+        decoder: JSONDecoder) -> AnyPublisher<T, Error>
+    
+    func call<T: Decodable>(
+        to endpoint: Enpoint,
+        acceptedInRange codes: HTTPCodes,
+        resulttQueue: DispatchQueue,
+        decoder: JSONDecoder,
+        promise: @escaping (Result<T, Error>) -> Void)
 }
 
-@available(OSX 10.15, *)
 extension Repository {
     private func prepare(request: URLRequest, middlewares: [Middleware]) throws -> URLRequest {
         var request = request
@@ -30,65 +37,86 @@ extension Repository {
         }
         return request
     }
-
-    private func didReceive(response: URLResponse, middlewares: [Middleware]) throws {
-        for middleware in middlewares {
-            try middleware.didReceive(response: response)
+    
+    public func call<T: Decodable>(
+        to endpoint: Enpoint,
+        acceptedInRange codes: HTTPCodes = .success,
+        executionQueue: DispatchQueue = .global(),
+        resulttQueue: DispatchQueue = .main,
+        decoder: JSONDecoder = JSONDecoder()) -> AnyPublisher<T, Error> {
+        do {
+            let middlewares = self.middlewares
+            let request = try requestFactory.make(endpoint: endpoint)
+            let preparedRequest = try prepare(request: request, middlewares: middlewares)
+            
+            return session
+                .dataTaskPublisher(for: preparedRequest)
+                .handleEvents(receiveSubscription: { (_) in
+                    for middleware in middlewares {
+                        middleware.willSend(request: request)
+                    }
+                })
+                .subscribe(on: executionQueue)
+                .tryMap { (data: Data, response: URLResponse) in
+                    for middleware in middlewares {
+                        try middleware.didReceive(response: response, data: data)
+                    }
+                    return data
+            }
+            .decode(type: T.self, decoder: decoder)
+            .receive(on: resulttQueue)
+            .eraseToAnyPublisher()
+        } catch {
+            return Fail(error: error)
+                .eraseToAnyPublisher()
         }
     }
-
-    private func didReceive(data: Data, middlewares: [Middleware]) throws {
-        for middleware in middlewares {
-            try middleware.didReceive(data: data)
+    
+    public func call<T: Decodable>(
+           to endpoint: Enpoint,
+           acceptedInRange codes: HTTPCodes = .success,
+           resulttQueue: DispatchQueue = .main,
+           decoder: JSONDecoder = JSONDecoder(),
+           promise: @escaping (Result<T, Error>) -> Void) {
+        let completion = { (result: Result<T, Error>) in
+            resulttQueue.async {
+                promise(result)
+            }
         }
-    }
-
-    private func task(request: URLRequest) -> AnyPublisher<Data, Error> {
-        session
-            .dataTaskPublisher(for: request)
-            .handleEvents(receiveSubscription: { (_) in
-                for middleware in self.middlewares {
-                    middleware.willSend(request: request)
+        
+        do {
+            let middlewares = self.middlewares
+            let request = try requestFactory.make(endpoint: endpoint)
+            let preparedRequest = try prepare(request: request, middlewares: middlewares)
+            
+            let task = session.dataTask(with: preparedRequest) { (data: Data?, response: URLResponse?, error: Error?) -> Void in
+                if let error = error {
+                    return completion(.failure(error))
                 }
-            })
-            .subscribe(on: executionQueue)
-            .tryMap { (data: Data, response: URLResponse) in
-                try self.didReceive(response: response, middlewares: self.middlewares)
-                try self.didReceive(data: data, middlewares: self.middlewares)
-                return data
-        }
-        .eraseToAnyPublisher()
-    }
-
-    public func call(to endpoint: Enpoint,
-                     acceptedInRange codes: HTTPCodes = .success,
-                     resulttQueue: DispatchQueue = .main) -> AnyPublisher<Data, Error> {
-        do {
-            let request = try requestFactory.make(endpoint: endpoint)
-            let preparedRequest = try prepare(request: request, middlewares: middlewares)
-            let task = self.task(request: preparedRequest)
-            return task
-                .receive(on: resulttQueue)
-                .eraseToAnyPublisher()
+                
+                guard let response = response, let data = data else {
+                    return completion(.failure(NetworkingError.empty))
+                }
+                
+                do {
+                    for middleware in middlewares {
+                        try middleware.didReceive(response: response, data: data)
+                    }
+                    
+                    let result = try decoder.decode(T.self, from: data)
+                    completion(.success(result))
+                } catch {
+                    completion(.failure(error))
+                }
+            }
+            
+            for middleware in middlewares {
+                middleware.willSend(request: preparedRequest)
+            }
+            
+            task.resume()
         } catch {
-            return Fail(error: error).eraseToAnyPublisher()
-        }
-    }
-
-    public func call<T: Decodable>(to endpoint: Enpoint,
-                                   acceptedInRange codes: HTTPCodes = .success,
-                                   resulttQueue: DispatchQueue = .main,
-                                   decoder: JSONDecoder = JSONDecoder()) -> AnyPublisher<T, Error> {
-        do {
-            let request = try requestFactory.make(endpoint: endpoint)
-            let preparedRequest = try prepare(request: request, middlewares: middlewares)
-            let task = self.task(request: preparedRequest)
-            return task
-                .decode(type: T.self, decoder: decoder)
-                .receive(on: resulttQueue)
-                .eraseToAnyPublisher()
-        } catch {
-            return Fail(error: error).eraseToAnyPublisher()
+            completion(.failure(error))
         }
     }
 }
@@ -98,16 +126,14 @@ public struct DefaultRepository: Repository {
     public let requestFactory: URLRequestFactory
     public let middlewares: [Middleware]
     public let session: URLSession
-    public let executionQueue: DispatchQueue
-
-    public init(requestFactory: URLRequestFactory,
-                middlewares: [Middleware] = [DefaultCodeValidationMiddleware(), DefaultLoggingMiddleware()],
-                session: URLSession = .shared,
-                executionQueue: DispatchQueue = DispatchQueue.global()) {
+    
+    public init(
+        requestFactory: URLRequestFactory,
+        middlewares: [Middleware] = [DefaultCodeValidationMiddleware(), DefaultLoggingMiddleware()],
+        session: URLSession = .shared) {
         self.requestFactory = requestFactory
         self.middlewares = middlewares
         self.session = session
-        self.executionQueue = executionQueue
     }
 }
 #endif

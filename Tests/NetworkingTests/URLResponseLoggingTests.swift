@@ -18,6 +18,7 @@ class URLResponseLoggingTests: XCTestCase {
         let logging = sut.logging()
 
         XCTAssertFalse(logging.isEmpty)
+        XCTAssertTrue(logging.contains("📩 Response: \(url.absoluteString)"))
         XCTAssertFalse(logging.contains("-H"))
         XCTAssertFalse(logging.contains("-d"))
         XCTAssertTrue(logging.contains(url.absoluteString))
@@ -34,7 +35,9 @@ class URLResponseLoggingTests: XCTestCase {
         let logging = sut.logging()
 
         XCTAssertFalse(logging.isEmpty)
-        XCTAssertTrue(logging.contains("Status Code: \(statusCode)"))
+        XCTAssertTrue(logging.contains("📩 Response: \(url.absoluteString)"))
+        XCTAssertTrue(logging.contains("-H \(statusCode)"))
+        XCTAssertTrue(logging.contains("-H \(statusCode)"))
         XCTAssertFalse(logging.contains("-H \"foo\": \"bar\""))
         XCTAssertFalse(logging.contains("-d"))
         XCTAssertTrue(logging.contains(url.absoluteString))

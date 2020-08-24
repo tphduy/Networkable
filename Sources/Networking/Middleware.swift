@@ -10,8 +10,7 @@ import Foundation
 public protocol Middleware {
     func prepare(request: URLRequest) throws -> URLRequest
     func willSend(request: URLRequest)
-    func didReceive(response: URLResponse) throws
-    func didReceive(data: Data) throws
+    func didReceive(response: URLResponse, data: Data) throws
 }
 
 extension Middleware {
@@ -20,8 +19,6 @@ extension Middleware {
     }
 
     public func willSend(request: URLRequest) {}
-
-    public func didReceive(response: URLResponse) throws {}
-
-    public func didReceive(data: Data) throws {}
+    
+    public func didReceive(response: URLResponse, data: Data) throws {}
 }

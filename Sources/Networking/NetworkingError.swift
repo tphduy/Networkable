@@ -8,6 +8,7 @@
 import Foundation
 
 public enum NetworkingError: Error, Equatable {
+    case empty
     case invalidURL(String)
     case unexpectedResponse(URLResponse)
     case unacceptableCode(HTTPCode, URLResponse)

@@ -13,7 +13,7 @@ extension URLRequest {
             return ""
         }
 
-        var components = ["curl -v"]
+        var components = ["🚀 Request: \(url.absoluteString)"]
 
         components.append("-X \(method)")
 
@@ -26,8 +26,6 @@ extension URLRequest {
         if let httpBody = httpBody, let value = String(data: httpBody, encoding: .utf8) {
             components.append("-d \"\(value)\"")
         }
-
-        components.append("\"\(url.absoluteString)\"")
 
         return components.joined(separator: " \n\t")
     }

@@ -44,11 +44,7 @@ final class MiddlewareTests: XCTestCase {
         XCTAssertNoThrow(sut.willSend(request: request))
     }
 
-    func testDidReceiveResponse() throws {
-        XCTAssertNoThrow(try sut.didReceive(response: response))
-    }
-
-    func testDidReceiveData() throws {
-        XCTAssertNoThrow(try sut.didReceive(data: data))
+    func testDidReceiveResponseData() throws {
+        XCTAssertNoThrow(try sut.didReceive(response: response, data: data))
     }
 }

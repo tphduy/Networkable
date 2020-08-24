@@ -16,7 +16,7 @@ final class URLRequestLoggingTests: XCTestCase {
     var sut: URLRequest!
 
     override func setUpWithError() throws {
-        url = URL(string: "https://apple.com")!
+        url = URL(string: "https://apple.com?foo=bar&id=1")!
         method = "GET"
         headers = ["foo": "bar"]
         body = """
@@ -63,7 +63,7 @@ final class URLRequestLoggingTests: XCTestCase {
 
     func testLogging() {
         let logging = sut.logging()
-        XCTAssertTrue(logging.contains("curl -v"))
+        XCTAssertTrue(logging.contains("🚀 Request: \(url.absoluteString)"))
         XCTAssertTrue(logging.contains("-X GET"))
         XCTAssertTrue(logging.contains("-H \"foo\": \"bar\""))
         XCTAssertTrue(logging.contains("-d \"{\"data\":\"some data\"}\""))
