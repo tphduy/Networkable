@@ -9,12 +9,21 @@ import Foundation
 
 // MARK: - AuthorizationType
 
+public enum AuthorizationPlace: Equatable, Hashable {
+    case header, query
+}
+
 public protocol AuthorizationType {
     var key: String { get }
     var value: String { get }
+    var place: AuthorizationPlace { get }
 }
 
-public enum DefaultAuthorizationType: AuthorizationType {
+public extension AuthorizationType {
+    var place: AuthorizationPlace { .header }
+}
+
+public enum DefaultAuthorizationType: AuthorizationType, Equatable, Hashable {
     case api(key: String, value: String)
     case bearer(token: String)
 
@@ -36,20 +45,29 @@ public enum DefaultAuthorizationType: AuthorizationType {
 // MARK: - AuthorizationMiddleware
 
 public protocol AuthorizationMiddleware: Middleware {
-    var type: AuthorizationType { get }
+    var authorization: AuthorizationType { get }
     func authorize(request: URLRequest) -> URLRequest
 }
 
 public struct DefaultAuthorizationMiddleware: AuthorizationMiddleware {
-    public let type: AuthorizationType
+    public let authorization: AuthorizationType
 
-    public init(type: AuthorizationType) {
-        self.type = type
+    public init(authorization: AuthorizationType) {
+        self.authorization = authorization
     }
 
     public func authorize(request: URLRequest) -> URLRequest {
         var request = request
-        request.addValue(type.value, forHTTPHeaderField: type.key)
+        
+        switch authorization.place {
+        case .header:
+            request.addValue(authorization.value, forHTTPHeaderField: authorization.key)
+        case .query:
+            let query = authorization.key + "=" + (authorization.value)
+            let url = URL(string: query, relativeTo: request.url)
+            request.url = url
+        }
+    
         return request
     }
 

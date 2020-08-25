@@ -9,6 +9,7 @@ import Foundation
 @testable import Networking
 
 final class SpyAuthorizationType: AuthorizationType {
+
     var invokedKeyGetter = false
     var invokedKeyGetterCount = 0
     var stubbedKey: String! = ""
@@ -28,10 +29,23 @@ final class SpyAuthorizationType: AuthorizationType {
         invokedValueGetterCount += 1
         return stubbedValue
     }
+
+    var invokedPlaceGetter = false
+    var invokedPlaceGetterCount = 0
+    var stubbedPlace: AuthorizationPlace!
+
+    var place: AuthorizationPlace {
+        invokedPlaceGetter = true
+        invokedPlaceGetterCount += 1
+        return stubbedPlace
+    }
 }
 
 extension SpyAuthorizationType: Equatable {
+    
     static func == (lhs: SpyAuthorizationType, rhs: SpyAuthorizationType) -> Bool {
-        lhs.key == rhs.key && lhs.value == rhs.value
+        lhs.key == rhs.key
+            && lhs.value == rhs.value
+            && lhs.place == rhs.place
     }
 }

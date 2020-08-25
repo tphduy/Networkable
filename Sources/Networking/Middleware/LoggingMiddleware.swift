@@ -67,12 +67,9 @@ public struct DefaultLoggingMiddleware: LoggingMiddleware {
     public func willSend(request: URLRequest) {
         log(request: request)
     }
-
-    public func didReceive(response: URLResponse) throws {
+    
+    public func didReceive(response: URLResponse, data: Data) throws {
         log(response: response)
-    }
-
-    public func didReceive(data: Data) throws {
         log(data: data)
     }
 }

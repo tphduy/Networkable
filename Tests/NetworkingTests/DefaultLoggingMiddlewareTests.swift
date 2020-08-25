@@ -44,10 +44,6 @@ final class DefaultLoggingMiddlewareTests: XCTestCase {
     }
 
     func testDidReceiveResponse() throws {
-        XCTAssertNoThrow(try sut.didReceive(response: response))
-    }
-
-    func testDidReceiveData() throws {
-        XCTAssertNoThrow(try sut.didReceive(data: data))
+        XCTAssertNoThrow(try sut.didReceive(response: response, data: data))
     }
 }

@@ -130,7 +130,6 @@ final class DefaultRepositoryTests: XCTestCase {
 
         sut.call(
             to: endpoint,
-            acceptedInRange: codes,
             resulttQueue: resultQueue)
             .sink(receiveCompletion: { (_: Subscribers.Completion<Error>) in
             }, receiveValue: { (_: Dictionary<String, String>) in
@@ -211,7 +210,6 @@ extension DefaultRepositoryTests {
 
         sut.call(
             to: endpoint,
-            acceptedInRange: codes,
             resulttQueue: resultQueue)
             .sink(receiveCompletion: { (completion: Subscribers.Completion<Error>) in
                 guard case let .failure(error) = completion else {
@@ -233,7 +231,6 @@ extension DefaultRepositoryTests {
         
         sut.call(
             to: endpoint,
-            acceptedInRange: codes,
             resulttQueue: .main) { (result: Result<Dictionary<String, String>, Error>) in
                 switch result {
                 case let .failure(error):

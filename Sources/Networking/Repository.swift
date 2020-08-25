@@ -17,14 +17,12 @@ public protocol Repository {
     @available(iOS 13.0, OSX 10.15, *)
     func call<T: Decodable>(
         to endpoint: Endpoint,
-        acceptedInRange codes: HTTPCodes,
         executionQueue: DispatchQueue,
         resulttQueue: DispatchQueue,
         decoder: JSONDecoder) -> AnyPublisher<T, Error>
     
     func call<T: Decodable>(
         to endpoint: Endpoint,
-        acceptedInRange codes: HTTPCodes,
         resulttQueue: DispatchQueue,
         decoder: JSONDecoder,
         promise: @escaping (Result<T, Error>) -> Void)
@@ -42,7 +40,6 @@ extension Repository {
     @available(iOS 13.0, OSX 10.15, *)
     public func call<T: Decodable>(
         to endpoint: Endpoint,
-        acceptedInRange codes: HTTPCodes = .success,
         executionQueue: DispatchQueue = .global(),
         resulttQueue: DispatchQueue = .main,
         decoder: JSONDecoder = JSONDecoder()) -> AnyPublisher<T, Error> {
@@ -76,7 +73,6 @@ extension Repository {
     
     public func call<T: Decodable>(
            to endpoint: Endpoint,
-           acceptedInRange codes: HTTPCodes = .success,
            resulttQueue: DispatchQueue = .main,
            decoder: JSONDecoder = JSONDecoder(),
            promise: @escaping (Result<T, Error>) -> Void) {
