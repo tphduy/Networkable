@@ -13,3 +13,8 @@ public protocol Endpoint {
     var method: Method { get }
     func body() throws -> Data?
 }
+
+extension Endpoint {
+    var headers: [String: String]? { nil }
+    func body() throws -> Data? { nil }
+}
