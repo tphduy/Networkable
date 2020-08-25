@@ -8,7 +8,7 @@
 import XCTest
 @testable import Networking
 
-fileprivate final class EmptyMiddleware: Middleware {}
+private final class EmptyMiddleware: Middleware {}
 
 final class MiddlewareTests: XCTestCase {
     var url: URL!
@@ -16,7 +16,7 @@ final class MiddlewareTests: XCTestCase {
     var response: URLResponse!
     var data: Data!
 
-    fileprivate var sut: EmptyMiddleware!
+    private var sut: EmptyMiddleware!
 
     override func setUpWithError() throws {
         url = URL(string: "https://apple.com")!
