@@ -8,20 +8,20 @@
 import Foundation
 import os.log
 
-@available(iOS 12.0, *)
 public protocol LoggingMiddleware: Middleware {
-    var log: OSLog { get }
     func log(request: URLRequest)
     func log(response: URLResponse)
     func log(data: Data)
 }
 
-@available(iOS 12.0, OSX 10.14, *)
 public struct DefaultLoggingMiddleware: LoggingMiddleware {
     public let type: OSLogType
     public let log: OSLog
 
-    public init(type: OSLogType = .info, log: OSLog = .default) {
+    @available(OSX 10.12, *)
+    public init(
+        type: OSLogType = .default,
+        log: OSLog = .default) {
         self.type = type
         self.log = log
     }
@@ -31,7 +31,12 @@ public struct DefaultLoggingMiddleware: LoggingMiddleware {
         guard !logging.isEmpty else {
             return
         }
-        os_log(type, log: log, "%@", logging)
+        
+        if #available(OSX 10.14, *) {
+            os_log(type, log: log, "%@", logging)
+        } else {
+            debugPrint(logging)
+        }
     }
 
     public func log(response: URLResponse) {
@@ -39,14 +44,24 @@ public struct DefaultLoggingMiddleware: LoggingMiddleware {
         guard !logging.isEmpty else {
             return
         }
-        os_log(type, log: log, "%@", logging)
+        
+        if #available(OSX 10.14, *) {
+            os_log(type, log: log, "%@", logging)
+        } else {
+            debugPrint(logging)
+        }
     }
 
     public func log(data: Data) {
         guard let logging = String(data: data, encoding: .utf8) else {
             return
         }
-        os_log(type, log: log, "%@", logging)
+        
+        if #available(OSX 10.14, *) {
+            os_log(type, log: log, "%@", logging)
+        } else {
+            debugPrint(logging)
+        }
     }
 
     public func willSend(request: URLRequest) {
