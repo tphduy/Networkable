@@ -17,7 +17,7 @@ final class DefaultAuthorizationMiddlewareTests: XCTestCase {
     var sut: DefaultAuthorizationMiddleware!
 
     override func setUpWithError() throws {
-        url = URL(string: "https://apple.com")!
+        url = URL(string: "https://apple.com?id=1")!
         request = URLRequest(url: url)
         response = HTTPURLResponse(url: url, statusCode: 200, httpVersion: nil, headerFields: nil)
         data = "data".data(using: .utf8)
@@ -38,8 +38,37 @@ final class DefaultAuthorizationMiddlewareTests: XCTestCase {
         sut = nil
     }
 
-    func testInit() {
+    func testInit() throws {
         XCTAssertEqual(sut.authorization as? SpyAuthorizationType, authorization)
+    }
+    
+    func testPrepareRequestWhenKeyIsEmptyAndPlaceIsHeader() throws {
+        authorization.stubbedKey = ""
+        authorization.stubbedPlace = .header
+        let preparedRequest = try sut.prepare(request: request)
+        XCTAssertNil(preparedRequest.allHTTPHeaderFields)
+    }
+    
+    func testPrepareRequestWhenKeyIsEmptyAndPlaceIsQuery() throws {
+        authorization.stubbedKey = ""
+        authorization.stubbedPlace = .query
+        let originalQuery = request.url?.query
+        let preparedRequest = try sut.prepare(request: request)
+        XCTAssertEqual(originalQuery, preparedRequest.url?.query)
+    }
+    
+    func testPrepareRequestWhenValueIsEmptyAndPlaceIsHeader() throws {
+        authorization.stubbedValue = ""
+        authorization.stubbedPlace = .header
+        let preparedRequest = try sut.prepare(request: request)
+        XCTAssertNil(preparedRequest.allHTTPHeaderFields)
+    }
+    
+    func testPrepareRequestWhenValueIsEmptyAndPlaceIsQuery() throws {
+        authorization.stubbedValue = ""
+        authorization.stubbedPlace = .query
+        let preparedRequest = try sut.prepare(request: request)
+        XCTAssertTrue(preparedRequest.url!.path.isEmpty)
     }
 
     func testPrepareRequestWhenPlaceIsHeader() throws {
@@ -55,10 +84,6 @@ final class DefaultAuthorizationMiddlewareTests: XCTestCase {
         authorization.stubbedPlace = .query
         let preparedRequest = try sut.prepare(request: request)
         let expected = authorization.stubbedKey + "=" + authorization.stubbedValue
-        XCTAssertTrue(preparedRequest.url!.path.contains(expected))
-    }
-    
-    func testDidReceiveResponseAndData() {
-        XCTAssertNoThrow(try sut.didReceive(response: response, data: data))
+        XCTAssertTrue(preparedRequest.url!.query!.contains(expected))
     }
 }

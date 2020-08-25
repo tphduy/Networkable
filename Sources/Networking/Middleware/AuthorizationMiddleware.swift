@@ -49,22 +49,27 @@ public struct DefaultAuthorizationMiddleware: AuthorizationMiddleware {
     }
 
     public func authorize(request: URLRequest) -> URLRequest {
+        guard !authorization.key.isEmpty, !authorization.value.isEmpty else { return request }
+        
         var request = request
         
         switch authorization.place {
         case .header:
             request.addValue(authorization.value, forHTTPHeaderField: authorization.key)
         case .query:
-            let query = authorization.key + "=" + (authorization.value)
-            let url = URL(string: query, relativeTo: request.url)
-            request.url = url
+            guard
+                let url = request.url,
+                var components = URLComponents(url: url, resolvingAgainstBaseURL: true)
+                else { break }
+            let queryItem = URLQueryItem(name: authorization.key, value: authorization.value)
+            components.queryItems = (components.queryItems ?? []) + [queryItem]
+            request.url = components.url
         }
     
         return request
     }
 
     public func prepare(request: URLRequest) throws -> URLRequest {
-        let authorizedRequest = self.authorize(request: request)
-        return authorizedRequest
+        return self.authorize(request: request)
     }
 }
