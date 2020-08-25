@@ -32,7 +32,7 @@ public struct DefaultLoggingMiddleware: LoggingMiddleware {
             return
         }
         
-        if #available(OSX 10.14, *) {
+        if #available(iOS 12.0, OSX 10.14, *) {
             os_log(type, log: log, "%@", logging)
         } else {
             debugPrint(logging)
@@ -45,7 +45,7 @@ public struct DefaultLoggingMiddleware: LoggingMiddleware {
             return
         }
         
-        if #available(OSX 10.14, *) {
+        if #available(iOS 12.0, OSX 10.14, *) {
             os_log(type, log: log, "%@", logging)
         } else {
             debugPrint(logging)
@@ -57,7 +57,7 @@ public struct DefaultLoggingMiddleware: LoggingMiddleware {
             return
         }
         
-        if #available(OSX 10.14, *) {
+        if #available(iOS 12.0, OSX 10.14, *) {
             os_log(type, log: log, "%@", logging)
         } else {
             debugPrint(logging)
