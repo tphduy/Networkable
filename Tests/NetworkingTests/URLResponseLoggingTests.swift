@@ -24,7 +24,7 @@ class URLResponseLoggingTests: XCTestCase {
         XCTAssertTrue(logging.contains(url.absoluteString))
     }
 
-    func testLoggingWhenBeingHTTPURLResponse() {
+    func testLoggingWhenBeingHTTPURLResponse() throws {
         let url = URL(string: "https://apple.com")!
         let statusCode = 200
         let sut = HTTPURLResponse(
@@ -33,7 +33,7 @@ class URLResponseLoggingTests: XCTestCase {
             httpVersion: nil,
             headerFields: ["foo": "bar"])!
         let logging = sut.logging()
-
+        
         XCTAssertFalse(logging.isEmpty)
         XCTAssertTrue(logging.contains("📩 Response: \(url.absoluteString)"))
         XCTAssertTrue(logging.contains("-H \(statusCode)"))

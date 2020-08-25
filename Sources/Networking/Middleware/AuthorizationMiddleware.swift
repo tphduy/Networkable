@@ -19,26 +19,18 @@ public protocol AuthorizationType {
     var place: AuthorizationPlace { get }
 }
 
-public extension AuthorizationType {
-    var place: AuthorizationPlace { .header }
-}
-
-public enum DefaultAuthorizationType: AuthorizationType, Equatable, Hashable {
-    case api(key: String, value: String)
-    case bearer(token: String)
-
-    public var key: String {
-        switch self {
-        case let .api(key, _): return key
-        case .bearer: return "Bearer "
-        }
-    }
-
-    public var value: String {
-        switch self {
-        case let .api(_, value): return value
-        case let .bearer(token): return token
-        }
+public struct DefaultAuthorizationType: AuthorizationType, Equatable, Hashable {
+    public let key: String
+    public let value: String
+    public let place: AuthorizationPlace
+    
+    public init(
+        key: String,
+        value: String,
+        place: AuthorizationPlace = .header) {
+        self.key = key
+        self.value = value
+        self.place = place
     }
 }
 

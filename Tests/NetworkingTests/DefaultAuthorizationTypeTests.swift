@@ -10,21 +10,29 @@ import XCTest
 
 final class DefaultAuthorizationTypeTests: XCTestCase {
     
-    func testAPIKeyAndValue() throws {
-        let key = "key", value = "value", place = AuthorizationPlace.header
-        let sut = DefaultAuthorizationType.api(key: key, value: value)
-
+    let key = "key"
+    let value = "value"
+    let place = AuthorizationPlace.header
+    
+    func testInitWithDefaulParameters() {
+        let sut = DefaultAuthorizationType(
+            key: key,
+            value: value)
+        
         XCTAssertEqual(sut.key, key)
         XCTAssertEqual(sut.value, value)
-        XCTAssertEqual(sut.place, place)
+        XCTAssertEqual(sut.place, .header)
     }
-
-    func testBearer() throws {
-        let token = "token", place = AuthorizationPlace.header
-        let sut = DefaultAuthorizationType.bearer(token: token)
-
-        XCTAssertEqual(sut.key, "Bearer ")
-        XCTAssertEqual(sut.value, token)
+    
+    func testInit() throws {
+        
+        let sut = DefaultAuthorizationType(
+            key: key,
+            value: value,
+            place: place)
+        
+        XCTAssertEqual(sut.key, key)
+        XCTAssertEqual(sut.value, value)
         XCTAssertEqual(sut.place, place)
     }
 }
