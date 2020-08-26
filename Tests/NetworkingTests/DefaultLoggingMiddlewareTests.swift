@@ -38,6 +38,27 @@ final class DefaultLoggingMiddlewareTests: XCTestCase {
         data = nil
         sut = nil
     }
+    
+    func testLogRequest() {
+        let log = sut.log(request: request)
+        let expected = request.logging()
+        XCTAssertEqual(log, expected)
+    }
+    
+    func testLogResponseWhenDataIsEmpty() {
+        data = Data()
+        let log = sut.log(response: response, data: data)
+        let expected = response.logging()
+        XCTAssertEqual(log, expected)
+    }
+    
+    func testLogResponseAndData() {
+        let rawData = #"{"lorem":"isplum""#
+        data = rawData.data(using: .utf8)
+        let log = sut.log(response: response, data: data)
+        let expected = response.logging() + "\n" + rawData
+        XCTAssertEqual(log, expected)
+    }
 
     func testWillSendRequest() throws {
         XCTAssertNoThrow(sut.willSend(request: request))

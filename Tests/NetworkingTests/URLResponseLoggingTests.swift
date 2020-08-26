@@ -7,7 +7,7 @@
 
 import XCTest
 
-class URLResponseLoggingTests: XCTestCase {
+final class URLResponseLoggingTests: XCTestCase {
     func testLogging() throws {
         let url = URL(string: "https://apple.com")!
         let sut = URLResponse(
@@ -42,4 +42,13 @@ class URLResponseLoggingTests: XCTestCase {
         XCTAssertFalse(logging.contains("-d"))
         XCTAssertTrue(logging.contains(url.absoluteString))
     }
+    
+    func testLoggingWhenURLIsNil() throws {
+        let sut = URLResponse()
+        XCTAssertTrue(sut.logging().isEmpty)
+    }
+}
+
+fileprivate class EmptyResponse: HTTPURLResponse {
+    override var url: URL? { nil }
 }

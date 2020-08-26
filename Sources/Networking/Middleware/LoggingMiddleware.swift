@@ -9,9 +9,23 @@ import Foundation
 import os.log
 
 public protocol LoggingMiddleware: Middleware {
-    func log(request: URLRequest)
-    func log(response: URLResponse)
-    func log(data: Data)
+    func log(request: URLRequest) -> String
+    func log(response: URLResponse, data: Data) -> String
+}
+
+extension LoggingMiddleware {
+    
+    public func log(request: URLRequest) -> String {
+        return request.logging()
+    }
+
+    public func log(response: URLResponse, data: Data) -> String {
+        var logging = response.logging()
+        if let data = String(data: data, encoding: .utf8), !data.isEmpty {
+            logging += "\n" + data
+        }
+        return logging
+    }
 }
 
 public struct DefaultLoggingMiddleware: LoggingMiddleware {
@@ -25,51 +39,24 @@ public struct DefaultLoggingMiddleware: LoggingMiddleware {
         self.type = type
         self.log = log
     }
-
-    public func log(request: URLRequest) {
-        let logging = request.logging()
-        guard !logging.isEmpty else {
-            return
-        }
-        
-        if #available(iOS 12.0, OSX 10.14, *) {
-            os_log(type, log: log, "%@", logging)
-        } else {
-            debugPrint(logging)
-        }
-    }
-
-    public func log(response: URLResponse) {
-        let logging = response.logging()
-        guard !logging.isEmpty else {
-            return
-        }
-        
-        if #available(iOS 12.0, OSX 10.14, *) {
-            os_log(type, log: log, "%@", logging)
-        } else {
-            debugPrint(logging)
-        }
-    }
-
-    public func log(data: Data) {
-        guard let logging = String(data: data, encoding: .utf8) else {
-            return
-        }
-        
-        if #available(iOS 12.0, OSX 10.14, *) {
-            os_log(type, log: log, "%@", logging)
-        } else {
-            debugPrint(logging)
-        }
-    }
-
+    
     public func willSend(request: URLRequest) {
-        log(request: request)
+        let message = log(request: request)
+        log(message: message)
     }
     
     public func didReceive(response: URLResponse, data: Data) throws {
-        log(response: response)
-        log(data: data)
+        let message = log(response: response, data: data)
+        log(message: message)
+    }
+    
+    // MARK: - Private
+    
+    private func log(message: String) {
+        if #available(iOS 12.0, OSX 10.14, *) {
+            os_log(type, log: log, "%@", message)
+        } else {
+            debugPrint(message)
+        }
     }
 }
