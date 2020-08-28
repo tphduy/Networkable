@@ -19,6 +19,6 @@ extension Middleware {
     }
 
     public func willSend(request: URLRequest) {}
-    
+
     public func didReceive(response: URLResponse, data: Data) throws {}
 }

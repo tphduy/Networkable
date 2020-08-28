@@ -9,11 +9,11 @@ import Foundation
 @testable import Networking
 
 final class SpyMiddleware: Middleware, Equatable {
-    
+
     static func == (lhs: SpyMiddleware, rhs: SpyMiddleware) -> Bool {
         lhs.uuid == rhs.uuid
     }
-    
+
     let uuid = UUID()
 
     var invokedPrepare = false

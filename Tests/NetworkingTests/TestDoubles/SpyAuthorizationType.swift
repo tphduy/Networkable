@@ -42,7 +42,7 @@ final class SpyAuthorizationType: AuthorizationType {
 }
 
 extension SpyAuthorizationType: Equatable {
-    
+
     static func == (lhs: SpyAuthorizationType, rhs: SpyAuthorizationType) -> Bool {
         lhs.key == rhs.key
             && lhs.value == rhs.value

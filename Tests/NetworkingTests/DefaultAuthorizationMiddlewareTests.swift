@@ -5,8 +5,8 @@
 //  Created by Duy Tran on 7/13/20.
 //
 
-import XCTest
 @testable import Networking
+import XCTest
 
 final class DefaultAuthorizationMiddlewareTests: XCTestCase {
     var url: URL!
@@ -41,14 +41,14 @@ final class DefaultAuthorizationMiddlewareTests: XCTestCase {
     func testInit() throws {
         XCTAssertEqual(sut.authorization as? SpyAuthorizationType, authorization)
     }
-    
+
     func testPrepareRequestWhenKeyIsEmptyAndPlaceIsHeader() throws {
         authorization.stubbedKey = ""
         authorization.stubbedPlace = .header
         let preparedRequest = try sut.prepare(request: request)
         XCTAssertNil(preparedRequest.allHTTPHeaderFields)
     }
-    
+
     func testPrepareRequestWhenKeyIsEmptyAndPlaceIsQuery() throws {
         authorization.stubbedKey = ""
         authorization.stubbedPlace = .query
@@ -56,14 +56,14 @@ final class DefaultAuthorizationMiddlewareTests: XCTestCase {
         let preparedRequest = try sut.prepare(request: request)
         XCTAssertEqual(originalQuery, preparedRequest.url?.query)
     }
-    
+
     func testPrepareRequestWhenValueIsEmptyAndPlaceIsHeader() throws {
         authorization.stubbedValue = ""
         authorization.stubbedPlace = .header
         let preparedRequest = try sut.prepare(request: request)
         XCTAssertNil(preparedRequest.allHTTPHeaderFields)
     }
-    
+
     func testPrepareRequestWhenValueIsEmptyAndPlaceIsQuery() throws {
         authorization.stubbedValue = ""
         authorization.stubbedPlace = .query
@@ -79,7 +79,7 @@ final class DefaultAuthorizationMiddlewareTests: XCTestCase {
             header.key == authorization.key && header.value == authorization.value
         }))
     }
-    
+
     func testPrepareRequestWhenPlaceIsQuery() throws {
         authorization.stubbedPlace = .query
         let preparedRequest = try sut.prepare(request: request)

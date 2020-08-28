@@ -5,8 +5,8 @@
 //  Created by Duy Tran on 8/25/20.
 //
 
-import XCTest
 @testable import Networking
+import XCTest
 
 private final class EmptyEndpoint: Endpoint {
     var path: String { "" }
@@ -14,7 +14,7 @@ private final class EmptyEndpoint: Endpoint {
 }
 
 final class EndpointTests: XCTestCase {
-    
+
     private var sut: EmptyEndpoint!
 
     override func setUpWithError() throws {
@@ -28,7 +28,7 @@ final class EndpointTests: XCTestCase {
     func testHeader() throws {
         XCTAssertNil(sut.headers)
     }
-    
+
     func testBody() throws {
         XCTAssertNoThrow(try sut.body())
         XCTAssertNil(try sut.body())

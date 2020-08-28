@@ -23,7 +23,7 @@ public struct DefaultAuthorizationType: AuthorizationType, Equatable, Hashable {
     public let key: String
     public let value: String
     public let place: AuthorizationPlace
-    
+
     public init(
         key: String,
         value: String,
@@ -50,9 +50,9 @@ public struct DefaultAuthorizationMiddleware: AuthorizationMiddleware {
 
     public func authorize(request: URLRequest) -> URLRequest {
         guard !authorization.key.isEmpty, !authorization.value.isEmpty else { return request }
-        
+
         var request = request
-        
+
         switch authorization.place {
         case .header:
             request.addValue(authorization.value, forHTTPHeaderField: authorization.key)
@@ -65,7 +65,7 @@ public struct DefaultAuthorizationMiddleware: AuthorizationMiddleware {
             components.queryItems = (components.queryItems ?? []) + [queryItem]
             request.url = components.url
         }
-    
+
         return request
     }
 

@@ -14,7 +14,7 @@ public protocol LoggingMiddleware: Middleware {
 }
 
 extension LoggingMiddleware {
-    
+
     public func log(request: URLRequest) -> String {
         return request.logging()
     }
@@ -39,19 +39,19 @@ public struct DefaultLoggingMiddleware: LoggingMiddleware {
         self.type = type
         self.log = log
     }
-    
+
     public func willSend(request: URLRequest) {
         let message = log(request: request)
         log(message: message)
     }
-    
+
     public func didReceive(response: URLResponse, data: Data) throws {
         let message = log(response: response, data: data)
         log(message: message)
     }
-    
+
     // MARK: - Private
-    
+
     private func log(message: String) {
         if #available(iOS 12.0, OSX 10.14, *) {
             os_log(type, log: log, "%@", message)

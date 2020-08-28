@@ -5,8 +5,8 @@
 //  Created by Duy Tran on 7/15/20.
 //
 
-import XCTest
 @testable import Networking
+import XCTest
 
 final class URLRequestLoggingTests: XCTestCase {
     var url: URL!

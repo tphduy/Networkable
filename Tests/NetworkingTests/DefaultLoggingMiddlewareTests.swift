@@ -5,9 +5,9 @@
 //  Created by Duy Tran on 7/15/20.
 //
 
-import XCTest
-import os.log
 @testable import Networking
+import os.log
+import XCTest
 
 @available(iOS 12.0, OSX 10.14, *)
 final class DefaultLoggingMiddlewareTests: XCTestCase {
@@ -38,20 +38,20 @@ final class DefaultLoggingMiddlewareTests: XCTestCase {
         data = nil
         sut = nil
     }
-    
+
     func testLogRequest() {
         let log = sut.log(request: request)
         let expected = request.logging()
         XCTAssertEqual(log, expected)
     }
-    
+
     func testLogResponseWhenDataIsEmpty() {
         data = Data()
         let log = sut.log(response: response, data: data)
         let expected = response.logging()
         XCTAssertEqual(log, expected)
     }
-    
+
     func testLogResponseAndData() {
         let rawData = #"{"lorem":"isplum""#
         data = rawData.data(using: .utf8)

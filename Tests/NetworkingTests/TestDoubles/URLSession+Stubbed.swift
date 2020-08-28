@@ -14,18 +14,15 @@ extension URLSession {
         return URLSession(configuration: configuration)
     }
 
-    func set(stubbedResponse response: URLResponse?,
-             for request: URLRequest) {
+    func set(stubbedResponse response: URLResponse?, for request: URLRequest) {
         StubbedURLProtocol.stubbedResponse[request] = response
     }
 
-    func set(stubbedResponseError error: Error?,
-             for request: URLRequest) {
+    func set(stubbedResponseError error: Error?, for request: URLRequest) {
         StubbedURLProtocol.stubbedResponseError[request] = error
     }
 
-    func set(stubbedData data: Data?,
-             for request: URLRequest) {
+    func set(stubbedData data: Data?, for request: URLRequest) {
         StubbedURLProtocol.stubbedData[request] = data
     }
 

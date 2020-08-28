@@ -33,7 +33,7 @@ final class URLResponseLoggingTests: XCTestCase {
             httpVersion: nil,
             headerFields: ["foo": "bar"])!
         let logging = sut.logging()
-        
+
         XCTAssertFalse(logging.isEmpty)
         XCTAssertTrue(logging.contains("📩 Response: \(url.absoluteString)"))
         XCTAssertTrue(logging.contains("-H \(statusCode)"))
@@ -42,13 +42,13 @@ final class URLResponseLoggingTests: XCTestCase {
         XCTAssertFalse(logging.contains("-d"))
         XCTAssertTrue(logging.contains(url.absoluteString))
     }
-    
+
     func testLoggingWhenURLIsNil() throws {
         let sut = URLResponse()
         XCTAssertTrue(sut.logging().isEmpty)
     }
 }
 
-fileprivate class EmptyResponse: HTTPURLResponse {
+private class EmptyResponse: HTTPURLResponse {
     override var url: URL? { nil }
 }

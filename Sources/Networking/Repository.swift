@@ -6,21 +6,22 @@
 //
 
 #if canImport(Combine)
-import Foundation
 import Combine
+#endif
+import Foundation
 
 public protocol Repository {
     var requestFactory: URLRequestFactory { get }
     var middlewares: [Middleware] { get }
     var session: URLSession { get }
-    
+
     @available(iOS 13.0, OSX 10.15, *)
     func call<T: Decodable>(
         to endpoint: Endpoint,
         executionQueue: DispatchQueue,
         resulttQueue: DispatchQueue,
         decoder: JSONDecoder) -> AnyPublisher<T, Error>
-    
+
     func call<T: Decodable>(
         to endpoint: Endpoint,
         resulttQueue: DispatchQueue,
@@ -36,7 +37,7 @@ extension Repository {
         }
         return request
     }
-    
+
     @available(iOS 13.0, OSX 10.15, *)
     public func call<T: Decodable>(
         to endpoint: Endpoint,
@@ -47,7 +48,7 @@ extension Repository {
             let middlewares = self.middlewares
             let request = try requestFactory.make(endpoint: endpoint)
             let preparedRequest = try prepare(request: request, middlewares: middlewares)
-            
+
             return session
                 .dataTaskPublisher(for: preparedRequest)
                 .handleEvents(receiveSubscription: { (_) in
@@ -70,48 +71,48 @@ extension Repository {
                 .eraseToAnyPublisher()
         }
     }
-    
+
     public func call<T: Decodable>(
-           to endpoint: Endpoint,
-           resulttQueue: DispatchQueue = .main,
-           decoder: JSONDecoder = JSONDecoder(),
-           promise: @escaping (Result<T, Error>) -> Void) {
+        to endpoint: Endpoint,
+        resulttQueue: DispatchQueue = .main,
+        decoder: JSONDecoder = JSONDecoder(),
+        promise: @escaping (Result<T, Error>) -> Void) {
         let completion = { (result: Result<T, Error>) in
             resulttQueue.async {
                 promise(result)
             }
         }
-        
+
         do {
             let middlewares = self.middlewares
             let request = try requestFactory.make(endpoint: endpoint)
             let preparedRequest = try prepare(request: request, middlewares: middlewares)
-            
+
             let task = session.dataTask(with: preparedRequest) { (data: Data?, response: URLResponse?, error: Error?) -> Void in
                 if let error = error {
                     return completion(.failure(error))
                 }
-                
+
                 guard let response = response, let data = data else {
                     return completion(.failure(NetworkingError.empty))
                 }
-                
+
                 do {
                     for middleware in middlewares {
                         try middleware.didReceive(response: response, data: data)
                     }
-                    
+
                     let result = try decoder.decode(T.self, from: data)
                     completion(.success(result))
                 } catch {
                     completion(.failure(error))
                 }
             }
-            
+
             for middleware in middlewares {
                 middleware.willSend(request: preparedRequest)
             }
-            
+
             task.resume()
         } catch {
             completion(.failure(error))
@@ -124,7 +125,7 @@ public struct DefaultRepository: Repository {
     public let requestFactory: URLRequestFactory
     public let middlewares: [Middleware]
     public let session: URLSession
-    
+
     @available(iOS 12.0, *)
     public init(
         requestFactory: URLRequestFactory,
@@ -135,4 +136,3 @@ public struct DefaultRepository: Repository {
         self.session = session
     }
 }
-#endif

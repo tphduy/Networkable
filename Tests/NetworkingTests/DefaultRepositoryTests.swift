@@ -6,8 +6,8 @@
 //
 
 import Combine
-import XCTest
 @testable import Networking
+import XCTest
 
 @available(iOS 13.0, OSX 10.15, *)
 final class DefaultRepositoryTests: XCTestCase {
@@ -80,12 +80,12 @@ final class DefaultRepositoryTests: XCTestCase {
 
     func testCallThreading() throws {
         let expectation = self.expectation(description: "expected running on main thread")
-        
+
         sut.call(to: endpoint, resulttQueue: .main)
             .sink(receiveCompletion: { (_) in
                 XCTAssertTrue(Thread.isMainThread)
                 expectation.fulfill()
-            }, receiveValue: { (data: String) in
+            }, receiveValue: { (_: String) in
                 XCTAssertTrue(Thread.isMainThread)
                 expectation.fulfill()
             })
@@ -93,26 +93,26 @@ final class DefaultRepositoryTests: XCTestCase {
 
         wait(for: [expectation], timeout: 0.5)
     }
-    
+
     func testCallWithPromiseThreading() {
         let expectation = self.expectation(description: "expected running on main thread")
-        
-        sut.call(to: endpoint, resulttQueue: .main) { (result: Result<Dictionary<String, String>, Error>) in
+
+        sut.call(to: endpoint, resulttQueue: .main) { (_: Result<[String: String], Error>) in
             XCTAssertTrue(Thread.isMainThread)
             expectation.fulfill()
         }
-        
+
         wait(for: [expectation], timeout: 0.5)
     }
 
     // MARK: - Request Factory
-    
+
     func testCallWhenRequestFactoryThrowError() throws {
         let expected = DummyError()
         requestFactory.stubbedMakeError = expected
         call(throwingError: expected)
     }
-    
+
     func testCallWithPromiseWhenRequestFactoryThrowError() throws {
         let expected = DummyError()
         requestFactory.stubbedMakeError = expected
@@ -120,7 +120,7 @@ final class DefaultRepositoryTests: XCTestCase {
     }
 
     // MARK: - Middleware
-    
+
     func testCallInvokeMiddleware() throws {
         let prepareRequestExpectation = self.expectation(description: "expected invoking middleware for preparing request")
         let willSendRequestExpectation = self.expectation(description: "expected invoking middleware for will-send-request event")
@@ -129,7 +129,7 @@ final class DefaultRepositoryTests: XCTestCase {
 
         sut.call(to: endpoint)
             .sink(receiveCompletion: { (_: Subscribers.Completion<Error>) in
-            }, receiveValue: { (_: Dictionary<String, String>) in
+            }, receiveValue: { (_: [String: String]) in
                 XCTAssertTrue(self.middleware.invokedPrepare)
                 XCTAssertTrue(self.middleware.invokedWillSend)
                 XCTAssertTrue(self.middleware.invokedDidReceive)
@@ -161,17 +161,17 @@ final class DefaultRepositoryTests: XCTestCase {
         middleware.stubbedDidReceiveError = expected
         call(throwingError: expected)
     }
-    
+
     func testCallWithPromiseInvokeMiddleware() throws {
         let prepareRequestExpectation = self.expectation(description: "expected invoking middleware for preparing request")
         let willSendRequestExpectation = self.expectation(description: "expected invoking middleware for will-send-request event")
         let didReceiveResponseExpectation = self.expectation(description: "expected invoking middeware for did-receive-response event")
-        
-        sut.call(to: endpoint) { (result: Result<Dictionary<String, String>, Error>) in
+
+        sut.call(to: endpoint) { (_: Result<[String: String], Error>) in
             XCTAssertTrue(self.middleware.invokedPrepare)
             XCTAssertTrue(self.middleware.invokedWillSend)
             XCTAssertTrue(self.middleware.invokedDidReceive)
-            
+
             prepareRequestExpectation.fulfill()
             willSendRequestExpectation.fulfill()
             didReceiveResponseExpectation.fulfill()
@@ -181,30 +181,30 @@ final class DefaultRepositoryTests: XCTestCase {
             for: [
                 prepareRequestExpectation,
                 willSendRequestExpectation,
-                didReceiveResponseExpectation,
+                didReceiveResponseExpectation
             ],
             timeout: 0.5)
     }
-    
+
     func testCallWithPromiseFailedWhenMiddlewareThrowErrorInPrepareRequest() throws {
         let expected = DummyError()
         middleware.stubbedPrepareError = expected
         callWithPromise(throwingError: expected)
     }
-    
+
     func testCallWithPromiseFailedWhenMiddlewareThrowErrorInDidReceiveResponseData() throws {
         let expected = DummyError()
         middleware.stubbedDidReceiveError = expected
         callWithPromise(throwingError: expected)
     }
-    
+
     // MARK: - Response
-    
+
     func testCallThrowErrorWhenRecievingError() {
         let expected = DummyError()
         let request = requestFactory.stubbedMakeResult!
         session.set(stubbedResponseError: expected, for: request)
-        
+
         let expectation = self.expectation(description: "expected throwing error: \(expected)")
         sut.call(to: endpoint)
             .sink(receiveCompletion: { (completion: Subscribers.Completion<Error>) in
@@ -214,21 +214,21 @@ final class DefaultRepositoryTests: XCTestCase {
                 case .finished:
                     XCTFail(expectation.description)
                 }
-            }, receiveValue: { (_: Dictionary<String, String>) in
+            }, receiveValue: { (_: [String: String]) in
                 XCTFail(expectation.description)
             })
             .store(in: &cancellable)
-        
+
         wait(for: [expectation], timeout: 0.5)
     }
-    
+
     func testCallWithPromiseThrowErrorWhenRecievingError() {
         let error = DummyError()
         let request = requestFactory.stubbedMakeResult!
         session.set(stubbedResponseError: error, for: request)
         callWithPromise(throwingError: error)
     }
-    
+
     func testCallWithPromiseThrowEmptyWhenResponseIsNil() {
         let error = NetworkingError.empty
         let request = requestFactory.stubbedMakeResult!
@@ -239,7 +239,7 @@ final class DefaultRepositoryTests: XCTestCase {
 
 @available(iOS 13.0, OSX 10.15, *)
 extension DefaultRepositoryTests {
-    
+
     private func call<E: Error & Equatable>(throwingError expected: E) {
         let expectation = self.expectation(description: "expected throwing \(expected)")
 
@@ -258,20 +258,20 @@ extension DefaultRepositoryTests {
 
         wait(for: [expectation], timeout: 0.5)
     }
-    
+
     private func callWithPromise<E: Error & Equatable>(throwingError expected: E) {
         let expectation = self.expectation(description: "expected throwing \(expected)")
-        
-        sut.call(to: endpoint) { (result: Result<Dictionary<String, String>, Error>) in
-                switch result {
-                case let .failure(error):
-                    XCTAssertEqual(error as? E, expected)
-                    expectation.fulfill()
-                case .success:
-                    XCTFail(expectation.expectationDescription)
-                }
+
+        sut.call(to: endpoint) { (result: Result<[String: String], Error>) in
+            switch result {
+            case let .failure(error):
+                XCTAssertEqual(error as? E, expected)
+                expectation.fulfill()
+            case .success:
+                XCTFail(expectation.expectationDescription)
             }
-        
+        }
+
         wait(for: [expectation], timeout: 0.5)
     }
 }
