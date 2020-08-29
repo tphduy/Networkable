@@ -14,7 +14,6 @@ public protocol LoggingMiddleware: Middleware {
 }
 
 extension LoggingMiddleware {
-
     public func log(request: URLRequest) -> String {
         return request.logging()
     }
@@ -33,9 +32,7 @@ public struct DefaultLoggingMiddleware: LoggingMiddleware {
     public let log: OSLog
 
     @available(OSX 10.12, *)
-    public init(
-        type: OSLogType = .default,
-        log: OSLog = .default) {
+    public init(type: OSLogType = .default, log: OSLog = .default) {
         self.type = type
         self.log = log
     }

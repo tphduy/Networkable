@@ -271,7 +271,7 @@ extension DefaultRepositoryTests {
                 XCTFail(expectation.expectationDescription)
             }
         }
-
+        
         wait(for: [expectation], timeout: 0.5)
     }
 }

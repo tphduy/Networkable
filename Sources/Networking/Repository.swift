@@ -67,8 +67,7 @@ extension Repository {
             .receive(on: resulttQueue)
             .eraseToAnyPublisher()
         } catch {
-            return Fail(error: error)
-                .eraseToAnyPublisher()
+            return Fail(error: error).eraseToAnyPublisher()
         }
     }
 

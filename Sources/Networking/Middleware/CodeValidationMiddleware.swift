@@ -12,23 +12,25 @@ protocol CodeValidationMiddleware: Middleware {
     func invalidate(response: URLResponse) throws
 }
 
-public struct DefaultCodeValidationMiddleware: CodeValidationMiddleware {
-    public let acceptableCodes: HTTPCodes
-
-    public init(acceptableCodes: HTTPCodes = .success) {
-        self.acceptableCodes = acceptableCodes
-    }
-
+extension CodeValidationMiddleware {
     public func invalidate(response: URLResponse) throws {
         guard let code = (response as? HTTPURLResponse)?.statusCode else {
             throw NetworkingError.unexpectedResponse(response)
         }
-
+        
         guard acceptableCodes.contains(code) else {
             throw NetworkingError.unacceptableCode(code, response)
         }
     }
+}
 
+public struct DefaultCodeValidationMiddleware: CodeValidationMiddleware {
+    public let acceptableCodes: HTTPCodes
+    
+    public init(acceptableCodes: HTTPCodes = .success) {
+        self.acceptableCodes = acceptableCodes
+    }
+    
     public func didReceive(response: URLResponse) throws {
         try invalidate(response: response)
     }
