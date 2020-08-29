@@ -15,12 +15,14 @@ public protocol Repository {
     var middlewares: [Middleware] { get }
     var session: URLSession { get }
 
+    #if canImport(Combine)
     @available(iOS 13.0, OSX 10.15, *)
     func call<T: Decodable>(
         to endpoint: Endpoint,
         executionQueue: DispatchQueue,
         resulttQueue: DispatchQueue,
         decoder: JSONDecoder) -> AnyPublisher<T, Error>
+    #endif
 
     func call<T: Decodable>(
         to endpoint: Endpoint,
@@ -38,6 +40,7 @@ extension Repository {
         return request
     }
 
+    #if canImport(Combine)
     @available(iOS 13.0, OSX 10.15, *)
     public func call<T: Decodable>(
         to endpoint: Endpoint,
@@ -70,6 +73,7 @@ extension Repository {
             return Fail(error: error).eraseToAnyPublisher()
         }
     }
+    #endif
 
     public func call<T: Decodable>(
         to endpoint: Endpoint,
