@@ -80,8 +80,8 @@ final class DefaultRepositoryTests: XCTestCase {
 
     func testCallThreading() throws {
         let expectation = self.expectation(description: "expected running on main thread")
-
-        sut.call(to: endpoint, resulttQueue: .main)
+        
+        sut.call(to: endpoint, resultQueue: .main)
             .sink(receiveCompletion: { (_) in
                 XCTAssertTrue(Thread.isMainThread)
                 expectation.fulfill()
@@ -90,14 +90,14 @@ final class DefaultRepositoryTests: XCTestCase {
                 expectation.fulfill()
             })
             .store(in: &cancellable)
-
+        
         wait(for: [expectation], timeout: 0.5)
     }
 
     func testCallWithPromiseThreading() {
         let expectation = self.expectation(description: "expected running on main thread")
 
-        sut.call(to: endpoint, resulttQueue: .main) { (_: Result<[String: String], Error>) in
+        sut.call(to: endpoint, resultQueue: .main) { (_: Result<[String: String], Error>) in
             XCTAssertTrue(Thread.isMainThread)
             expectation.fulfill()
         }

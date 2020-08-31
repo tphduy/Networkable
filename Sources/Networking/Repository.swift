@@ -20,13 +20,14 @@ public protocol Repository {
     func call<T: Decodable>(
         to endpoint: Endpoint,
         executionQueue: DispatchQueue,
-        resulttQueue: DispatchQueue,
+        resultQueue: DispatchQueue,
         decoder: JSONDecoder) -> AnyPublisher<T, Error>
     #endif
 
     func call<T: Decodable>(
         to endpoint: Endpoint,
-        resulttQueue: DispatchQueue,
+        executionQueue: DispatchQueue,
+        resultQueue: DispatchQueue,
         decoder: JSONDecoder,
         promise: @escaping (Result<T, Error>) -> Void)
 }
@@ -45,7 +46,7 @@ extension Repository {
     public func call<T: Decodable>(
         to endpoint: Endpoint,
         executionQueue: DispatchQueue = .global(),
-        resulttQueue: DispatchQueue = .main,
+        resultQueue: DispatchQueue = .main,
         decoder: JSONDecoder = JSONDecoder()) -> AnyPublisher<T, Error> {
         do {
             let middlewares = self.middlewares
@@ -67,7 +68,7 @@ extension Repository {
                     return data
             }
             .decode(type: T.self, decoder: decoder)
-            .receive(on: resulttQueue)
+            .receive(on: resultQueue)
             .eraseToAnyPublisher()
         } catch {
             return Fail(error: error).eraseToAnyPublisher()
@@ -77,11 +78,12 @@ extension Repository {
 
     public func call<T: Decodable>(
         to endpoint: Endpoint,
-        resulttQueue: DispatchQueue = .main,
+        executionQueue: DispatchQueue = .global(),
+        resultQueue: DispatchQueue = .main,
         decoder: JSONDecoder = JSONDecoder(),
         promise: @escaping (Result<T, Error>) -> Void) {
         let completion = { (result: Result<T, Error>) in
-            resulttQueue.async {
+            resultQueue.async {
                 promise(result)
             }
         }
@@ -90,7 +92,7 @@ extension Repository {
             let middlewares = self.middlewares
             let request = try requestFactory.make(endpoint: endpoint)
             let preparedRequest = try prepare(request: request, middlewares: middlewares)
-
+            
             let task = session.dataTask(with: preparedRequest) { (data: Data?, response: URLResponse?, error: Error?) -> Void in
                 if let error = error {
                     return completion(.failure(error))
@@ -116,7 +118,9 @@ extension Repository {
                 middleware.willSend(request: preparedRequest)
             }
 
-            task.resume()
+            executionQueue.async {
+                task.resume()
+            }
         } catch {
             completion(.failure(error))
         }
