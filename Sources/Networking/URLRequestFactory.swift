@@ -8,15 +8,20 @@
 import Foundation
 
 public protocol URLRequestFactory {
-    var host: String { get }
+    var host: String { get set }
+    var cachePolicy: URLRequest.CachePolicy { get set }
     func make(endpoint: Endpoint) throws -> URLRequest
 }
 
 public struct DefaultURLRequestFactory: URLRequestFactory {
-    public let host: String
+    public var host: String
+    public var cachePolicy: URLRequest.CachePolicy
 
-    public init(host: String) {
+    public init(
+        host: String,
+        cachePolicy: URLRequest.CachePolicy = .useProtocolCachePolicy) {
         self.host = host
+        self.cachePolicy = cachePolicy
     }
 
     public func make(endpoint: Endpoint) throws -> URLRequest {
