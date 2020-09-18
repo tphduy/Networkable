@@ -72,4 +72,8 @@ public struct DefaultAuthorizationMiddleware: AuthorizationMiddleware {
     public func prepare(request: URLRequest) throws -> URLRequest {
         return self.authorize(request: request)
     }
+    
+    public func willSend(request: URLRequest) {}
+    
+    public func didReceive(response: URLResponse, data: Data) throws {}
 }

@@ -31,6 +31,12 @@ public struct DefaultCodeValidationMiddleware: CodeValidationMiddleware {
         self.acceptableCodes = acceptableCodes
     }
     
+    public func prepare(request: URLRequest) throws -> URLRequest {
+        return request
+    }
+    
+    public func willSend(request: URLRequest) {}
+    
     public func didReceive(response: URLResponse, data: Data) throws {
         try invalidate(response: response)
     }

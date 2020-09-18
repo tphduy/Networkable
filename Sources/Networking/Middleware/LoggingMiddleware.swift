@@ -36,6 +36,10 @@ public struct DefaultLoggingMiddleware: LoggingMiddleware {
         self.type = type
         self.log = log
     }
+    
+    public func prepare(request: URLRequest) throws -> URLRequest {
+        return request
+    }
 
     public func willSend(request: URLRequest) {
         let message = log(request: request)
