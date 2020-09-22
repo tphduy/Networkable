@@ -8,7 +8,14 @@
 @testable import Networking
 import XCTest
 
-private final class EmptyMiddleware: Middleware {}
+private final class EmptyMiddleware: Middleware {
+    
+    func prepare(request: URLRequest) throws -> URLRequest { request }
+    
+    func willSend(request: URLRequest) {}
+    
+    func didReceive(response: URLResponse, data: Data) throws {}
+}
 
 final class MiddlewareTests: XCTestCase {
     var url: URL!

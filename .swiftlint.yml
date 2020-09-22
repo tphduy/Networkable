@@ -7,5 +7,10 @@ opt_in_rules:
     
 disabled_rules:
     - trailing_whitespace
+    
+included:
+  - Sources
+excluded:
+  - Tests
 
 line_length: 150

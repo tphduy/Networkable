@@ -9,15 +9,6 @@ import Foundation
 @testable import Networking
 
 final class SpyURLRequestFactory: URLRequestFactory {
-    var invokedRawURLGetter = false
-    var invokedRawURLGetterCount = 0
-    var stubbedRawURL: String! = ""
-
-    var host: String {
-        invokedRawURLGetter = true
-        invokedRawURLGetterCount += 1
-        return stubbedRawURL
-    }
 
     var invokedMake = false
     var invokedMakeCount = 0
@@ -35,5 +26,26 @@ final class SpyURLRequestFactory: URLRequestFactory {
             throw error
         }
         return stubbedMakeResult
+    }
+
+    var invokedMakeEndpoint = false
+    var invokedMakeEndpointCount = 0
+    var invokedMakeEndpointParameters: (endpoint: Endpoint, cachePolicy: URLRequest.CachePolicy, timeoutInterval: TimeInterval)?
+    var invokedMakeEndpointParametersList = [(endpoint: Endpoint, cachePolicy: URLRequest.CachePolicy, timeoutInterval: TimeInterval)]()
+    var stubbedMakeEndpointError: Error?
+    var stubbedMakeEndpointResult: URLRequest!
+
+    func make(
+        endpoint: Endpoint,
+        cachePolicy: URLRequest.CachePolicy,
+        timeoutInterval: TimeInterval) throws -> URLRequest {
+        invokedMakeEndpoint = true
+        invokedMakeEndpointCount += 1
+        invokedMakeEndpointParameters = (endpoint, cachePolicy, timeoutInterval)
+        invokedMakeEndpointParametersList.append((endpoint, cachePolicy, timeoutInterval))
+        if let error = stubbedMakeEndpointError {
+            throw error
+        }
+        return stubbedMakeEndpointResult
     }
 }

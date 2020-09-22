@@ -43,7 +43,7 @@ final class DefaultCodeValidationMiddlewareTests: XCTestCase {
         let expected = NetworkingError.unexpectedResponse(response)
         let expectedMessage = "expected throwing \(expected)"
 
-        XCTAssertThrowsError(try sut.didReceive(response: response), expectedMessage) { (error: Error) in
+        XCTAssertThrowsError(try sut.didReceive(response: response, data: Data()), expectedMessage) { (error: Error) in
             XCTAssertEqual(error as! NetworkingError, expected)
         }
     }
@@ -58,12 +58,12 @@ final class DefaultCodeValidationMiddlewareTests: XCTestCase {
         let expected = NetworkingError.unacceptableCode(code, response)
         let expectedMessage = "expected throwing \(expected)"
 
-        XCTAssertThrowsError(try sut.didReceive(response: response), expectedMessage) { (error: Error) in
+        XCTAssertThrowsError(try sut.didReceive(response: response, data: Data()), expectedMessage) { (error: Error) in
             XCTAssertEqual(error as! NetworkingError, expected)
         }
     }
 
     func testDidReceiveResponse() throws {
-        XCTAssertNoThrow(try sut.didReceive(response: response))
+        XCTAssertNoThrow(try sut.didReceive(response: response, data: Data()))
     }
 }
