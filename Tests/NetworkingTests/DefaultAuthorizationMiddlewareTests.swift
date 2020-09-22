@@ -26,7 +26,7 @@ final class DefaultAuthorizationMiddlewareTests: XCTestCase {
         authorization.stubbedValue = "value"
         authorization.stubbedPlace = .header
 
-        sut = DefaultAuthorizationMiddleware(authorization: authorization)
+        sut = DefaultAuthorizationMiddleware(authorization: { self.authorization })
     }
 
     override func tearDownWithError() throws {
@@ -39,7 +39,7 @@ final class DefaultAuthorizationMiddlewareTests: XCTestCase {
     }
 
     func testInit() throws {
-        XCTAssertEqual(sut.authorization as? SpyAuthorizationType, authorization)
+        XCTAssertEqual(sut.authorization() as? SpyAuthorizationType, authorization)
     }
 
     func testPrepareRequestWhenKeyIsEmptyAndPlaceIsHeader() throws {

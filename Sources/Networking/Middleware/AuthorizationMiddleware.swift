@@ -10,16 +10,19 @@ import Foundation
 // MARK: - AuthorizationType
 
 public enum AuthorizationPlace: Equatable, Hashable {
+    
     case header, query
 }
 
 public protocol AuthorizationType {
+    
     var key: String { get }
     var value: String { get }
     var place: AuthorizationPlace { get }
 }
 
 public struct DefaultAuthorizationType: AuthorizationType, Equatable, Hashable {
+    
     public let key: String
     public let value: String
     public let place: AuthorizationPlace
@@ -37,18 +40,20 @@ public struct DefaultAuthorizationType: AuthorizationType, Equatable, Hashable {
 // MARK: - AuthorizationMiddleware
 
 public protocol AuthorizationMiddleware: Middleware {
-    var authorization: AuthorizationType { get }
+    
     func authorize(request: URLRequest) -> URLRequest
 }
 
 public struct DefaultAuthorizationMiddleware: AuthorizationMiddleware {
-    public let authorization: AuthorizationType
+    
+    public let authorization: () -> AuthorizationType
 
-    public init(authorization: AuthorizationType) {
+    public init(authorization: @escaping () -> AuthorizationType) {
         self.authorization = authorization
     }
 
     public func authorize(request: URLRequest) -> URLRequest {
+        let authorization = self.authorization()
         guard !authorization.key.isEmpty, !authorization.value.isEmpty else { return request }
 
         var request = request
