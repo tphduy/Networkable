@@ -8,27 +8,34 @@
 import Foundation
 
 public protocol URLRequestFactory {
-    var host: String { get set }
-    var cachePolicy: URLRequest.CachePolicy { get set }
-    var timeoutInterval: TimeInterval { get set }
+    
     func make(endpoint: Endpoint) throws -> URLRequest
+    
+    func make(
+        endpoint: Endpoint,
+        cachePolicy: URLRequest.CachePolicy,
+        timeoutInterval: TimeInterval) throws -> URLRequest
 }
 
 public struct DefaultURLRequestFactory: URLRequestFactory {
-    public var host: String
-    public var cachePolicy: URLRequest.CachePolicy
-    public var timeoutInterval: TimeInterval
     
-    public init(
-        host: String,
-        cachePolicy: URLRequest.CachePolicy = .useProtocolCachePolicy,
-        timeoutInterval: TimeInterval = 60) {
+    public var host: String
+    
+    public init(host: String) {
         self.host = host
-        self.cachePolicy = cachePolicy
-        self.timeoutInterval = timeoutInterval
     }
 
     public func make(endpoint: Endpoint) throws -> URLRequest {
+        try self.make(
+            endpoint: endpoint,
+            cachePolicy: .useProtocolCachePolicy,
+            timeoutInterval: 60)
+    }
+    
+    public func make(
+        endpoint: Endpoint,
+        cachePolicy: URLRequest.CachePolicy = .useProtocolCachePolicy,
+        timeoutInterval: TimeInterval = 60) throws -> URLRequest {
         guard var url = URL(string: host) else {
             throw NetworkingError.invalidURL(host)
         }
