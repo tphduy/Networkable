@@ -26,7 +26,6 @@ public protocol Repository {
 
     func call<T: Decodable>(
         to endpoint: Endpoint,
-        executionQueue: DispatchQueue,
         resultQueue: DispatchQueue,
         decoder: JSONDecoder,
         promise: @escaping (Result<T, Error>) -> Void)
@@ -78,7 +77,6 @@ extension Repository {
 
     public func call<T: Decodable>(
         to endpoint: Endpoint,
-        executionQueue: DispatchQueue = .global(),
         resultQueue: DispatchQueue = .main,
         decoder: JSONDecoder = JSONDecoder(),
         promise: @escaping (Result<T, Error>) -> Void) {
@@ -117,10 +115,8 @@ extension Repository {
             for middleware in middlewares {
                 middleware.willSend(request: preparedRequest)
             }
-
-            executionQueue.async {
-                task.resume()
-            }
+            
+            task.resume()
         } catch {
             completion(.failure(error))
         }
