@@ -24,11 +24,12 @@ public protocol Repository {
         decoder: JSONDecoder) -> AnyPublisher<T, Error>
     #endif
 
+    @discardableResult
     func call<T: Decodable>(
         to endpoint: Endpoint,
         resultQueue: DispatchQueue,
         decoder: JSONDecoder,
-        promise: @escaping (Result<T, Error>) -> Void)
+        promise: @escaping (Result<T, Error>) -> Void) -> URLSessionDataTask?
 }
 
 extension Repository {
@@ -75,11 +76,12 @@ extension Repository {
     }
     #endif
 
+    @discardableResult
     public func call<T: Decodable>(
         to endpoint: Endpoint,
         resultQueue: DispatchQueue = .main,
         decoder: JSONDecoder = JSONDecoder(),
-        promise: @escaping (Result<T, Error>) -> Void) {
+        promise: @escaping (Result<T, Error>) -> Void) -> URLSessionDataTask? {
         let completion = { (result: Result<T, Error>) in
             resultQueue.async {
                 promise(result)
@@ -117,8 +119,12 @@ extension Repository {
             }
             
             task.resume()
+            
+            return task
         } catch {
             completion(.failure(error))
+            
+            return nil
         }
     }
 }
