@@ -14,10 +14,10 @@ final class DefaultURLRequestFactoryTests: XCTestCase {
     var sut: DefaultURLRequestFactory!
 
     override func setUpWithError() throws {
-        host = "https://test.com"
+        host = "https://www.apple.com"
         endpoint = SpyEndpoint()
         endpoint.stubbedHeaders = ["key": "value"]
-        endpoint.stubbedPath = "/path?string=\"String\"&int=0&bool=true"
+        endpoint.stubbedPath = #"/path?string=String&int=0&bool=true"#
         endpoint.stubbedMethod = .get
         endpoint.stubbedBodyResult = "data".data(using: .utf8)!
 
@@ -38,10 +38,7 @@ final class DefaultURLRequestFactoryTests: XCTestCase {
 
     func testMakeWithEndpointResultURL() throws {
         let request = try sut.make(endpoint: endpoint)
-        let expected = host
-            + endpoint
-                .path
-                .addingPercentEncoding(withAllowedCharacters: .urlPathAllowed)!
+        let expected = host + endpoint.path
 
         XCTAssertEqual(
             request.url?.absoluteString,
@@ -49,9 +46,9 @@ final class DefaultURLRequestFactoryTests: XCTestCase {
     }
 
     func testMakeWithEndpointResultURLWhenURLIsInvalid() throws {
-        host = ""
+        endpoint.stubbedPath = "$#@#!@%@"
         sut = DefaultURLRequestFactory(host: host)
-        let expectedError = NetworkingError.invalidURL("")
+        let expectedError = NetworkingError.invalidURL(host)
 
         XCTAssertThrowsError(
             try sut.make(endpoint: endpoint),
@@ -92,7 +89,7 @@ final class DefaultURLRequestFactoryTests: XCTestCase {
     }
 
     func testMakeWithEndpointResultBody() throws {
-        let body = "[\"body\":\"body\"".data(using: .utf8)
+        let body = #"{ "foo": "bar" }"#.data(using: .utf8)
         endpoint.stubbedBodyResult = body
 
         let request = try sut.make(endpoint: endpoint)
