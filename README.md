@@ -4,7 +4,7 @@
 
 ![Swift](https://github.com/duytph/Networking/workflows/Swift/badge.svg)
 
-# Overview
+## Overview
 
 So the basic idea of **Networking** is an ad-hoc network player built on top of `URLSession`. It should be simple enough that common things are easy but comprehensive enough that complicated things are also easy.
 
@@ -13,3 +13,45 @@ So the basic idea of **Networking** is an ad-hoc network player built on top of 
 > Comparing to them, **Networking** is a tiny handy library, aimed at the most basic things of a network layer should behave, trigger a request then handle the response.
 > 
 > If you are the type of developer who wants to manipulate everything under your scope, then an understandable package maybe the thing you favor.
+
+## Features
+
+1. Combine Support.
+2. Easy-peasy testing.
+3. Lets you define a clear usage of different endpoints with associated enum values.
+4. Middleware offers the capability of injecting logic.
+    - Authenticate request
+    - Localize request
+    - Logging
+    - Error handling
+    - ...
+
+## Requirements
+- iOS 10+ / macOS 10.12+ / tvOS 10.0+ / watchOS 3.0+
+- Xcode 12+
+- Swift 5.3+
+
+## Installation
+
+### Swift Package Manager
+
+Embedded in a package
+
+```
+dependencies: [
+    .package(url: "https://github.com/duytph/Networking"),
+]
+```
+
+Embedded in Xcode project
+> - Open menu File > Swift Packages > Add Package Dependency...
+> - Enter https://github.com/duytph/Networking
+
+### Cocoapods
+
+Not implemented
+
+### Carthage
+
+Not implemented
+
