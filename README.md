@@ -3,23 +3,25 @@
 # Networking
 
 ![Swift](https://github.com/duytph/Networking/workflows/Swift/badge.svg)
+[![Version](https://img.shields.io/cocoapods/v/Networking.svg?style=flat)](https://cocoapods.org/pods/Networking)
+[![License](https://img.shields.io/cocoapods/l/Networking.svg?style=flat)](https://cocoapods.org/pods/Networking)
+[![Platform](https://img.shields.io/cocoapods/p/Networking.svg?style=flat)](https://cocoapods.org/pods/Networking)
 
 ## Overview
 
 So the basic idea of **Networking** is an ad-hoc network player built on top of `URLSession`. It should be simple enough that common things are easy but comprehensive enough that complicated things are also easy.
 
-> **Why not Alamofire/Moya?**
-> 
-> Comparing to them, **Networking** is a tiny handy library, aimed at the most basic things of a network layer should behave, trigger a request then handle the response.
-> 
-> If you are the type of developer who wants to manipulate everything under your scope, then an understandable package maybe the thing you favor.
+>**Why not Alamofire/Moya?**
+>
+>Comparing to them, **Networking** is a tiny handy library, aimed at the most basic things of a network layer should behave, trigger a request then handle the response.
+>If you are the type of developer who wants to manipulate everything under your scope, then an understandable package maybe the thing you favor.
 
 ## Features
 
-1. Combine Support.
-2. Easy-peasy testing.
-3. Lets you define a clear usage of different endpoints with associated enum values.
-4. Middleware offers the capability of injecting logic.
+1. Combine Support
+2. Easy-peasy testing
+3. Lets you define a clear usage of different endpoints with associated enum values
+4. Middleware offers the capability of injecting logic
     - Authenticate request
     - Localize request
     - Logging
@@ -27,7 +29,10 @@ So the basic idea of **Networking** is an ad-hoc network player built on top of 
     - ...
 
 ## Requirements
-- iOS 10+ / macOS 10.12+ / tvOS 10.0+ / watchOS 3.0+
+- iOS 10+
+- MacOS 10.12+
+- tvOS 10.0+
+- watchOS 3.0+
 - Xcode 12+
 - Swift 5.3+
 
@@ -37,21 +42,31 @@ So the basic idea of **Networking** is an ad-hoc network player built on top of 
 
 Embedded in a package
 
-```
+```swift
 dependencies: [
     .package(url: "https://github.com/duytph/Networking"),
 ]
 ```
 
 Embedded in Xcode project
-> - Open menu File > Swift Packages > Add Package Dependency...
-> - Enter https://github.com/duytph/Networking
+
+> 1. Open menu File > Swift Packages > Add Package Dependency...
+> 2. Enter https://github.com/duytph/Networking
 
 ### Cocoapods
 
-Not implemented
+```ruby
+pod 'Networking'
+```
 
 ### Carthage
 
 Not implemented
 
+## Author
+
+duytph, tphduy@gmail.com
+
+## License
+
+Networking is available under the MIT license. See the LICENSE file for more info.
