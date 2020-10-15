@@ -6,7 +6,9 @@
 //
 
 import Foundation
+#if canImport(os)
 import os.log
+#endif
 
 public protocol LoggingMiddleware: Middleware {
     func log(request: URLRequest) -> String
@@ -31,7 +33,6 @@ public struct DefaultLoggingMiddleware: LoggingMiddleware {
     public let type: OSLogType
     public let log: OSLog
 
-    @available(OSX 10.12, *)
     public init(type: OSLogType = .default, log: OSLog = .default) {
         self.type = type
         self.log = log
@@ -54,7 +55,7 @@ public struct DefaultLoggingMiddleware: LoggingMiddleware {
     // MARK: - Private
 
     private func log(message: String) {
-        if #available(iOS 12.0, OSX 10.14, *) {
+        if #available(iOS 12, macOS 10.14, macCatalyst 13.0, tvOS 12.0, watchOS 5.0, *) {
             os_log(type, log: log, "%@", message)
         } else {
             debugPrint(message)

@@ -5,8 +5,8 @@
 //  Created by Duy Tran on 7/15/20.
 //
 
-@testable import Networking
 import XCTest
+@testable import Networking
 
 private final class EmptyMiddleware: Middleware {
     

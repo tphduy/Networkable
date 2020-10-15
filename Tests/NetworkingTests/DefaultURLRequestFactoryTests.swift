@@ -5,8 +5,8 @@
 //  Created by Duy Tran on 7/12/20.
 //
 
-@testable import Networking
 import XCTest
+@testable import Networking
 
 final class DefaultURLRequestFactoryTests: XCTestCase {
     var host: String!

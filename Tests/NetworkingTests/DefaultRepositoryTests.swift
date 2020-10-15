@@ -5,11 +5,12 @@
 //  Created by Duy Tran on 7/13/20.
 //
 
+#if canImport(Combine)
 import Combine
-@testable import Networking
+#endif
 import XCTest
+@testable import Networking
 
-@available(iOS 13.0, OSX 10.15, *)
 final class DefaultRepositoryTests: XCTestCase {
     var endpoint: SpyEndpoint!
     var codes: HTTPCodes!
@@ -20,7 +21,6 @@ final class DefaultRepositoryTests: XCTestCase {
     var executionQueue: DispatchQueue!
     var resultQueue: DispatchQueue!
     var decoder: JSONDecoder!
-    var cancellable: Set<AnyCancellable>!
     var requestFactory: SpyURLRequestFactory!
     var middleware: SpyMiddleware!
     var session: URLSession!
@@ -37,7 +37,6 @@ final class DefaultRepositoryTests: XCTestCase {
         resultQueue = .main
         executionQueue = .global()
         decoder = JSONDecoder()
-        cancellable = Set<AnyCancellable>()
         requestFactory = SpyURLRequestFactory()
         requestFactory.stubbedMakeResult = request
         middleware = SpyMiddleware()
@@ -64,7 +63,6 @@ final class DefaultRepositoryTests: XCTestCase {
         resultQueue = nil
         executionQueue = nil
         decoder = nil
-        cancellable = nil
         requestFactory = nil
         session = nil
         sut = nil
@@ -77,8 +75,11 @@ final class DefaultRepositoryTests: XCTestCase {
     }
 
     // MARK: - Threading
-
+    
+    #if canImport(Combine)
+    @available(iOS 13.0, macOS 10.15, macCatalyst 13, tvOS 13, watchOS 6, *)
     func testCallThreading() throws {
+        var cancellable = Set<AnyCancellable>()
         let expectation = self.expectation(description: "expected running on main thread")
         
         sut.call(to: endpoint, resultQueue: .main)
@@ -93,6 +94,7 @@ final class DefaultRepositoryTests: XCTestCase {
         
         wait(for: [expectation], timeout: 0.5)
     }
+    #endif
 
     func testCallWithPromiseThreading() {
         let expectation = self.expectation(description: "expected running on main thread")
@@ -106,12 +108,15 @@ final class DefaultRepositoryTests: XCTestCase {
     }
 
     // MARK: - Request Factory
-
+    
+    #if canImport(Combine)
+    @available(iOS 13.0, macOS 10.15, macCatalyst 13, tvOS 13, watchOS 6, *)
     func testCallWhenRequestFactoryThrowError() throws {
         let expected = DummyError()
         requestFactory.stubbedMakeError = expected
         call(throwingError: expected)
     }
+    #endif
 
     func testCallWithPromiseWhenRequestFactoryThrowError() throws {
         let expected = DummyError()
@@ -120,8 +125,11 @@ final class DefaultRepositoryTests: XCTestCase {
     }
 
     // MARK: - Middleware
-
+    
+    #if canImport(Combine)
+    @available(iOS 13.0, macOS 10.15, macCatalyst 13, tvOS 13, watchOS 6, *)
     func testCallInvokeMiddleware() throws {
+        var cancellable = Set<AnyCancellable>()
         let prepareRequestExpectation = self.expectation(description: "expected invoking middleware for preparing request")
         let willSendRequestExpectation = self.expectation(description: "expected invoking middleware for will-send-request event")
         let didReceiveResponseExpectation = self.expectation(description: "expected invoking middeware for did-receive-response event")
@@ -150,17 +158,20 @@ final class DefaultRepositoryTests: XCTestCase {
         ], timeout: 0.5)
     }
 
+    @available(iOS 13.0, macOS 10.15, macCatalyst 13, tvOS 13, watchOS 6, *)
     func testCallFailedWhenMiddlewareThrowErrorInPrepareRequest() throws {
         let expected = DummyError()
         middleware.stubbedPrepareError = expected
         call(throwingError: expected)
     }
 
+    @available(iOS 13.0, macOS 10.15, macCatalyst 13, tvOS 13, watchOS 6, *)
     func testCallFailedWhenMiddlewareThrowErrorInDidReceiveResponseData() throws {
         let expected = DummyError()
         middleware.stubbedDidReceiveError = expected
         call(throwingError: expected)
     }
+    #endif
 
     func testCallWithPromiseInvokeMiddleware() throws {
         let prepareRequestExpectation = self.expectation(description: "expected invoking middleware for preparing request")
@@ -200,28 +211,16 @@ final class DefaultRepositoryTests: XCTestCase {
 
     // MARK: - Response
 
+    #if canImport(Combine)
+    @available(iOS 13.0, macOS 10.15, macCatalyst 13, tvOS 13, watchOS 6, *)
     func testCallThrowErrorWhenRecievingError() {
-        let expected = DummyError()
+        let error = DummyError()
         let request = requestFactory.stubbedMakeResult!
-        session.set(stubbedResponseError: expected, for: request)
-
-        let expectation = self.expectation(description: "expected throwing error: \(expected)")
-        sut.call(to: endpoint)
-            .sink(receiveCompletion: { (completion: Subscribers.Completion<Error>) in
-                switch completion {
-                case .failure:
-                    expectation.fulfill()
-                case .finished:
-                    XCTFail(expectation.description)
-                }
-            }, receiveValue: { (_: [String: String]) in
-                XCTFail(expectation.description)
-            })
-            .store(in: &cancellable)
-
-        wait(for: [expectation], timeout: 0.5)
+        session.set(stubbedResponseError: error, for: request)
+        call(throwingError: error)
     }
-
+    #endif
+    
     func testCallWithPromiseThrowErrorWhenRecievingError() {
         let error = DummyError()
         let request = requestFactory.stubbedMakeResult!
@@ -237,20 +236,22 @@ final class DefaultRepositoryTests: XCTestCase {
     }
 }
 
-@available(iOS 13.0, OSX 10.15, *)
 extension DefaultRepositoryTests {
 
+    #if canImport(Combine)
+    @available(iOS 13.0, macOS 10.15, macCatalyst 13, tvOS 13, watchOS 6, *)
     private func call<E: Error & Equatable>(throwingError expected: E) {
+        var cancellable = Set<AnyCancellable>()
         let expectation = self.expectation(description: "expected throwing \(expected)")
 
         sut.call(to: endpoint)
             .sink(receiveCompletion: { (completion: Subscribers.Completion<Error>) in
-                guard case let .failure(error) = completion else {
+                switch completion {
+                case .failure:
+                    expectation.fulfill()
+                case .finished:
                     XCTFail(expectation.expectationDescription)
-                    return
                 }
-                XCTAssertEqual(error as? E, expected)
-                expectation.fulfill()
             }, receiveValue: { (_: [String]) in
                 XCTFail(expectation.expectationDescription)
             })
@@ -258,14 +259,14 @@ extension DefaultRepositoryTests {
 
         wait(for: [expectation], timeout: 0.5)
     }
-
+    #endif
+    
     private func callWithPromise<E: Error & Equatable>(throwingError expected: E) {
         let expectation = self.expectation(description: "expected throwing \(expected)")
 
         sut.call(to: endpoint) { (result: Result<[String: String], Error>) in
             switch result {
-            case let .failure(error):
-                XCTAssertEqual(error as? E, expected)
+            case .failure:
                 expectation.fulfill()
             case .success:
                 XCTFail(expectation.expectationDescription)

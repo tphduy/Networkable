@@ -5,8 +5,8 @@
 //  Created by Duy Tran on 7/13/20.
 //
 
-@testable import Networking
 import XCTest
+@testable import Networking
 
 final class DefaultAuthorizationMiddlewareTests: XCTestCase {
     var url: URL!

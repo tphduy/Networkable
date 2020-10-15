@@ -5,10 +5,10 @@ import PackageDescription
 let package = Package(
     name: "Networking",
     platforms: [
-        .macOS(.v10_10),
+        .macOS(.v10_12),
         .iOS(.v10),
-        .tvOS(.v13),
-        .watchOS(.v6)
+        .tvOS(.v10),
+        .watchOS(.v3)
     ],
     products: [
         .library(

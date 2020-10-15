@@ -16,14 +16,14 @@ public protocol Repository {
     var session: URLSession { get }
 
     #if canImport(Combine)
-    @available(iOS 13.0, OSX 10.15, *)
+    @available(iOS 13.0, macOS 10.15, macCatalyst 13, tvOS 13, watchOS 6, *)
     func call<T: Decodable>(
         to endpoint: Endpoint,
         executionQueue: DispatchQueue,
         resultQueue: DispatchQueue,
         decoder: JSONDecoder) -> AnyPublisher<T, Error>
     #endif
-
+    
     @discardableResult
     func call<T: Decodable>(
         to endpoint: Endpoint,
@@ -42,7 +42,7 @@ extension Repository {
     }
 
     #if canImport(Combine)
-    @available(iOS 13.0, OSX 10.15, *)
+    @available(iOS 13.0, macOS 10.15, macCatalyst 13, tvOS 13, watchOS 6, *)
     public func call<T: Decodable>(
         to endpoint: Endpoint,
         executionQueue: DispatchQueue = .global(),
@@ -75,7 +75,7 @@ extension Repository {
         }
     }
     #endif
-
+    
     @discardableResult
     public func call<T: Decodable>(
         to endpoint: Endpoint,
@@ -129,13 +129,11 @@ extension Repository {
     }
 }
 
-@available(OSX 10.15, *)
 public struct DefaultRepository: Repository {
     public let requestFactory: URLRequestFactory
     public let middlewares: [Middleware]
     public let session: URLSession
 
-    @available(iOS 12.0, *)
     public init(
         requestFactory: URLRequestFactory,
         middlewares: [Middleware] = [DefaultCodeValidationMiddleware(), DefaultLoggingMiddleware()],
