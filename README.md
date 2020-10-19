@@ -16,13 +16,64 @@ So the basic idea of **Networkable** is an ad-hoc network player built on top of
 >Comparing to them, **Networkable** is a tiny handy library, aimed at the most basic things of a network layer should behave, trigger a request then handle the response.
 >If you are the type of developer who wants to manipulate everything under your scope, then an understandable package maybe the thing you favor.
 
+## Sample usage
+
+```swift
+protocol MovieRepository {
+    
+    func movie(id: Int, promise: @escaping (Result<Movie, Error>) -> Void)
+    func movie(id: Int) -> AnyPublisher<Movie, Error>
+}
+
+struct DefaultMovieRepository: MovieRepository, Repository {
+    
+    var requestFactory: URLRequestFactory = DefaultURLRequestFactory(host: "https://api.themoviedb.org/3")
+    var middlewares: [Middleware] = [DefaultLoggingMiddleware()]
+    var session: URLSession = .shared
+    
+    func movie(id: Int, promise: @escaping (Result<Movie, Error>) -> Void) {
+        let endpoint = APIEndpoint.movie(id: id)
+        call(to: endpoint, promise: promise)
+    }
+    
+    func movie(id: Int) -> AnyPublisher<Movie, Error> {
+        let endpoint = APIEndpoint.movie(id: id)
+        return call(to: endpoint)
+    }
+}
+
+extension DefaultMovieRepository {
+    
+    enum APIEndpoint: Networking.Endpoint {
+        
+        case movie(id: Int)
+        
+        var path: String {
+            switch self {
+            case let .movie(id): return "/movie/\(id)"
+            }
+        }
+        
+        var method: Networking.Method {
+            switch self {
+            case .movie: return .get
+            }
+        }
+        
+        func body() throws -> Data? {
+            switch self {
+            case .movie: return nil
+            }
+        }
+    }
+}
+```
+
 ## Sample project
 
-I have provided a sample projects in the repository. To use it download the repo, wait for Xcode download dependency package and you're good to go. 
+I have provided a sample projects in https://github.com/duytph/Moviable. To use it download the repo, wait for Xcode resolve dependency and you're good to go. 
 
 `Networiking` use cases should be found in `Repositories` directory.
-
-https://github.com/duytph/Moviable
 
 ## Features
 
