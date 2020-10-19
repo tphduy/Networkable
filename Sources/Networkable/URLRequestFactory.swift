@@ -9,7 +9,7 @@ import Foundation
 
 public protocol URLRequestFactory {
     
-    var host: String { get set }
+    var baseURL: String { get set }
     var cachePolicy: URLRequest.CachePolicy { get set }
     var timeoutInterval: TimeInterval { get set }
     
@@ -18,7 +18,7 @@ public protocol URLRequestFactory {
 
 public struct DefaultURLRequestFactory: URLRequestFactory {
     
-    public var host: String
+    public var baseURL: String
     public var cachePolicy: URLRequest.CachePolicy
     public var timeoutInterval: TimeInterval
     
@@ -26,15 +26,15 @@ public struct DefaultURLRequestFactory: URLRequestFactory {
         host: String,
         cachePolicy: URLRequest.CachePolicy = .useProtocolCachePolicy,
         timeoutInterval: TimeInterval = 60) {
-        self.host = host
+        self.baseURL = host
         self.cachePolicy = cachePolicy
         self.timeoutInterval = timeoutInterval
     }
     
     public func make(endpoint: Endpoint) throws -> URLRequest {
         let path = endpoint.path
-        guard let url = URL(string: host + path) else {
-            throw NetworkableError.invalidURL(host)
+        guard let url = URL(string: baseURL + path) else {
+            throw NetworkableError.invalidURL(baseURL)
         }
         var request = URLRequest(
             url: url,

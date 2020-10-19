@@ -18,7 +18,7 @@ final class SpyURLRequestFactory: URLRequestFactory {
     var invokedHostGetterCount = 0
     var stubbedHost: String! = ""
 
-    var host: String {
+    var baseURL: String {
         set {
             invokedHostSetter = true
             invokedHostSetterCount += 1

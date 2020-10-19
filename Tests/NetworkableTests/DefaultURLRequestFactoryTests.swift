@@ -32,7 +32,7 @@ final class DefaultURLRequestFactoryTests: XCTestCase {
 
     func testInit() {
         XCTAssertEqual(
-            sut.host,
+            sut.baseURL,
             host)
     }
 

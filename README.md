@@ -27,7 +27,7 @@ protocol MovieRepository {
 
 struct DefaultMovieRepository: MovieRepository, Repository {
     
-    var requestFactory: URLRequestFactory = DefaultURLRequestFactory(host: "https://api.themoviedb.org/3")
+    var requestFactory: URLRequestFactory = DefaultURLRequestFactory(baseURL: "https://api.themoviedb.org/3")
     var middlewares: [Middleware] = [DefaultLoggingMiddleware()]
     var session: URLSession = .shared
     
