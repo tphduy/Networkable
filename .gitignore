@@ -4,4 +4,4 @@
 /*.xcodeproj
 xcuserdata/
 .swiftpm/xcode/package.xcworkspace/contents.xcworkspacedata
-.swiftpm/xcode/xcshareddata/xcschemes/Networking.xcscheme
+.swiftpm/xcode/xcshareddata/xcschemes/Networkable.xcscheme

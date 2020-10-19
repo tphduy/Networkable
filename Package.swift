@@ -3,7 +3,7 @@
 import PackageDescription
 
 let package = Package(
-    name: "Networking",
+    name: "Networkable",
     platforms: [
         .macOS(.v10_12),
         .iOS(.v10),
@@ -12,16 +12,16 @@ let package = Package(
     ],
     products: [
         .library(
-            name: "Networking",
-            targets: ["Networking"])
+            name: "Networkable",
+            targets: ["Networkable"])
     ],
     dependencies: [],
     targets: [
         .target(
-            name: "Networking",
+            name: "Networkable",
             dependencies: []),
         .testTarget(
-            name: "NetworkingTests",
-            dependencies: ["Networking"])
+            name: "NetworkableTests",
+            dependencies: ["Networkable"])
     ]
 )
