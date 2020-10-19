@@ -16,6 +16,14 @@ So the basic idea of **Networking** is an ad-hoc network player built on top of 
 >Comparing to them, **Networking** is a tiny handy library, aimed at the most basic things of a network layer should behave, trigger a request then handle the response.
 >If you are the type of developer who wants to manipulate everything under your scope, then an understandable package maybe the thing you favor.
 
+## Sample project
+
+I have provided a sample projects in the repository. To use it download the repo, wait for Xcode download dependency package and you're good to go. 
+
+`Networiking` use cases should be found in `Repositories` directory.
+
+https://github.com/duytph/Moviable
+
 ## Features
 
 1. Combine Support
