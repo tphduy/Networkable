@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'Networkable'
-  s.version          = '0.1.0'
+  s.version          = '1.0.0'
   s.summary          = 'Ad-hoc network layer built on URLSession'
 
 # This description is used to generate tags and improve search results.
