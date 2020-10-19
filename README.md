@@ -44,7 +44,7 @@ struct DefaultMovieRepository: MovieRepository, Repository {
 
 extension DefaultMovieRepository {
     
-    enum APIEndpoint: Networking.Endpoint {
+    enum APIEndpoint: Networkable.Endpoint {
         
         case movie(id: Int)
         
@@ -54,7 +54,7 @@ extension DefaultMovieRepository {
             }
         }
         
-        var method: Networking.Method {
+        var method: Networkable.Method {
             switch self {
             case .movie: return .get
             }
@@ -73,7 +73,7 @@ extension DefaultMovieRepository {
 
 I have provided a sample projects in https://github.com/duytph/Moviable. To use it download the repo, wait for Xcode resolve dependency and you're good to go. 
 
-`Networiking` use cases should be found in `Repositories` directory.
+`Networkable` use cases should be found in `Repositories` directory.
 
 ## Features
 
