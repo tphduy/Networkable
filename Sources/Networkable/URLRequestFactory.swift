@@ -23,10 +23,10 @@ public struct DefaultURLRequestFactory: URLRequestFactory {
     public var timeoutInterval: TimeInterval
     
     public init(
-        host: String,
+        baseURL: String,
         cachePolicy: URLRequest.CachePolicy = .useProtocolCachePolicy,
         timeoutInterval: TimeInterval = 60) {
-        self.baseURL = host
+        self.baseURL = baseURL
         self.cachePolicy = cachePolicy
         self.timeoutInterval = timeoutInterval
     }
