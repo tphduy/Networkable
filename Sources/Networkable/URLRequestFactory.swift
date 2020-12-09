@@ -7,15 +7,24 @@
 
 import Foundation
 
+/// The object that constructs the request.
 public protocol URLRequestFactory {
     
+    /// The base URL  (or host)  for  the request.
     var baseURL: String { get set }
+    
+    /// The cache policy for the request.
     var cachePolicy: URLRequest.CachePolicy { get set }
+    
+    /// The timeout interval for the request.
     var timeoutInterval: TimeInterval { get set }
     
+    /// Creates and initializes a URL request with the given endpoint.
+    /// - Parameter endpoint: the endpoint of the request.
     func make(endpoint: Endpoint) throws -> URLRequest
 }
 
+/// A default implementation of `URLRequestFactory`.
 public struct DefaultURLRequestFactory: URLRequestFactory {
     
     public var baseURL: String
