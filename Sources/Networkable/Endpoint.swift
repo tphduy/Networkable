@@ -7,6 +7,7 @@
 
 import Foundation
 
+/// The object that re-presents the request components.
 public protocol Endpoint {
     
     /// A dictionary containing all of the header fields for the request.
