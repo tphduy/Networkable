@@ -9,106 +9,86 @@ import XCTest
 @testable import Networkable
 
 final class DefaultURLRequestFactoryTests: XCTestCase {
-    var host: String!
+    
     var endpoint: SpyEndpoint!
+    var baseURL: String!
+    var cachePolicy: URLRequest.CachePolicy!
+    var timeoutInterval: TimeInterval!
     var sut: DefaultURLRequestFactory!
 
     override func setUpWithError() throws {
-        host = "https://www.apple.com"
         endpoint = SpyEndpoint()
         endpoint.stubbedHeaders = ["key": "value"]
         endpoint.stubbedPath = #"/path?string=String&int=0&bool=true"#
         endpoint.stubbedMethod = .get
         endpoint.stubbedBodyResult = "data".data(using: .utf8)!
-
-        sut = DefaultURLRequestFactory(host: host)
+        baseURL = "https://www.apple.com"
+        cachePolicy = .useProtocolCachePolicy
+        timeoutInterval = 60
+        sut = DefaultURLRequestFactory(
+            baseURL: baseURL,
+            cachePolicy: cachePolicy,
+            timeoutInterval: timeoutInterval)
     }
 
     override func tearDownWithError() throws {
-        host = nil
         endpoint = nil
+        baseURL = nil
+        cachePolicy = nil
+        timeoutInterval = nil
         sut = nil
     }
+    
+    // MARK: - Init
 
     func testInit() {
-        XCTAssertEqual(
-            sut.baseURL,
-            host)
+        XCTAssertEqual(sut.baseURL, baseURL)
+        XCTAssertEqual(sut.cachePolicy, cachePolicy)
+        XCTAssertEqual(sut.timeoutInterval, timeoutInterval)
     }
-
-    func testMakeWithEndpointResultURL() throws {
+    
+     // MARK: - Make Endpoint
+    
+    func testMakeEndpoint_whenBaseURLIsInvalid() throws {
+        sut.baseURL = " "
+        XCTAssertThrowsError(try sut.make(endpoint: endpoint)) { (error: Error) in
+            let url = sut.baseURL + endpoint.path
+            let expectedError = NetworkableError.invalidURL(url)
+            XCTAssertEqual(error as? NetworkableError, expectedError)
+        }
+    }
+    
+    func testMakeEndpoint_whenPathIsInvalid() throws {
+        endpoint.stubbedPath = " "
+        XCTAssertThrowsError(try sut.make(endpoint: endpoint)) { (error: Error) in
+            let url = sut.baseURL + endpoint.path
+            let expectedError = NetworkableError.invalidURL(url)
+            XCTAssertEqual(error as? NetworkableError, expectedError)
+        }
+    }
+    
+    func testMakeEndpoint_whenBodyThrowingError() throws {
+        let expectedError = DummyError()
+        endpoint.stubbedBodyError = expectedError
+        XCTAssertThrowsError(try sut.make(endpoint: endpoint)) { (error: Error) in
+            XCTAssertEqual(error as? DummyError, expectedError)
+        }
+    }
+    
+    func testMakeEndpoint() throws {
         let request = try sut.make(endpoint: endpoint)
-        let expected = host + endpoint.path
-
-        XCTAssertEqual(
-            request.url?.absoluteString,
-            expected)
-    }
-
-    func testMakeWithEndpointResultURLWhenURLIsInvalid() throws {
-        endpoint.stubbedPath = "$#@#!@%@"
-        sut = DefaultURLRequestFactory(host: host)
-        let expectedError = NetworkableError.invalidURL(host)
-
-        XCTAssertThrowsError(
-            try sut.make(endpoint: endpoint),
-            "Expected throwing \(expectedError)") { (error: Error) in
-                XCTAssertTrue(error is NetworkableError)
-                XCTAssertEqual(
-                    error as! NetworkableError,
-                    expectedError)
-        }
-    }
-
-    func testMakeWithEndpointResultMethod() throws {
-        try Networkable.Method.allCases.forEach { (method: Networkable.Method) in
-            endpoint.stubbedMethod = method
-            let request = try sut.make(endpoint: endpoint)
-            XCTAssertEqual(
-                request.httpMethod,
-                method.rawValue.uppercased())
-        }
-    }
-
-    func testMakeWithEndpointResultHeader() throws {
-        let headers = [
-            "foo": "bar",
-            "fizz": ""
-        ]
-        endpoint.stubbedHeaders = headers
-
-        XCTAssertEqual(
-            try sut.make(endpoint: endpoint).allHTTPHeaderFields,
-            headers)
-    }
-
-    func testMakeWithEndpointResultHeaderWhenHeaderIsNil() throws {
-        endpoint.stubbedHeaders = nil
-        let headers = try sut.make(endpoint: endpoint).allHTTPHeaderFields
-        XCTAssertTrue(headers!.isEmpty)
-    }
-
-    func testMakeWithEndpointResultBody() throws {
-        let body = #"{ "foo": "bar" }"#.data(using: .utf8)
-        endpoint.stubbedBodyResult = body
-
-        let request = try sut.make(endpoint: endpoint)
-
-        XCTAssertEqual(
-            request.httpBody,
-            body)
-    }
-
-    func testMakeWithEndpointResultBodyWhenThrowError() throws {
-        let dummyError = DummyError()
-        endpoint.stubbedBodyError = dummyError
-        XCTAssertThrowsError(
-            try sut.make(endpoint: endpoint),
-            "Expecting throwing \(dummyError)") { (error: Error) in
-                XCTAssertTrue(error is DummyError)
-                XCTAssertEqual(
-                    error as! DummyError,
-                    dummyError)
-        }
+        
+        XCTAssertTrue(endpoint.invokedHeadersGetter)
+        XCTAssertTrue(endpoint.invokedMethodGetter)
+        XCTAssertTrue(endpoint.invokedPathGetter)
+        XCTAssertTrue(endpoint.invokedMethodGetter)
+        XCTAssertTrue(endpoint.invokedBody)
+        
+        XCTAssertEqual(request.url, URL(string: baseURL + endpoint.stubbedPath))
+        XCTAssertEqual(request.cachePolicy, cachePolicy)
+        XCTAssertEqual(request.timeoutInterval, timeoutInterval)
+        XCTAssertEqual(request.allHTTPHeaderFields, endpoint.stubbedHeaders)
+        XCTAssertEqual(request.httpMethod, endpoint.stubbedMethod.rawValue.uppercased())
+        XCTAssertEqual(request.httpBody, endpoint.stubbedBodyResult)
     }
 }

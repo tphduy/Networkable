@@ -9,6 +9,7 @@ import Foundation
 @testable import Networkable
 
 final class SpyEndpoint: Endpoint {
+    
     var invokedHeadersGetter = false
     var invokedHeadersGetterCount = 0
     var stubbedHeaders: [String: String]!

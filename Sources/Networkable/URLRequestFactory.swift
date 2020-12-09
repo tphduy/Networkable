@@ -32,10 +32,14 @@ public struct DefaultURLRequestFactory: URLRequestFactory {
     }
     
     public func make(endpoint: Endpoint) throws -> URLRequest {
-        let path = endpoint.path
-        guard let url = URL(string: baseURL + path) else {
-            throw NetworkableError.invalidURL(baseURL)
+        let rawURL = baseURL + endpoint.path
+        
+        guard
+            let url = URL(string: rawURL)
+        else {
+            throw NetworkableError.invalidURL(rawURL)
         }
+        
         var request = URLRequest(
             url: url,
             cachePolicy: cachePolicy,
