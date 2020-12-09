@@ -8,13 +8,16 @@
 import Foundation
 
 public protocol Endpoint {
+    
+    /// A dictionary containing all of the header fields for the request.
     var headers: [String: String]? { get }
+    
+    /// The path component of the URL for  the request.
     var path: String { get }
+    
+    /// The  method for the request.
     var method: Method { get }
+    
+    /// The data sent as the message body of the request.
     func body() throws -> Data?
-}
-
-extension Endpoint {
-    var headers: [String: String]? { nil }
-    func body() throws -> Data? { nil }
 }
