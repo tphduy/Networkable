@@ -1,0 +1,32 @@
+{
+  "configurations" : [
+    {
+      "id" : "B9205E99-2AC2-4ECF-BDED-60E9A737F06D",
+      "name" : "Configuration 1",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "codeCoverage" : {
+      "targets" : [
+        {
+          "containerPath" : "container:Networkable.xcodeproj",
+          "identifier" : "Networkable::Networkable",
+          "name" : "Networkable"
+        }
+      ]
+    }
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:Networkable.xcodeproj",
+        "identifier" : "Networkable::NetworkableTests",
+        "name" : "NetworkableTests"
+      }
+    }
+  ],
+  "version" : 1
+}
