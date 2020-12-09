@@ -11,5 +11,5 @@ public enum NetworkableError: Error, Equatable {
     case empty
     case invalidURL(String)
     case unexpectedResponse(URLResponse)
-    case unacceptableCode(HTTPCode, URLResponse)
+    case unacceptableCode(ResponseStatusCode, URLResponse)
 }

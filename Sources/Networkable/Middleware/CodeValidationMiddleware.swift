@@ -8,7 +8,7 @@
 import Foundation
 
 protocol CodeValidationMiddleware: Middleware {
-    var acceptableCodes: HTTPCodes { get }
+    var acceptableCodes: ResponseStatusCodes { get }
     func invalidate(response: URLResponse) throws
 }
 
@@ -25,9 +25,9 @@ extension CodeValidationMiddleware {
 }
 
 public struct DefaultCodeValidationMiddleware: CodeValidationMiddleware {
-    public let acceptableCodes: HTTPCodes
+    public let acceptableCodes: ResponseStatusCodes
     
-    public init(acceptableCodes: HTTPCodes = .success) {
+    public init(acceptableCodes: ResponseStatusCodes = .success) {
         self.acceptableCodes = acceptableCodes
     }
     

@@ -13,7 +13,7 @@ import XCTest
 
 final class DefaultRepositoryTests: XCTestCase {
     var endpoint: SpyEndpoint!
-    var codes: HTTPCodes!
+    var codes: ResponseStatusCodes!
     var url: URL!
     var request: URLRequest!
     var response: URLResponse!

@@ -13,7 +13,7 @@ final class DefaultCodeValidationMiddlewareTests: XCTestCase {
     var request: URLRequest!
     var response: URLResponse!
     var data: Data!
-    var codes: HTTPCodes!
+    var codes: ResponseStatusCodes!
     var sut: DefaultCodeValidationMiddleware!
 
     override func setUpWithError() throws {
