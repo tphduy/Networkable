@@ -28,7 +28,7 @@ protocol MovieRepository {
 struct DefaultMovieRepository: MovieRepository, Repository {
     
     var requestFactory: URLRequestFactory = DefaultURLRequestFactory(baseURL: "https://api.themoviedb.org/3")
-    var middlewares: [Middleware] = [DefaultLoggingMiddleware()]
+    var middlewares: [Middleware] = [LoggingMiddleware()]
     var session: URLSession = .shared
     
     func movie(id: Int, promise: @escaping (Result<Movie, Error>) -> Void) {

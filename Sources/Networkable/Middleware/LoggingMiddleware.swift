@@ -7,36 +7,34 @@
 
 import Foundation
 #if canImport(os)
-import os.log
+import os
 #endif
 
-public protocol LoggingMiddleware: Middleware {
-    func log(request: URLRequest) -> String
-    func log(response: URLResponse, data: Data) -> String
-}
+/// A middleware logs network activities to a logging system.
+public struct LoggingMiddleware: Middleware {
+    
+    // MARK: - Dependencies
+    
+    /// The log level to assign to the message
+    public var type: OSLogType
+    
+    /// The custom log object categorizes the log messages.
+    public var log: OSLog
 
-extension LoggingMiddleware {
-    public func log(request: URLRequest) -> String {
-        return request.logging()
-    }
-
-    public func log(response: URLResponse, data: Data) -> String {
-        var logging = response.logging()
-        if let data = String(data: data, encoding: .utf8), !data.isEmpty {
-            logging += "\n" + data
-        }
-        return logging
-    }
-}
-
-public struct DefaultLoggingMiddleware: LoggingMiddleware {
-    public let type: OSLogType
-    public let log: OSLog
-
-    public init(type: OSLogType = .default, log: OSLog = .default) {
+    // MARK: - Init
+    
+    /// Creates a middleware logs network activities to a logging system.
+    /// - Parameters:
+    ///   - type: The log level to assign to the message. Default is `.default`.
+    ///   - log: The custom log object categorizes the log message. Default is `.default`.
+    public init(
+        type: OSLogType = .default,
+        log: OSLog = .default) {
         self.type = type
         self.log = log
     }
+    
+    // MARK: - Middleware
     
     public func prepare(request: URLRequest) throws -> URLRequest {
         return request
@@ -52,11 +50,38 @@ public struct DefaultLoggingMiddleware: LoggingMiddleware {
         log(message: message)
     }
 
-    // MARK: - Private
-
-    private func log(message: String) {
-        if #available(iOS 12, macOS 10.14, macCatalyst 13.0, tvOS 12.0, watchOS 5.0, *) {
-            os_log(type, log: log, "%@", message)
+    // MARK: - Main
+    
+    /// Create a string describing a request.
+    /// - Parameter request: A request to describe.
+    /// - Returns: A string describes the request.
+    public func log(request: URLRequest) -> String {
+        return request.logging()
+    }
+    
+    /// Create a string describing a response and its associated data that is loaded by a request before.
+    /// - Parameters:
+    ///   - response: A response to describe.
+    ///   - data: A loaded data.
+    /// - Returns: A string describing a response and its associated data.
+    public func log(response: URLResponse, data: Data) -> String {
+        var message = response.logging()
+        
+        guard
+            !data.isEmpty,
+            let data = String(data: data, encoding: .utf8)
+        else { return message }
+        
+        message += "\n" + data
+        
+        return message
+    }
+    
+    /// Log a message to logging system.
+    /// - Parameter message: A message to log.
+    public func log(message: String) {
+        if #available(iOS 10, macOS 10.12, macCatalyst 13.0, tvOS 10.0, watchOS 3.0, *) {
+            os_log("%@", log: log, type: type, message)
         } else {
             debugPrint(message)
         }

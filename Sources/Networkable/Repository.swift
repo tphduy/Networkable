@@ -136,7 +136,7 @@ public struct DefaultRepository: Repository {
 
     public init(
         requestFactory: URLRequestFactory,
-        middlewares: [Middleware] = [DefaultCodeValidationMiddleware(), DefaultLoggingMiddleware()],
+        middlewares: [Middleware] = [DefaultCodeValidationMiddleware(), LoggingMiddleware()],
         session: URLSession = .shared) {
         self.requestFactory = requestFactory
         self.middlewares = middlewares
