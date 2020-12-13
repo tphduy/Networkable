@@ -8,14 +8,17 @@
 import Foundation
 
 extension URLRequest {
+    
+    /// Create a string re-presenting itself.
+    /// - Returns: A string re-presenting itself.
     public func logging() -> String {
-        guard let url = url, let method = httpMethod else {
-            return ""
-        }
+        guard let url = url else { return "" }
 
         var components = ["🚀 Request: \(url.absoluteString)"]
 
-        components.append("-X \(method)")
+        if let method = httpMethod {
+            components.append("-X \(method)")
+        }
 
         if let headers = allHTTPHeaderFields {
             for header in headers {
@@ -27,6 +30,6 @@ extension URLRequest {
             components.append("-d \"\(value)\"")
         }
 
-        return components.joined(separator: " \n\t")
+        return components.joined(separator: "\n\t")
     }
 }
