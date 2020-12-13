@@ -7,78 +7,86 @@
 
 import Foundation
 
-// MARK: - AuthorizationType
+// MARK: - AuthorizationMiddleware
 
-public enum AuthorizationPlace: Equatable, Hashable {
+/// A middleware authorizees outgoing request
+public struct AuthorizationMiddleware: Middleware {
     
-    case header, query
-}
-
-public protocol AuthorizationType {
+    /// A place within a request where authorization materials will be placed
+    public enum Place: Equatable, Hashable {
+        
+        /// The request's header
+        case header
+        
+        /// The query components of request's URL
+        case query
+    }
     
-    var key: String { get }
-    var value: String { get }
-    var place: AuthorizationPlace { get }
-}
+    // MARK: - Dependencies
 
-public struct DefaultAuthorizationType: AuthorizationType, Equatable, Hashable {
+    /// The key of authorization material
+    public var key: String
     
-    public let key: String
-    public let value: String
-    public let place: AuthorizationPlace
-
+    /// The authorization material
+    public var value: String
+    
+    /// A place within a request where authorization materials will be placed
+    public var place: Place
+    
+    // MARK: - Init
+    
+    /// Create a middleware authorizees outgoing request
+    /// - Parameters:
+    ///   - key: The key of authorization material
+    ///   - value: The authorization material
+    ///   - place: A place within a request where authorization materials will be placed
     public init(
         key: String,
         value: String,
-        place: AuthorizationPlace = .header) {
+        place: Place = .header) {
         self.key = key
         self.value = value
         self.place = place
     }
-}
-
-// MARK: - AuthorizationMiddleware
-
-public protocol AuthorizationMiddleware: Middleware {
     
-    func authorize(request: URLRequest) -> URLRequest
-}
+    // MARK: - Middleware
 
-public struct DefaultAuthorizationMiddleware: AuthorizationMiddleware {
-    
-    public let authorization: () -> AuthorizationType
-
-    public init(authorization: @escaping () -> AuthorizationType) {
-        self.authorization = authorization
+    public func prepare(request: URLRequest) throws -> URLRequest {
+        let authorizedRequest = self.authorize(request: request)
+        return authorizedRequest
     }
-
+    
+    public func willSend(request: URLRequest) {}
+    
+    public func didReceive(response: URLResponse, data: Data) throws {}
+    
+    // MARK: - Main
+    
+    /// Create an authorized request from the origin request
+    /// - Parameter request: The original request
+    /// - Returns: An authorized request
     public func authorize(request: URLRequest) -> URLRequest {
-        let authorization = self.authorization()
-        guard !authorization.key.isEmpty, !authorization.value.isEmpty else { return request }
+        guard
+            !key.isEmpty,
+            !value.isEmpty
+        else { return request }
 
         var request = request
 
-        switch authorization.place {
+        switch place {
         case .header:
-            request.addValue(authorization.value, forHTTPHeaderField: authorization.key)
+            request.addValue(value, forHTTPHeaderField: key)
         case .query:
             guard
                 let url = request.url,
                 var components = URLComponents(url: url, resolvingAgainstBaseURL: true)
-                else { break }
-            let queryItem = URLQueryItem(name: authorization.key, value: authorization.value)
+            else { break }
+            
+            let queryItem = URLQueryItem(name: key, value: value)
             components.queryItems = (components.queryItems ?? []) + [queryItem]
             request.url = components.url
         }
 
         return request
     }
-
-    public func prepare(request: URLRequest) throws -> URLRequest {
-        return self.authorize(request: request)
-    }
-    
-    public func willSend(request: URLRequest) {}
-    
-    public func didReceive(response: URLResponse, data: Data) throws {}
 }
