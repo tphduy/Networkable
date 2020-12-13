@@ -8,6 +8,9 @@
 import Foundation
 
 extension URLResponse {
+    
+    /// Create a string re-presenting itself.
+    /// - Returns: A string re-presenting a itself.
     public func logging() -> String {
         guard let url = self.url else { return "" }
         var components = ["📩 Response: \(url.absoluteString)"]
@@ -18,6 +21,6 @@ extension URLResponse {
             }
         }
 
-        return components.joined(separator: " \n\t")
+        return components.joined(separator: "\n\t")
     }
 }
