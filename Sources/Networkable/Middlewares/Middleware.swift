@@ -7,7 +7,7 @@
 
 import Foundation
 
-/// An object perform side effects wherever a request is sent or received.
+/// An object performs side effects whenever a request is sent or a response is received.
 public protocol Middleware {
     
     /// Prepare a request before sending.
