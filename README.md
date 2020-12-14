@@ -27,7 +27,7 @@ protocol MovieRepository {
 
 struct DefaultMovieRepository: MovieRepository, Repository {
     
-    var requestFactory: URLRequestFactory = DefaultURLRequestFactory(baseURL: "https://api.themoviedb.org/3")
+    var requestFactory: URLRequestFactory = DefaultURLRequestFactory(baseURL: URL(string: "https://api.themoviedb.org/"))
     var middlewares: [Middleware] = [LoggingMiddleware()]
     var session: URLSession = .shared
     
@@ -48,9 +48,9 @@ extension DefaultMovieRepository {
         
         case movie(id: Int)
         
-        var path: String {
+        var url: String {
             switch self {
-            case let .movie(id): return "/movie/\(id)"
+            case let .movie(id): return "/3/movie/\(id)"
             }
         }
         
