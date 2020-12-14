@@ -14,11 +14,11 @@ public enum NetworkableError: Error, Equatable {
     case empty
     
     /// The string re-presenting a request's URL is invalid
-    case invalidURL(String)
+    case invalidURL(String, relativeURL: URL?)
     
     /// An unexpected response  is received.
     case unexpectedResponse(URLResponse)
     
     /// A response has unacceptable status code is received.
-    case unacceptableCode(ResponseStatusCode, URLResponse)
+    case unacceptableStatusCode(ResponseStatusCode, URLResponse)
 }

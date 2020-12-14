@@ -48,7 +48,7 @@ public struct StatusCodeValidationMiddleware: Middleware {
         }
         
         guard acceptableStatusCodes.contains(code) else {
-            throw NetworkableError.unacceptableCode(code, response)
+            throw NetworkableError.unacceptableStatusCode(code, response)
         }
     }
 }
