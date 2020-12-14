@@ -10,25 +10,25 @@ import Foundation
 
 final class SpyURLRequestFactory: URLRequestFactory {
 
-    var invokedHostSetter = false
-    var invokedHostSetterCount = 0
-    var invokedHost: String?
-    var invokedHostList = [String]()
-    var invokedHostGetter = false
-    var invokedHostGetterCount = 0
-    var stubbedHost: String! = ""
+    var invokedBaseURLSetter = false
+    var invokedBaseURLSetterCount = 0
+    var invokedBaseURL: URL?
+    var invokedBaseURLList = [URL?]()
+    var invokedBaseURLGetter = false
+    var invokedBaseURLGetterCount = 0
+    var stubbedBaseURL: URL!
 
-    var baseURL: String {
+    var baseURL: URL? {
         set {
-            invokedHostSetter = true
-            invokedHostSetterCount += 1
-            invokedHost = newValue
-            invokedHostList.append(newValue)
+            invokedBaseURLSetter = true
+            invokedBaseURLSetterCount += 1
+            invokedBaseURL = newValue
+            invokedBaseURLList.append(newValue)
         }
         get {
-            invokedHostGetter = true
-            invokedHostGetterCount += 1
-            return stubbedHost
+            invokedBaseURLGetter = true
+            invokedBaseURLGetterCount += 1
+            return stubbedBaseURL
         }
     }
 

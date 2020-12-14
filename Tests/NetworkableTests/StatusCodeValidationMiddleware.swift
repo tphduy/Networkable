@@ -65,7 +65,7 @@ final class StatusCodeValidationMiddlewareTests: XCTestCase {
     func testDidReceiveResponseAndData_whenStatusCodeIsUnacceptable() throws {
         let statusCode = acceptableStatusCodes.upperBound + 1
         response = HTTPURLResponse(url: url, statusCode: statusCode, httpVersion: nil, headerFields: nil)
-        let expected = NetworkableError.unacceptableCode(statusCode, response)
+        let expected = NetworkableError.unacceptableStatusCode(statusCode, response)
         let expectedMessage = "expected throwing \(expected)"
 
         XCTAssertThrowsError(try sut.didReceive(response: response, data: Data()), expectedMessage) { (error: Error) in

@@ -9,7 +9,7 @@ import Foundation
 @testable import Networkable
 
 final class SpyEndpoint: Endpoint {
-    
+
     var invokedHeadersGetter = false
     var invokedHeadersGetterCount = 0
     var stubbedHeaders: [String: String]!
@@ -20,14 +20,14 @@ final class SpyEndpoint: Endpoint {
         return stubbedHeaders
     }
 
-    var invokedPathGetter = false
-    var invokedPathGetterCount = 0
-    var stubbedPath: String! = ""
+    var invokedUrlGetter = false
+    var invokedUrlGetterCount = 0
+    var stubbedUrl: String! = ""
 
-    var path: String {
-        invokedPathGetter = true
-        invokedPathGetterCount += 1
-        return stubbedPath
+    var url: String {
+        invokedUrlGetter = true
+        invokedUrlGetterCount += 1
+        return stubbedUrl
     }
 
     var invokedMethodGetter = false

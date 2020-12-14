@@ -10,8 +10,8 @@ import Foundation
 /// The object that constructs the request.
 public protocol URLRequestFactory {
     
-    /// The base URL  (or host)  for  the request.
-    var baseURL: String { get set }
+    /// The base URL of the request.
+    var baseURL: URL? { get set }
     
     /// The cache policy for the request.
     var cachePolicy: URLRequest.CachePolicy { get set }
@@ -20,19 +20,28 @@ public protocol URLRequestFactory {
     var timeoutInterval: TimeInterval { get set }
     
     /// Creates and initializes a URL request with the given endpoint.
-    /// - Parameter endpoint: the endpoint of the request.
+    /// - Parameter endpoint: The endpoint of the request.
     func make(endpoint: Endpoint) throws -> URLRequest
 }
 
 /// A default implementation of `URLRequestFactory`.
 public struct DefaultURLRequestFactory: URLRequestFactory {
     
-    public var baseURL: String
+    // MARK: - Dependencies
+    
+    public var baseURL: URL?
     public var cachePolicy: URLRequest.CachePolicy
     public var timeoutInterval: TimeInterval
     
+    // MARK: - Init
+    
+    /// An object allows to construct `URLRequest` from an  `Endpoint`.
+    /// - Parameters:
+    ///   - baseURL: The base URL of the request.
+    ///   - cachePolicy: The cache policy for the request.
+    ///   - timeoutInterval:  The timeout interval for the request.
     public init(
-        baseURL: String,
+        baseURL: URL? = nil,
         cachePolicy: URLRequest.CachePolicy = .useProtocolCachePolicy,
         timeoutInterval: TimeInterval = 60) {
         self.baseURL = baseURL
@@ -40,13 +49,21 @@ public struct DefaultURLRequestFactory: URLRequestFactory {
         self.timeoutInterval = timeoutInterval
     }
     
+    // MARK: - URLRequestFactory
+    
+    /// Creates and initializes a URL request with the given endpoint. If the URL of the endpoint is absolute, the base URL takes no effect.
+    /// - Parameter endpoint: The endpoint of the request.
+    /// - Throws: `NetworkableError.invalidURL` if the URL of the endpoint is invalid
+    /// - Returns: An URL request.
     public func make(endpoint: Endpoint) throws -> URLRequest {
-        let rawURL = baseURL + endpoint.path
-        
         guard
-            let url = URL(string: rawURL)
+            let url = URL(
+                string: endpoint.url,
+                relativeTo: baseURL)
         else {
-            throw NetworkableError.invalidURL(rawURL)
+            throw NetworkableError.invalidURL(
+                endpoint.url,
+                relativeURL: baseURL)
         }
         
         var request = URLRequest(
