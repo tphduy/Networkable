@@ -25,7 +25,7 @@ final class DefaultRepositoryTests: XCTestCase {
     var middleware: SpyMiddleware!
     var session: URLSession!
 
-    var sut: DefaultRepository!
+    var sut: DefaultWebRepository!
 
     override func setUpWithError() throws {
         endpoint = SpyEndpoint()
@@ -46,7 +46,7 @@ final class DefaultRepositoryTests: XCTestCase {
         session.set(stubbedResponse: response, for: request)
         session.set(stubbedData: data, for: request)
 
-        sut = DefaultRepository(
+        sut = DefaultWebRepository(
             requestFactory: requestFactory,
             middlewares: [middleware],
             session: session)

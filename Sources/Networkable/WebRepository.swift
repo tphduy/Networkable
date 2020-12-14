@@ -1,5 +1,5 @@
 //
-//  Repository.swift
+//  WebRepository.swift
 //  NetworkableTests
 //
 //  Created by Duy Tran on 7/13/20.
@@ -10,7 +10,8 @@ import Combine
 #endif
 import Foundation
 
-public protocol Repository {
+public protocol WebRepository {
+    
     var requestFactory: URLRequestFactory { get }
     var middlewares: [Middleware] { get }
     var session: URLSession { get }
@@ -32,7 +33,7 @@ public protocol Repository {
         promise: @escaping (Result<T, Error>) -> Void) -> URLSessionDataTask?
 }
 
-extension Repository {
+extension WebRepository {
     private func prepare(request: URLRequest, middlewares: [Middleware]) throws -> URLRequest {
         var request = request
         for middleware in middlewares {
@@ -129,14 +130,21 @@ extension Repository {
     }
 }
 
-public struct DefaultRepository: Repository {
-    public let requestFactory: URLRequestFactory
-    public let middlewares: [Middleware]
-    public let session: URLSession
+public struct DefaultWebRepository: WebRepository {
+    
+    static let shared = DefaultWebRepository()
+    
+    // MARK: - Dependencies
+    
+    public var requestFactory: URLRequestFactory
+    public var middlewares: [Middleware]
+    public var session: URLSession
+    
+    // MARK: - Init
 
     public init(
-        requestFactory: URLRequestFactory,
-        middlewares: [Middleware] = [StatusCodeValidationMiddleware(), LoggingMiddleware()],
+        requestFactory: URLRequestFactory = DefaultURLRequestFactory(),
+        middlewares: [Middleware] = [LoggingMiddleware()],
         session: URLSession = .shared) {
         self.requestFactory = requestFactory
         self.middlewares = middlewares
