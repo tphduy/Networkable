@@ -1,5 +1,5 @@
 //
-//  URLRequestFactory.swift
+//  URLRequestBuilder.swift
 //  Networkable
 //
 //  Created by Duy Tran on 7/12/20.
@@ -7,25 +7,8 @@
 
 import Foundation
 
-/// The object that constructs the request.
-public protocol URLRequestFactory {
-    
-    /// The base URL of the request.
-    var baseURL: URL? { get set }
-    
-    /// The cache policy for the request.
-    var cachePolicy: URLRequest.CachePolicy { get set }
-    
-    /// The timeout interval for the request.
-    var timeoutInterval: TimeInterval { get set }
-    
-    /// Creates and initializes a URL request with the given endpoint.
-    /// - Parameter endpoint: The endpoint of the request.
-    func make(endpoint: Endpoint) throws -> URLRequest
-}
-
-/// A default implementation of `URLRequestFactory`.
-public struct DefaultURLRequestFactory: URLRequestFactory {
+/// The object that constructs a request.
+public struct URLRequestBuilder: URLRequestBuildable {
     
     // MARK: - Dependencies
     
@@ -55,7 +38,7 @@ public struct DefaultURLRequestFactory: URLRequestFactory {
     /// - Parameter endpoint: The endpoint of the request.
     /// - Throws: `NetworkableError.invalidURL` if the URL of the endpoint is invalid
     /// - Returns: An URL request.
-    public func make(endpoint: Endpoint) throws -> URLRequest {
+    public func build(endpoint: Endpoint) throws -> URLRequest {
         guard
             let url = URL(
                 string: endpoint.url,

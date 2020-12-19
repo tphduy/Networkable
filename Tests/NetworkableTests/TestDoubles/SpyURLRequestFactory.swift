@@ -8,7 +8,7 @@
 import Foundation
 @testable import Networkable
 
-final class SpyURLRequestFactory: URLRequestFactory {
+final class SpyURLRequestFactory: URLRequestBuildable {
 
     var invokedBaseURLSetter = false
     var invokedBaseURLSetterCount = 0
@@ -83,7 +83,7 @@ final class SpyURLRequestFactory: URLRequestFactory {
     var stubbedMakeError: Error?
     var stubbedMakeResult: URLRequest!
 
-    func make(endpoint: Endpoint) throws -> URLRequest {
+    func build(endpoint: Endpoint) throws -> URLRequest {
         invokedMake = true
         invokedMakeCount += 1
         invokedMakeParameters = (endpoint, ())

@@ -11,7 +11,7 @@ import Combine
 import XCTest
 @testable import Networkable
 
-final class DefaultWebRepositoryTests: XCTestCase {
+class DefaultWebRepositoryTests: XCTestCase {
     
     var data: Data!
     var url: String!
@@ -20,8 +20,6 @@ final class DefaultWebRepositoryTests: XCTestCase {
     var body: Data!
     var request: URLRequest!
     var response: HTTPURLResponse!
-    var cancellables: Set<AnyCancellable>!
-    
     var endpoint: SpyEndpoint!
     var requestFactory: SpyURLRequestFactory!
     var middleware: SpyMiddleware!
@@ -40,7 +38,6 @@ final class DefaultWebRepositoryTests: XCTestCase {
             statusCode: 200,
             httpVersion: nil,
             headerFields: nil)
-        cancellables = Set()
         
         endpoint = SpyEndpoint()
         endpoint.stubbedUrl = url
@@ -67,7 +64,6 @@ final class DefaultWebRepositoryTests: XCTestCase {
         body = nil
         request = nil
         response = nil
-        cancellables = nil
         endpoint = nil
         requestFactory = nil
         middleware = nil
@@ -137,141 +133,6 @@ final class DefaultWebRepositoryTests: XCTestCase {
         XCTAssertTrue(requestFactory.invokedMake)
         XCTAssertTrue(middleware.invokedPrepare)
         XCTAssertTrue(otherMiddleware.invokedPrepare)
-    }
-    
-    // MARK: - Call - Publisher
-    
-    func testCallAsPublisher_whenMakingRequestThrowsError_itRethrowsThatError() throws {
-        let dummyError = DummyError()
-        requestFactory.stubbedMakeError = dummyError
-        let expectation = self.expectation(description: "expect receive failure as completion")
-        
-        sut.call(to: endpoint)
-            .sink { (completion: Subscribers.Completion<Error>) in
-                guard case let .failure(error) = completion else { return }
-                XCTAssertEqual(error as? DummyError, dummyError)
-                expectation.fulfill()
-            } receiveValue: { (result: DummyCodable) in
-                XCTFail(expectation.expectationDescription)
-            }
-            .store(in: &cancellables)
-        
-        wait(for: [expectation], timeout: 0.1)
-        
-        XCTAssertFalse(middleware.invokedWillSend)
-        XCTAssertFalse(middleware.invokedDidReceive)
-    }
-    
-    func testCallAsPublisher_whenReceiveNetworkError_itRethrowsThatError() throws {
-        let dummyError = DummyError()
-        session.set(stubbedResponseError: dummyError, for: request)
-        let expectation = self.expectation(description: "expect receive failure as completion")
-        
-        sut.call(to: endpoint)
-            .sink { (completion: Subscribers.Completion<Error>) in
-                guard case .failure = completion else { return }
-                expectation.fulfill()
-            } receiveValue: { (result: DummyCodable) in
-                XCTFail(expectation.expectationDescription)
-            }
-            .store(in: &cancellables)
-        
-        wait(for: [expectation], timeout: 0.1)
-        
-        XCTAssertTrue(requestFactory.invokedMake)
-        XCTAssertTrue(middleware.invokedPrepare)
-        XCTAssertTrue(middleware.invokedWillSend)
-    }
-    
-    func testCallAsPublisher_whenReceiveResponseAndData_butMiddlewareThrowsError_itRethrowsThatError() throws {
-        let dummyError = DummyError()
-        session.set(stubbedResponse: response, for: request)
-        session.set(stubbedData: data, for: request)
-        middleware.stubbedDidReceiveError = dummyError
-        let expectation = self.expectation(description: "expect receive failure as completion")
-        
-        sut.call(to: endpoint)
-            .sink { (completion: Subscribers.Completion<Error>) in
-                guard case let .failure(error) = completion else { return }
-                XCTAssertEqual(error as? DummyError, dummyError)
-                expectation.fulfill()
-            } receiveValue: { (result: DummyCodable) in
-                XCTFail(expectation.expectationDescription)
-            }
-            .store(in: &cancellables)
-        
-        wait(for: [expectation], timeout: 0.1)
-        
-        XCTAssertTrue(requestFactory.invokedMake)
-        XCTAssertTrue(middleware.invokedPrepare)
-        XCTAssertTrue(middleware.invokedWillSend)
-    }
-    
-    func testCallAsPublisher_whenReceiveResponse_withoutData_itThrowsError() throws {
-        data = Data()
-        session.set(stubbedResponse: response, for: request)
-        session.set(stubbedData: data, for: request)
-        let expectation = self.expectation(description: "expect receive failure as completion")
-        
-        sut.call(to: endpoint)
-            .sink { (completion: Subscribers.Completion<Error>) in
-                guard case let .failure(error) = completion else { return }
-                XCTAssertEqual(error as? NetworkableError, .empty)
-                expectation.fulfill()
-            } receiveValue: { (result: DummyCodable) in
-                XCTFail(expectation.expectationDescription)
-            }
-            .store(in: &cancellables)
-        
-        wait(for: [expectation], timeout: 0.1)
-        
-        XCTAssertTrue(requestFactory.invokedMake)
-        XCTAssertTrue(middleware.invokedPrepare)
-        XCTAssertTrue(middleware.invokedWillSend)
-    }
-    
-    func testCallAsPublisher_whenReceiveResponseAndData_butDecodingThrowsError_itRethrowsThatError() throws {
-        data = "%@#!@#".data(using: .utf8)
-        session.set(stubbedResponse: response, for: request)
-        session.set(stubbedData: data, for: request)
-        let expectation = self.expectation(description: "expect receive failure as completion")
-        
-        sut.call(to: endpoint)
-            .sink { (completion: Subscribers.Completion<Error>) in
-                guard case let .failure(error) = completion else { return }
-                XCTAssertTrue(error is DecodingError)
-                expectation.fulfill()
-            } receiveValue: { (result: DummyCodable) in
-                XCTFail(expectation.expectationDescription)
-            }
-            .store(in: &cancellables)
-        
-        wait(for: [expectation], timeout: 0.1)
-        
-        XCTAssertTrue(requestFactory.invokedMake)
-        XCTAssertTrue(middleware.invokedPrepare)
-        XCTAssertTrue(middleware.invokedWillSend)
-    }
-    
-    func testCallAsPublisher_whenReceiveResponseAndData_itReturnResult() throws {
-        session.set(stubbedResponse: response, for: request)
-        session.set(stubbedData: data, for: request)
-        let expectation = self.expectation(description: "expect receive value as completion")
-        
-        sut.call(to: endpoint)
-            .sink { (completion: Subscribers.Completion<Error>) in
-                guard case .failure = completion else { return }
-                XCTFail(expectation.expectationDescription)
-            } receiveValue: { (_: DummyCodable) in
-                expectation.fulfill()
-            }
-            .store(in: &cancellables)
-        
-        wait(for: [expectation], timeout: 0.1)
-        
-        XCTAssertTrue(requestFactory.invokedMake)
-        XCTAssertTrue(middleware.invokedPrepare)
-        XCTAssertTrue(middleware.invokedWillSend)
     }
     
     // MARK: - Call Promise
@@ -409,3 +270,158 @@ final class DefaultWebRepositoryTests: XCTestCase {
         XCTAssertTrue(middleware.invokedWillSend)
     }
 }
+
+#if canImport(Combine)
+import Combine
+
+@available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
+final class DefaultWebRepository_Publisher_Tests: DefaultWebRepositoryTests {
+    
+    var cancellables: Set<AnyCancellable>!
+    
+    override func setUpWithError() throws {
+        try super.setUpWithError()
+        cancellables = Set()
+    }
+    
+    override func tearDownWithError() throws {
+        try super.tearDownWithError()
+        cancellables = nil
+    }
+    
+    // MARK: - Call - Publisher
+    
+    func testCallAsPublisher_whenMakingRequestThrowsError_itRethrowsThatError() throws {
+        let dummyError = DummyError()
+        requestFactory.stubbedMakeError = dummyError
+        let expectation = self.expectation(description: "expect receive failure as completion")
+        
+        sut.call(to: endpoint)
+            .sink { (completion: Subscribers.Completion<Error>) in
+                guard case let .failure(error) = completion else { return }
+                XCTAssertEqual(error as? DummyError, dummyError)
+                expectation.fulfill()
+            } receiveValue: { (result: DummyCodable) in
+                XCTFail(expectation.expectationDescription)
+            }
+            .store(in: &cancellables)
+        
+        wait(for: [expectation], timeout: 0.1)
+        
+        XCTAssertFalse(middleware.invokedWillSend)
+        XCTAssertFalse(middleware.invokedDidReceive)
+    }
+    
+    func testCallAsPublisher_whenReceiveNetworkError_itRethrowsThatError() throws {
+        let dummyError = DummyError()
+        session.set(stubbedResponseError: dummyError, for: request)
+        let expectation = self.expectation(description: "expect receive failure as completion")
+        
+        sut.call(to: endpoint)
+            .sink { (completion: Subscribers.Completion<Error>) in
+                guard case .failure = completion else { return }
+                expectation.fulfill()
+            } receiveValue: { (result: DummyCodable) in
+                XCTFail(expectation.expectationDescription)
+            }
+            .store(in: &cancellables)
+        
+        wait(for: [expectation], timeout: 0.1)
+        
+        XCTAssertTrue(requestFactory.invokedMake)
+        XCTAssertTrue(middleware.invokedPrepare)
+        XCTAssertTrue(middleware.invokedWillSend)
+    }
+    
+    func testCallAsPublisher_whenReceiveResponseAndData_butMiddlewareThrowsError_itRethrowsThatError() throws {
+        let dummyError = DummyError()
+        session.set(stubbedResponse: response, for: request)
+        session.set(stubbedData: data, for: request)
+        middleware.stubbedDidReceiveError = dummyError
+        let expectation = self.expectation(description: "expect receive failure as completion")
+        
+        sut.call(to: endpoint)
+            .sink { (completion: Subscribers.Completion<Error>) in
+                guard case let .failure(error) = completion else { return }
+                XCTAssertEqual(error as? DummyError, dummyError)
+                expectation.fulfill()
+            } receiveValue: { (result: DummyCodable) in
+                XCTFail(expectation.expectationDescription)
+            }
+            .store(in: &cancellables)
+        
+        wait(for: [expectation], timeout: 0.1)
+        
+        XCTAssertTrue(requestFactory.invokedMake)
+        XCTAssertTrue(middleware.invokedPrepare)
+        XCTAssertTrue(middleware.invokedWillSend)
+    }
+    
+    func testCallAsPublisher_whenReceiveResponse_withoutData_itThrowsError() throws {
+        data = Data()
+        session.set(stubbedResponse: response, for: request)
+        session.set(stubbedData: data, for: request)
+        let expectation = self.expectation(description: "expect receive failure as completion")
+        
+        sut.call(to: endpoint)
+            .sink { (completion: Subscribers.Completion<Error>) in
+                guard case let .failure(error) = completion else { return }
+                XCTAssertEqual(error as? NetworkableError, .empty)
+                expectation.fulfill()
+            } receiveValue: { (result: DummyCodable) in
+                XCTFail(expectation.expectationDescription)
+            }
+            .store(in: &cancellables)
+        
+        wait(for: [expectation], timeout: 0.1)
+        
+        XCTAssertTrue(requestFactory.invokedMake)
+        XCTAssertTrue(middleware.invokedPrepare)
+        XCTAssertTrue(middleware.invokedWillSend)
+    }
+    
+    func testCallAsPublisher_whenReceiveResponseAndData_butDecodingThrowsError_itRethrowsThatError() throws {
+        data = "%@#!@#".data(using: .utf8)
+        session.set(stubbedResponse: response, for: request)
+        session.set(stubbedData: data, for: request)
+        let expectation = self.expectation(description: "expect receive failure as completion")
+        
+        sut.call(to: endpoint)
+            .sink { (completion: Subscribers.Completion<Error>) in
+                guard case let .failure(error) = completion else { return }
+                XCTAssertTrue(error is DecodingError)
+                expectation.fulfill()
+            } receiveValue: { (result: DummyCodable) in
+                XCTFail(expectation.expectationDescription)
+            }
+            .store(in: &cancellables)
+        
+        wait(for: [expectation], timeout: 0.1)
+        
+        XCTAssertTrue(requestFactory.invokedMake)
+        XCTAssertTrue(middleware.invokedPrepare)
+        XCTAssertTrue(middleware.invokedWillSend)
+    }
+    
+    func testCallAsPublisher_whenReceiveResponseAndData_itReturnResult() throws {
+        session.set(stubbedResponse: response, for: request)
+        session.set(stubbedData: data, for: request)
+        let expectation = self.expectation(description: "expect receive value as completion")
+        
+        sut.call(to: endpoint)
+            .sink { (completion: Subscribers.Completion<Error>) in
+                guard case .failure = completion else { return }
+                XCTFail(expectation.expectationDescription)
+            } receiveValue: { (_: DummyCodable) in
+                expectation.fulfill()
+            }
+            .store(in: &cancellables)
+        
+        wait(for: [expectation], timeout: 0.1)
+        
+        XCTAssertTrue(requestFactory.invokedMake)
+        XCTAssertTrue(middleware.invokedPrepare)
+        XCTAssertTrue(middleware.invokedWillSend)
+    }
+}
+#endif

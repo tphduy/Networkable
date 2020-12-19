@@ -14,7 +14,7 @@ import Foundation
 public protocol WebRepository {
     
     /// An object to construct request
-    var requestFactory: URLRequestFactory { get }
+    var requestFactory: URLRequestBuildable { get }
     
     /// Middlewares perform side effects whenever a request is sent or a response is received.
     var middlewares: [Middleware] { get }
@@ -57,7 +57,7 @@ extension WebRepository {
     func makeRequest(
         endpoint: Endpoint,
         middlewares: [Middleware]) throws -> URLRequest {
-        var request = try requestFactory.make(endpoint: endpoint)
+        var request = try requestFactory.build(endpoint: endpoint)
         for middleware in middlewares {
             request = try middleware.prepare(request: request)
         }
@@ -148,14 +148,14 @@ public struct DefaultWebRepository: WebRepository {
     
     // MARK: - Dependencies
     
-    public var requestFactory: URLRequestFactory
+    public var requestFactory: URLRequestBuildable
     public var middlewares: [Middleware]
     public var session: URLSession
     
     // MARK: - Init
     
     public init(
-        requestFactory: URLRequestFactory = DefaultURLRequestFactory(),
+        requestFactory: URLRequestBuildable = URLRequestBuilder(),
         middlewares: [Middleware] = [LoggingMiddleware()],
         session: URLSession = .shared) {
         self.requestFactory = requestFactory
