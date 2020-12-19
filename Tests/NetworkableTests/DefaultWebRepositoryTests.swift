@@ -21,7 +21,7 @@ class DefaultWebRepositoryTests: XCTestCase {
     var request: URLRequest!
     var response: HTTPURLResponse!
     var endpoint: SpyEndpoint!
-    var requestFactory: SpyURLRequestFactory!
+    var requestBuilder: SpyURLRequestBuildable!
     var middleware: SpyMiddleware!
     var session: URLSession!
     var sut: DefaultWebRepository!
@@ -44,13 +44,13 @@ class DefaultWebRepositoryTests: XCTestCase {
         endpoint.stubbedMethod = method
         endpoint.stubbedHeaders = headers
         endpoint.stubbedBodyResult = Data()
-        requestFactory = SpyURLRequestFactory()
-        requestFactory.stubbedMakeResult = request
+        requestBuilder = SpyURLRequestBuildable()
+        requestBuilder.stubbedMakeResult = request
         middleware = SpyMiddleware()
         middleware.stubbedPrepareResult = request
         session = .stubbed
         sut = DefaultWebRepository(
-            requestFactory: requestFactory,
+            requestFactory: requestBuilder,
             middlewares: [middleware],
             session: session)
     }
@@ -65,7 +65,7 @@ class DefaultWebRepositoryTests: XCTestCase {
         request = nil
         response = nil
         endpoint = nil
-        requestFactory = nil
+        requestBuilder = nil
         middleware = nil
         session = nil
         sut = nil
@@ -74,7 +74,7 @@ class DefaultWebRepositoryTests: XCTestCase {
     // MARK: - Init
     
     func testInit() throws {
-        XCTAssertTrue(sut.requestFactory as? SpyURLRequestFactory === requestFactory)
+        XCTAssertTrue(sut.requestBuilder as? SpyURLRequestBuildable === requestBuilder)
         XCTAssertTrue(sut.middlewares.first as? SpyMiddleware === middleware)
         XCTAssertEqual(sut.middlewares.count, 1)
         XCTAssertEqual(sut.session, session)
@@ -84,7 +84,7 @@ class DefaultWebRepositoryTests: XCTestCase {
     
     func testMakeRequest_whenRequestFactoryThrowsError_itRethrowsThatError() throws {
         let dummyError = DummyError()
-        requestFactory.stubbedMakeError = dummyError
+        requestBuilder.stubbedMakeError = dummyError
         
         XCTAssertThrowsError(
             try sut.makeRequest(
@@ -92,7 +92,7 @@ class DefaultWebRepositoryTests: XCTestCase {
                 middlewares: [middleware])) { (error: Error) in
             XCTAssertEqual(error as? DummyError, dummyError)
         }
-        XCTAssertTrue(requestFactory.invokedMake)
+        XCTAssertTrue(requestBuilder.invokedMake)
     }
     
     func testMakeRequest_whenMiddlewareThrowsError_itRethrowsThatError() throws {
@@ -114,8 +114,8 @@ class DefaultWebRepositoryTests: XCTestCase {
             endpoint: endpoint,
             middlewares: [])
         
-        XCTAssertEqual(preparedRequest, requestFactory.stubbedMakeResult)
-        XCTAssertTrue(requestFactory.invokedMake)
+        XCTAssertEqual(preparedRequest, requestBuilder.stubbedMakeResult)
+        XCTAssertTrue(requestBuilder.invokedMake)
         XCTAssertFalse(middleware.invokedPrepare)
     }
     
@@ -130,7 +130,7 @@ class DefaultWebRepositoryTests: XCTestCase {
             middlewares: [middleware, otherMiddleware])
         
         XCTAssertEqual(preparedRequest, otherMiddleware.stubbedPrepareResult)
-        XCTAssertTrue(requestFactory.invokedMake)
+        XCTAssertTrue(requestBuilder.invokedMake)
         XCTAssertTrue(middleware.invokedPrepare)
         XCTAssertTrue(otherMiddleware.invokedPrepare)
     }
@@ -139,7 +139,7 @@ class DefaultWebRepositoryTests: XCTestCase {
     
     func testCallAsPromise_whenMakingRequestThrowsError_itRethrowsThatError() throws {
         let dummyError = DummyError()
-        requestFactory.stubbedMakeError = dummyError
+        requestBuilder.stubbedMakeError = dummyError
         let expectation = self.expectation(description: "expect receive failure as completion")
         
         sut.call(to: endpoint) { (result: Result<DummyCodable, Error>) in
@@ -174,7 +174,7 @@ class DefaultWebRepositoryTests: XCTestCase {
         
         wait(for: [expectation], timeout: 0.1)
         
-        XCTAssertTrue(requestFactory.invokedMake)
+        XCTAssertTrue(requestBuilder.invokedMake)
         XCTAssertTrue(middleware.invokedPrepare)
         XCTAssertTrue(middleware.invokedWillSend)
     }
@@ -198,7 +198,7 @@ class DefaultWebRepositoryTests: XCTestCase {
         
         wait(for: [expectation], timeout: 0.1)
         
-        XCTAssertTrue(requestFactory.invokedMake)
+        XCTAssertTrue(requestBuilder.invokedMake)
         XCTAssertTrue(middleware.invokedPrepare)
         XCTAssertTrue(middleware.invokedWillSend)
     }
@@ -221,7 +221,7 @@ class DefaultWebRepositoryTests: XCTestCase {
         
         wait(for: [expectation], timeout: 0.1)
         
-        XCTAssertTrue(requestFactory.invokedMake)
+        XCTAssertTrue(requestBuilder.invokedMake)
         XCTAssertTrue(middleware.invokedPrepare)
         XCTAssertTrue(middleware.invokedWillSend)
     }
@@ -244,7 +244,7 @@ class DefaultWebRepositoryTests: XCTestCase {
         
         wait(for: [expectation], timeout: 0.1)
         
-        XCTAssertTrue(requestFactory.invokedMake)
+        XCTAssertTrue(requestBuilder.invokedMake)
         XCTAssertTrue(middleware.invokedPrepare)
         XCTAssertTrue(middleware.invokedWillSend)
     }
@@ -265,7 +265,7 @@ class DefaultWebRepositoryTests: XCTestCase {
         
         wait(for: [expectation], timeout: 0.1)
         
-        XCTAssertTrue(requestFactory.invokedMake)
+        XCTAssertTrue(requestBuilder.invokedMake)
         XCTAssertTrue(middleware.invokedPrepare)
         XCTAssertTrue(middleware.invokedWillSend)
     }
@@ -293,7 +293,7 @@ final class DefaultWebRepository_Publisher_Tests: DefaultWebRepositoryTests {
     
     func testCallAsPublisher_whenMakingRequestThrowsError_itRethrowsThatError() throws {
         let dummyError = DummyError()
-        requestFactory.stubbedMakeError = dummyError
+        requestBuilder.stubbedMakeError = dummyError
         let expectation = self.expectation(description: "expect receive failure as completion")
         
         sut.call(to: endpoint)
@@ -328,7 +328,7 @@ final class DefaultWebRepository_Publisher_Tests: DefaultWebRepositoryTests {
         
         wait(for: [expectation], timeout: 0.1)
         
-        XCTAssertTrue(requestFactory.invokedMake)
+        XCTAssertTrue(requestBuilder.invokedMake)
         XCTAssertTrue(middleware.invokedPrepare)
         XCTAssertTrue(middleware.invokedWillSend)
     }
@@ -352,7 +352,7 @@ final class DefaultWebRepository_Publisher_Tests: DefaultWebRepositoryTests {
         
         wait(for: [expectation], timeout: 0.1)
         
-        XCTAssertTrue(requestFactory.invokedMake)
+        XCTAssertTrue(requestBuilder.invokedMake)
         XCTAssertTrue(middleware.invokedPrepare)
         XCTAssertTrue(middleware.invokedWillSend)
     }
@@ -375,7 +375,7 @@ final class DefaultWebRepository_Publisher_Tests: DefaultWebRepositoryTests {
         
         wait(for: [expectation], timeout: 0.1)
         
-        XCTAssertTrue(requestFactory.invokedMake)
+        XCTAssertTrue(requestBuilder.invokedMake)
         XCTAssertTrue(middleware.invokedPrepare)
         XCTAssertTrue(middleware.invokedWillSend)
     }
@@ -398,7 +398,7 @@ final class DefaultWebRepository_Publisher_Tests: DefaultWebRepositoryTests {
         
         wait(for: [expectation], timeout: 0.1)
         
-        XCTAssertTrue(requestFactory.invokedMake)
+        XCTAssertTrue(requestBuilder.invokedMake)
         XCTAssertTrue(middleware.invokedPrepare)
         XCTAssertTrue(middleware.invokedWillSend)
     }
@@ -419,7 +419,7 @@ final class DefaultWebRepository_Publisher_Tests: DefaultWebRepositoryTests {
         
         wait(for: [expectation], timeout: 0.1)
         
-        XCTAssertTrue(requestFactory.invokedMake)
+        XCTAssertTrue(requestBuilder.invokedMake)
         XCTAssertTrue(middleware.invokedPrepare)
         XCTAssertTrue(middleware.invokedWillSend)
     }

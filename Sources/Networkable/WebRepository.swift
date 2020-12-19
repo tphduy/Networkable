@@ -13,10 +13,10 @@ import Foundation
 /// An Ad-hoc network layer built on `URLSession` to query web resources.
 public protocol WebRepository {
     
-    /// An object to construct request
-    var requestFactory: URLRequestBuildable { get }
+    /// A builder that constructs a request.
+    var requestBuilder: URLRequestBuildable { get }
     
-    /// Middlewares perform side effects whenever a request is sent or a response is received.
+    /// The middlewares that perform side effects whenever a request is sent or a response is received.
     var middlewares: [Middleware] { get }
     
     /// An object that coordinates a group of related, network data-transfer tasks.
@@ -57,7 +57,7 @@ extension WebRepository {
     func makeRequest(
         endpoint: Endpoint,
         middlewares: [Middleware]) throws -> URLRequest {
-        var request = try requestFactory.build(endpoint: endpoint)
+        var request = try requestBuilder.build(endpoint: endpoint)
         for middleware in middlewares {
             request = try middleware.prepare(request: request)
         }
@@ -148,7 +148,7 @@ public struct DefaultWebRepository: WebRepository {
     
     // MARK: - Dependencies
     
-    public var requestFactory: URLRequestBuildable
+    public var requestBuilder: URLRequestBuildable
     public var middlewares: [Middleware]
     public var session: URLSession
     
@@ -158,7 +158,7 @@ public struct DefaultWebRepository: WebRepository {
         requestFactory: URLRequestBuildable = URLRequestBuilder(),
         middlewares: [Middleware] = [LoggingMiddleware()],
         session: URLSession = .shared) {
-        self.requestFactory = requestFactory
+        self.requestBuilder = requestFactory
         self.middlewares = middlewares
         self.session = session
     }
