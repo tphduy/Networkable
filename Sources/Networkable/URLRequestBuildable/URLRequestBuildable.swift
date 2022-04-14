@@ -17,7 +17,7 @@ public protocol URLRequestBuildable {
     /// An enum specifies the interaction with the cached responses.
     var cachePolicy: URLRequest.CachePolicy { get set }
     
-    /// The timeout interval for the request.
+    /// The timeout interval in seconds for the request.
     ///
     /// If during a connection attempt the request remains idle for longer than the timeout interval, the request is considered to have timed out.
     var timeoutInterval: TimeInterval { get set }

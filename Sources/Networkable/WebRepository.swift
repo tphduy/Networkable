@@ -10,9 +10,8 @@ import Combine
 #endif
 import Foundation
 
-/// An Ad-hoc network layer built on `URLSession` to query web resources.
+/// An Ad-hoc network layer built on `URLSession` to perform an HTTP request.
 public protocol WebRepository {
-    
     /// A builder that constructs a request.
     var requestBuilder: URLRequestBuildable { get }
     

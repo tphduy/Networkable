@@ -7,7 +7,7 @@
 
 import Foundation
 
-/// An object re-presents a HTTP request.
+/// An object abstracts a HTTP request.
 public protocol Endpoint {
     /// A list of HTTP headers that let the client pass additional information with a request.
     ///
