@@ -7,9 +7,10 @@
 
 import Foundation
 
-/// The object re-presents HTTP methods to indicate the desired action to be performed for a given resource
-public enum Method: String, Hashable, Equatable, CaseIterable {
-    
+/// The object re-presents the HTTP methods to indicate the desired action to be performed for a given resource
+///
+/// https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods.
+public enum Method: String, Hashable, CaseIterable {
     /// Requests a representation of the specified resource. Requests using GET should only retrieve data.
     case get
     
