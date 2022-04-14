@@ -19,7 +19,7 @@ public struct URLRequestBuilder: URLRequestBuildable {
     
     // MARK: Init
     
-    /// An object that constructs an HTTP request.
+    /// Initiate a builder that constructs an HTTP request.
     /// - Parameters:
     ///   - baseURL: The base URL of the request. The default value is `nil`.
     ///   - cachePolicy: An enum specifies the interaction with the cached responses. The default value is `useProtocolCachePolicy`.

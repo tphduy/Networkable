@@ -7,27 +7,24 @@
 
 import Foundation
 
-/// A middleware validate a response by the response's status code
+/// A middleware determines whether a response is valid by verifying its status code.
 public struct StatusCodeValidationMiddleware: Middleware {
+    // MARK: Dependencies
     
-    // MARK: - Dependencies
-    
-    /// acceptable status code range
+    /// A range of HTTP response status codes that specifies a response is valid.
     public let acceptableStatusCodes: ResponseStatusCodes
     
-    // MARK: - Init
+    // MARK: Init
     
-    /// Creates a middleware validate a response by the response's status code
-    /// - Parameter acceptableStatusCodes: The range of acceptable status codes.
+    /// Initiate a middleware determines whether a response is valid by verifying its status code.
+    /// - Parameter acceptableStatusCodes: A range of HTTP response status codes that specifies a response is valid.
     public init(acceptableStatusCodes: ResponseStatusCodes = .success) {
         self.acceptableStatusCodes = acceptableStatusCodes
     }
     
-    // MARK: - Middleware
+    // MARK: Middleware
     
-    public func prepare(request: URLRequest) throws -> URLRequest {
-        return request
-    }
+    public func prepare(request: URLRequest) throws -> URLRequest { request }
     
     public func willSend(request: URLRequest) {}
     
@@ -35,14 +32,12 @@ public struct StatusCodeValidationMiddleware: Middleware {
         try validate(response: response)
     }
     
-    // MARK: - Main
+    // MARK: Main
     
-    /// Validate a response whether it is a HTTP response and its status code is acceptable
-    /// - Parameter response: The response to validate, it's must be a HTTP response.
-    /// - Throws:
-    ///     - An unexpected response error if the response is not HTTP response
-    ///     - An unacceptable code error if the response's status code is not acceptable
-    public func validate(response: URLResponse) throws {
+    /// Validate a response whether it is an HTTP response and its status code is acceptable.
+    /// - Parameter response: An object abstract information about a response. It's must be an instance of `HTTPURLResponse`.
+    /// - Throws: An unexpected response error if the response is not HTTP response, or an unacceptable code error if the response's status code is not acceptable.
+    func validate(response: URLResponse) throws {
         guard let code = (response as? HTTPURLResponse)?.statusCode else {
             throw NetworkableError.unexpectedResponse(response)
         }
