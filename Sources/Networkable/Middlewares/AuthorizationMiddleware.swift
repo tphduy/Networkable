@@ -7,86 +7,73 @@
 
 import Foundation
 
-// MARK: - AuthorizationMiddleware
-
-/// A middleware authorizees outgoing request
+/// A middleware authorizes an outgoing request.
 public struct AuthorizationMiddleware: Middleware {
     
-    /// A place within a request where authorization materials will be placed
+    /// An enum abstracts where the authorization components will be added within a request.
     public enum Place: Equatable, Hashable {
-        
-        /// The request's header
+        /// The request's header.
         case header
         
-        /// The query components of request's URL
+        /// The query components of the request's URL.
         case query
     }
     
-    // MARK: - Dependencies
+    // MARK: Dependencies
 
-    /// The key of authorization material
+    /// The key that specifies the authorization components.
     public var key: String
     
-    /// The authorization material
+    /// The authorization component.
     public var value: String
     
-    /// A place within a request where authorization materials will be placed
+    /// A place where the authorization components will be added within a request.
     public var place: Place
     
-    // MARK: - Init
+    // MARK: Init
     
-    /// Create a middleware authorizees outgoing request
+    /// Initiate a middleware authorizes an outgoing request.
     /// - Parameters:
-    ///   - key: The key of authorization material
-    ///   - value: The authorization material
-    ///   - place: A place within a request where authorization materials will be placed
+    ///   - key: The key that specifies the authorization components.
+    ///   - value: The authorization component.
+    ///   - place: A place where the authorization components will be added within a request. The default value is `.header`
     public init(
         key: String,
         value: String,
-        place: Place = .header) {
+        place: Place = .header
+    ) {
         self.key = key
         self.value = value
         self.place = place
     }
     
-    // MARK: - Middleware
+    // MARK: Middleware
 
     public func prepare(request: URLRequest) throws -> URLRequest {
-        let authorizedRequest = self.authorize(request: request)
-        return authorizedRequest
+        authorize(request: request)
     }
     
     public func willSend(request: URLRequest) {}
     
     public func didReceive(response: URLResponse, data: Data) throws {}
     
-    // MARK: - Main
+    // MARK: Utilities
     
-    /// Create an authorized request from the origin request
-    /// - Parameter request: The original request
-    /// - Returns: An authorized request
-    public func authorize(request: URLRequest) -> URLRequest {
-        guard
-            !key.isEmpty,
-            !value.isEmpty
-        else { return request }
-
-        var request = request
-
+    /// Return an authorized request from the origin request.
+    /// - Parameter request: An object abstracts information about the request.
+    /// - Returns: A request with embedded authorization components.
+    func authorize(request: URLRequest) -> URLRequest {
+        guard !key.isEmpty, !value.isEmpty else { return request }
+        var result = request
         switch place {
         case .header:
-            request.addValue(value, forHTTPHeaderField: key)
+            result.addValue(value, forHTTPHeaderField: key)
         case .query:
-            guard
-                let url = request.url,
-                var components = URLComponents(url: url, resolvingAgainstBaseURL: true)
-            else { break }
-            
+            guard let url = request.url, var components = URLComponents(url: url, resolvingAgainstBaseURL: true) else { break }
             let queryItem = URLQueryItem(name: key, value: value)
             components.queryItems = (components.queryItems ?? []) + [queryItem]
-            request.url = components.url
+            result.url = components.url
         }
-
-        return request
+        return result
     }
 }
