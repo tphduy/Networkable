@@ -7,19 +7,22 @@
 
 import Foundation
 
-/// The object that constructs a request.
+/// An object that constructs an HTTP request.
 public protocol URLRequestBuildable {
-    
     /// The base URL of the request.
+    ///
+    /// Example: https://api.foo.bar/v1.
     var baseURL: URL? { get set }
     
-    /// The cache policy for the request.
+    /// An enum specifies the interaction with the cached responses.
     var cachePolicy: URLRequest.CachePolicy { get set }
     
     /// The timeout interval for the request.
+    ///
+    /// If during a connection attempt the request remains idle for longer than the timeout interval, the request is considered to have timed out.
     var timeoutInterval: TimeInterval { get set }
     
-    /// Creates and initializes a URL request with the given endpoint.
-    /// - Parameter endpoint: The endpoint of the request.
+    /// Build an HTTP URL request with the given endpoint.
+    /// - Parameter endpoint: An object abstracts an endpoint of an HTTP request.
     func build(endpoint: Endpoint) throws -> URLRequest
 }
