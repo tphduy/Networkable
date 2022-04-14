@@ -8,19 +8,15 @@
 import Foundation
 
 extension URLResponse {
-    
-    /// Create a string re-presenting itself.
-    /// - Returns: A string re-presenting a itself.
+    /// Return a `String` representing itself.
+    /// - Returns: A `String` if the `url` is valid, otherwise, an emty `String`.
     public func logging() -> String {
         guard let url = self.url else { return "" }
-        var components = ["📩 Response: \(url.absoluteString)"]
-        if let response = self as? HTTPURLResponse {
-            components.append("-H \(response.statusCode)")
-            for header in response.allHeaderFields {
-                components.append("-H \"\(header.key): \(header.value)\"")
-            }
-        }
-
-        return components.joined(separator: "\n\t")
+        let title = "📩 Response: \(url.absoluteString)"
+        guard let response = self as? HTTPURLResponse else { return title }
+        let statusCode = "-H \(response.statusCode)"
+        let headers = response.allHeaderFields.map { "-H \"\($0): \($1)\"" }
+        let result = ([title, statusCode] + headers).joined(separator: "\n\t")
+        return result
     }
 }
