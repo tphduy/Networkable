@@ -19,5 +19,5 @@ public enum NetworkableError: Error, Equatable {
     case unexpectedResponse(URLResponse)
     
     /// A response with an unacceptable status code is received.
-    case unacceptableStatusCode(ResponseStatusCode, URLResponse)
+    case unacceptableStatusCode(Int, URLResponse)
 }
