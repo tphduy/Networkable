@@ -11,7 +11,7 @@ import Combine
 import XCTest
 @testable import Networkable
 
-class DefaultWebRepositoryTests: XCTestCase {
+final class DefaultWebRepositoryTests: XCTestCase {
     
     var data: Data!
     var url: String!

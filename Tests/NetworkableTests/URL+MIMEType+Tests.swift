@@ -2,6 +2,7 @@ import XCTest
 @testable import Networkable
 
 final class URL_MIMEType_Tests: XCTestCase {
+    // MARK: Test Case - mimeType()
     
     func test_mimeType_whenTypeIsApplication() throws {
         XCTAssertEqual(
