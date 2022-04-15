@@ -19,61 +19,68 @@ So the basic idea of **Networkable** is an ad-hoc network player built on top of
 ## Sample usage
 
 ```swift
-protocol MovieRepository {
+// An object provides methods for interacting with the crytocurrency market data in the remote database.
+struct DefaultRemoteCryptocurrencyMarketRepository: RemoteCryptocurrencyMarketRepository {
+    // MARK: Dependencies
     
-    func movie(id: Int, promise: @escaping (Result<Movie, Error>) -> Void)
-    func movie(id: Int) -> AnyPublisher<Movie, Error>
-}
-
-struct DefaultMovieRepository: MovieRepository, Repository {
+    /// An ad-hoc network layer built on URLSession to perform an HTTP request.
+    let provider: WebRepository
     
-    var requestFactory: URLRequestFactory = DefaultURLRequestFactory(baseURL: URL(string: "https://api.themoviedb.org/"))
-    var middlewares: [Middleware] = [LoggingMiddleware()]
-    var session: URLSession = .shared
+    // MARK: Init
     
-    func movie(id: Int, promise: @escaping (Result<Movie, Error>) -> Void) {
-        let endpoint = APIEndpoint.movie(id: id)
-        call(to: endpoint, promise: promise)
+    /// Initiate an object provides methods for interacting with the crytocurrency market data in the remote database.
+    /// - Parameter provider: An ad-hoc network layer built on URLSession to perform an HTTP request.
+    init(provider: WebRepository = DefaultWebRepository(requestBuilder: URLRequestBuilder(baseURL: URL(string: "https://api.coincap.io")))) {
+        self.provider = provider
     }
     
-    func movie(id: Int) -> AnyPublisher<Movie, Error> {
-        let endpoint = APIEndpoint.movie(id: id)
-        return call(to: endpoint)
+    // MARK: RemoteCryptocurrencyMarketRepository
+    func exchanges(promise: @escaping (Result<[Exchange], Error>) -> Void) -> URLSessionDataTask? {
+        struct Datum: Codable { let data: [Exchange] }
+        return provider.call(to: APIEndpoint.exchanges) { (result: Result<Datum, Error>) in
+            promise(result.map({ $0.data }))
+        }
     }
-}
-
-extension DefaultMovieRepository {
     
-    enum APIEndpoint: Networkable.Endpoint {
+#if canImport(Combine)
+    func exchanges() -> AnyPublisher<[Exchange], Error> {
+        struct Datum: Codable { let data: [Exchange] }
+        let result: AnyPublisher<Datum, Error> = provider.call(to: APIEndpoint.exchanges)
+        return result
+            .map(\.data)
+            .eraseToAnyPublisher()
+    }
+#endif
+    
+    // MARK: Subtypes - APIEndpoint
+    
+    /// An object abstracts a HTTP request.
+    enum APIEndpoint: Endpoint {
+        /// Get all available exchanges.
+        case exchanges
         
-        case movie(id: Int)
+        var headers: [String: String]? { nil }
         
-        var url: String {
-            switch self {
-            case let .movie(id): return "/3/movie/\(id)"
-            }
-        }
+        var url: String { "/v2/exchanges" }
         
-        var method: Networkable.Method {
-            switch self {
-            case .movie: return .get
-            }
-        }
+        var method: Method { .get }
         
-        func body() throws -> Data? {
-            switch self {
-            case .movie: return nil
-            }
-        }
+        func body() throws -> Data? { nil }
     }
 }
 ```
 
 ## Sample project
 
-I have provided a sample projects in https://github.com/duytph/Moviable. To use it download the repo, wait for Xcode resolve dependency and you're good to go. 
+```bash
+cd NetworkableExample
+pod install
+open NetworkableExample.xcworkspace
+```
+ 
+ Wait for the Cocoapods to generate the workspace then you're good to go. 
 
-`Networkable` use cases should be found in `Repositories` directory.
+`Networkable` use cases should be found in `UseCases` and `Repositories` directory.
 
 ## Features
 
