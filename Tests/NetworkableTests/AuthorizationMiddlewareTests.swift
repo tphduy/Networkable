@@ -9,29 +9,21 @@ import XCTest
 @testable import Networkable
 
 final class AuthorizationMiddlewareTests: XCTestCase {
+    // MARK: Misc
     
-    var queryItems1: URLQueryItem!
-    var queryItems2: URLQueryItem!
     var urlComponents: URLComponents!
-    var header1: (key: String, value: String)!
-    var header2: (key: String, value: String)!
     var request: URLRequest!
     var response: URLResponse!
     var key: String!
     var value: String!
     var place: AuthorizationMiddleware.Place!
     var sut: AuthorizationMiddleware!
+    
+    // MARK: Life Cycle
 
     override func setUpWithError() throws {
-        queryItems1 = URLQueryItem(name: "foo", value: "bar")
-        queryItems2 = URLQueryItem(name: "fizz", value: "buzz")
-        urlComponents = URLComponents(string: "https://apple.com/foo/bar")
-        urlComponents.queryItems = [queryItems1, queryItems2]
-        header1 = (key: "Foo", value: "Bar")
-        header2 = (key: "Fizz", value: "Buzz")
-        request = URLRequest(url: urlComponents.url!)
-        request.addValue(header1.value, forHTTPHeaderField: header1.key)
-        request.addValue(header2.value, forHTTPHeaderField: header2.key)
+        urlComponents = makeURLComponents()
+        request = makeRequest()
         response = HTTPURLResponse(url: urlComponents.url!, statusCode: 200, httpVersion: nil, headerFields: nil)
         key = "Authorization"
         value = "Bearer L8qq9PZyRg6ieKGEKhZolGC0vJWLw8iEJ88DRdyOg"
@@ -40,11 +32,7 @@ final class AuthorizationMiddlewareTests: XCTestCase {
     }
 
     override func tearDownWithError() throws {
-        queryItems1 = nil
-        queryItems2 = nil
         urlComponents = nil
-        header1 = nil
-        header2 = nil
         request = nil
         response = nil
         key = nil
@@ -53,7 +41,7 @@ final class AuthorizationMiddlewareTests: XCTestCase {
         sut = nil
     }
     
-    // MARK: - Init
+    // MARK: Test Cases - Init
 
     func testInit() throws {
         XCTAssertEqual(sut.key, key)
@@ -61,187 +49,88 @@ final class AuthorizationMiddlewareTests: XCTestCase {
         XCTAssertEqual(sut.place, place)
     }
     
-    // MARK: - Prepare Request
+    // MARK: Test Cases - prepare(request:)
     
-    func testPrepareRequest_whenKeyIsEmpty_itDoesNothing() throws {
+    func test_prepareRequest_whenKeyIsEmpty() throws {
         sut.key = ""
         
-        XCTAssertTrue(sut.key.isEmpty)
-        XCTAssertFalse(sut.value.isEmpty)
-        
-        sut.place = .header
-        
-        XCTAssertEqual(try sut.prepare(request: request), request)
-        
-        sut.place = .query
-        
-        XCTAssertEqual(try sut.prepare(request: request), request)
+        XCTAssertEqual(request, try sut.prepare(request: request))
     }
     
-    func testPrepareRequest_whenValueIsEmpty_itDoesNothing() throws {
+    func test_prepareRequest_whenValueIsEmpty() throws {
         sut.value = ""
         
-        XCTAssertFalse(sut.key.isEmpty)
-        XCTAssertTrue(sut.value.isEmpty)
-        
+        XCTAssertEqual(request, try sut.prepare(request: request))
+    }
+    
+    func test_prepareRequest_whenPlaceIsHeader() throws {
         sut.place = .header
-    
-        XCTAssertEqual(try sut.prepare(request: request), request)
         
+        let result = try sut.prepare(request: request)
+        let resultHeaders = result.allHTTPHeaderFields
+        let expectedHeaders = request.allHTTPHeaderFields?.merging([key: value], uniquingKeysWith: { $1 })
+        
+        XCTAssertNotEqual(result, request)
+        XCTAssertEqual(resultHeaders, expectedHeaders)
+    }
+    
+    func test_prepareRequest_whenPlaceIsQuery() throws {
         sut.place = .query
         
-        XCTAssertEqual(try sut.prepare(request: request), request)
+        let result = try sut.prepare(request: request)
+        let predicate: (URLQueryItem, URLQueryItem) -> Bool = { $0.name < $1.name }
+        let resultQuery = URLComponents(url: result.url!, resolvingAgainstBaseURL: true)!
+            .queryItems?
+            .sorted(by: predicate)
+        let expectedQuery = URLComponents(url: request.url!, resolvingAgainstBaseURL: false)
+            .flatMap { (source: URLComponents) -> [URLQueryItem]? in
+                var urlComponents = source
+                urlComponents.queryItems?.append(URLQueryItem(name: key, value: value))
+                return urlComponents.queryItems
+            }?
+            .sorted(by: predicate)
+        
+        XCTAssertNotEqual(result, request)
+        XCTAssertEqual(resultQuery, expectedQuery)
     }
     
-    func testPrepareRequest_whenPlaceIsHeader_withoutModifyingOriginHeaders_itAppendsAuthorizationHeader() throws {
-        XCTAssertEqual(request.value(forHTTPHeaderField: header1.key), header1.value)
-        XCTAssertEqual(request.value(forHTTPHeaderField: header2.key), header2.value)
-        
-        let preparedRequest = try sut.prepare(request: request)
-        
-        XCTAssertEqual(request.value(forHTTPHeaderField: header1.key), header1.value)
-        XCTAssertEqual(request.value(forHTTPHeaderField: header2.key), header2.value)
-        XCTAssertEqual(preparedRequest.value(forHTTPHeaderField: key), value)
-    }
+    // MARK: Test Cases - willSend(request:)
     
-    func testPrepareRequest_whenPlaceIsQuery_andURLIsAbsent_itDoesNothing() throws {
-        sut.place = .query
-        request.url = nil
-        
-        let preparedRequest = try sut.prepare(request: request)
-        
-        XCTAssertEqual(preparedRequest, request)
-    }
-    
-    func testPrepareRequest_whenPlaceIsQuery_andQueryIsNonExistent_itAppendsAuthorizationQuery() throws {
-        urlComponents.queryItems = nil
-        request = URLRequest(url: urlComponents.url!)
-        sut.place = .query
-        
-        XCTAssertNil(urlComponents.queryItems)
-        XCTAssertEqual(urlComponents.url, request.url)
-        
-        let preparedRequest = try sut.prepare(request: request)
-        let preparedURLComponents = URLComponents(url: preparedRequest.url!, resolvingAgainstBaseURL: true)!
-        
-        XCTAssertNotNil(preparedURLComponents.queryItems)
-        XCTAssertTrue(preparedURLComponents.queryItems!.contains(where: { (queryItem: URLQueryItem) -> Bool in
-            queryItem.name == key && queryItem.value == value
-        }))
-    }
-    
-    func testPrepareRequest_whenPlaceIsQuery_withoutModifyingOriginalQuery_itAppendsAuthorizationQuery() throws {
-        sut.place = .query
-        
-        XCTAssertTrue(urlComponents.queryItems!.contains(queryItems1))
-        XCTAssertTrue(urlComponents.queryItems!.contains(queryItems2))
-        XCTAssertEqual(urlComponents.url, request.url)
-        
-        let preparedRequest = try sut.prepare(request: request)
-        let preparedURLComponents = URLComponents(url: preparedRequest.url!, resolvingAgainstBaseURL: true)!
-        
-        XCTAssertTrue(preparedURLComponents.queryItems!.contains(queryItems1))
-        XCTAssertTrue(preparedURLComponents.queryItems!.contains(queryItems2))
-        XCTAssertTrue(preparedURLComponents.queryItems!.contains(where: { (queryItem: URLQueryItem) -> Bool in
-            queryItem.name == key && queryItem.value == value
-        }))
-    }
-    
-    // MARK: - Will Send Request
-
-    func testWillSendRequest() throws {
+    func test_willSendRequest() throws {
         XCTAssertNoThrow(sut.willSend(request: request))
     }
-
-    // MARK: - Did Receive Response And Data
-
-    func testDidReceiveResponseAndData() throws {
+    
+    // MARK: Test Cases - didReceive(response:)
+    
+    func test_didReceiveResponse() throws {
         XCTAssertNoThrow(try sut.didReceive(response: response, data: Data()))
     }
+}
+
+extension AuthorizationMiddlewareTests {
+    // MARK: Utilities
     
-    // MARK: - Authorize Request
-    
-    func testAuthorizeRequest_whenKeyIsEmpty_itDoesNothing() throws {
-        sut.key = ""
-        
-        XCTAssertTrue(sut.key.isEmpty)
-        XCTAssertFalse(sut.value.isEmpty)
-        
-        sut.place = .header
-        
-        XCTAssertEqual(sut.authorize(request: request), request)
-        
-        sut.place = .query
-        
-        XCTAssertEqual(sut.authorize(request: request), request)
+    private func makeURLComponents() -> URLComponents {
+        var result = URLComponents(string: "https://apple.com/foo/bar")!
+        result.queryItems = [
+            URLQueryItem(name: "foo", value: "bar"),
+            URLQueryItem(name: "fizz", value: "buzz"),
+        ]
+        return result
     }
     
-    func testAuthorizeRequest_whenValueIsEmpty_itDoesNothing() throws {
-        sut.value = ""
-        
-        XCTAssertFalse(sut.key.isEmpty)
-        XCTAssertTrue(sut.value.isEmpty)
-        
-        sut.place = .header
-    
-        XCTAssertEqual(sut.authorize(request: request), request)
-        
-        sut.place = .query
-        
-        XCTAssertEqual(sut.authorize(request: request), request)
+    private func makeRequest() -> URLRequest {
+        var result = URLRequest(url: urlComponents.url!)
+        result.addValue("Foo", forHTTPHeaderField: "Bar")
+        result.addValue("Fizz", forHTTPHeaderField: "Buzz")
+        return result
     }
     
-    func testAuthorizeRequest_whenPlaceIsHeader_withoutModifyingOriginHeaders_itAppendsAuthorizationHeader() throws {
-        XCTAssertEqual(request.value(forHTTPHeaderField: header1.key), header1.value)
-        XCTAssertEqual(request.value(forHTTPHeaderField: header2.key), header2.value)
-        
-        let preparedRequest = sut.authorize(request: request)
-        
-        XCTAssertEqual(request.value(forHTTPHeaderField: header1.key), header1.value)
-        XCTAssertEqual(request.value(forHTTPHeaderField: header2.key), header2.value)
-        XCTAssertEqual(preparedRequest.value(forHTTPHeaderField: key), value)
-    }
-    
-    func testAuthorizeRequest_whenPlaceIsQuery_andURLIsAbsent_itDoesNothing() throws {
-        sut.place = .query
-        request.url = nil
-        
-        let preparedRequest = sut.authorize(request: request)
-        
-        XCTAssertEqual(preparedRequest, request)
-    }
-    
-    func testAuthorizeRequest_whenPlaceIsQuery_andQueryIsNonExistent_itAppendsAuthorizationQuery() throws {
-        urlComponents.queryItems = nil
-        request = URLRequest(url: urlComponents.url!)
-        sut.place = .query
-        
-        XCTAssertNil(urlComponents.queryItems)
-        XCTAssertEqual(urlComponents.url, request.url)
-        
-        let preparedRequest = sut.authorize(request: request)
-        let preparedURLComponents = URLComponents(url: preparedRequest.url!, resolvingAgainstBaseURL: true)!
-        
-        XCTAssertNotNil(preparedURLComponents.queryItems)
-        XCTAssertTrue(preparedURLComponents.queryItems!.contains(where: { (queryItem: URLQueryItem) -> Bool in
-            queryItem.name == key && queryItem.value == value
-        }))
-    }
-    
-    func testAuthorizeRequest_whenPlaceIsQuery_withoutModifyingOriginalQuery_itAppendsAuthorizationQuery() throws {
-        sut.place = .query
-        
-        XCTAssertTrue(urlComponents.queryItems!.contains(queryItems1))
-        XCTAssertTrue(urlComponents.queryItems!.contains(queryItems2))
-        XCTAssertEqual(urlComponents.url, request.url)
-        
-        let preparedRequest = sut.authorize(request: request)
-        let preparedURLComponents = URLComponents(url: preparedRequest.url!, resolvingAgainstBaseURL: true)!
-        
-        XCTAssertTrue(preparedURLComponents.queryItems!.contains(queryItems1))
-        XCTAssertTrue(preparedURLComponents.queryItems!.contains(queryItems2))
-        XCTAssertTrue(preparedURLComponents.queryItems!.contains(where: { (queryItem: URLQueryItem) -> Bool in
-            queryItem.name == key && queryItem.value == value
-        }))
+    private func makeResponse() -> URLResponse {
+        HTTPURLResponse(
+            url: urlComponents.url!,
+            statusCode: 200,
+            httpVersion: nil,
+            headerFields: nil)!
     }
 }
