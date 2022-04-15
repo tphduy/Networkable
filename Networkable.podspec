@@ -21,8 +21,11 @@ TODO: Add long description of the pod here.
   s.source           = { :git => 'https://github.com/duytph/Networkable.git', :tag => s.version.to_s }
 
   s.ios.deployment_target = '10.0'
-  
-  s.swift_versions = "5.3"
+  s.osx.deployment_target = '10.12'
+  s.tvos.deployment_target = '10.0'
+  s.watchos.deployment_target = '3.0'
+
+  s.swift_versions = "5.5"
 
   s.source_files = 'Sources/**/*'
 end
