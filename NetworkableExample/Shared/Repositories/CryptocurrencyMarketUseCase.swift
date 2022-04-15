@@ -17,7 +17,7 @@ protocol CryptocurrencyMarketUseCase {
     /// Get all available exchanges.
     /// - Parameter promise: A promise to be fulfilled with a result represents either a success or a failure. The success value is the cart data of a store.
     /// - Returns: A URL session task that returns downloaded data directly to the app in memory.
-    func exchanges(promise: @escaping (Result<[Exchange], Error>) -> Void) -> URLSessionDataTask?
+    @discardableResult func exchanges(promise: @escaping (Result<[Exchange], Error>) -> Void) -> URLSessionDataTask?
     
 #if canImport(Combine)
     /// Get all available exchanges.
@@ -43,7 +43,7 @@ struct DefaultCryptocurrencyMarketUseCase: CryptocurrencyMarketUseCase {
     
     // MARK: CryptocurrencyMarketUseCase
     
-    func exchanges(promise: @escaping (Result<[Exchange], Error>) -> Void) -> URLSessionDataTask? {
+    @discardableResult func exchanges(promise: @escaping (Result<[Exchange], Error>) -> Void) -> URLSessionDataTask? {
         remoteCryptocurrencyMarketRepository.exchanges(promise: promise)
     }
     
@@ -60,14 +60,14 @@ struct DefaultCryptocurrencyMarketUseCase: CryptocurrencyMarketUseCase {
 struct StubbedCryptocurrencyMarketUseCase: CryptocurrencyMarketUseCase {
     // MARK: CryptocurrencyMarketUseCase
     
-    func exchanges(promise: @escaping (Result<[Exchange], Error>) -> Void) -> URLSessionDataTask? {
-        promise(.success(Exchange.stubbed))
+    @discardableResult  func exchanges(promise: @escaping (Result<[Exchange], Error>) -> Void) -> URLSessionDataTask? {
+        promise(.success(.stubbed))
         return nil
     }
     
     func exchanges() -> AnyPublisher<[Exchange], Error> {
         Future<[Exchange], Error> { promise in
-            promise(.success(Exchange.stubbed))
+            promise(.success(.stubbed))
         }
         .eraseToAnyPublisher()
     }

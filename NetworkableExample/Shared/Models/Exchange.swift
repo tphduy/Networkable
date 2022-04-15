@@ -24,6 +24,17 @@ struct Exchange: Codable, Equatable, Identifiable {
 
 #if DEBUG
 extension Exchange {
+    /// Return a stubbed object for previewing.
+    static var stubbed: Exchange {
+        Exchange(
+            id: "binance",
+            name: "Binance",
+            rank: "1",
+            exchangeURL: URL(string: "https://www.binance.com/"))
+    }
+}
+
+extension Array where Element == Exchange {
     /// A list of stubbed exchanges for previewing.
     static var stubbed: [Exchange] {
         let json = """
