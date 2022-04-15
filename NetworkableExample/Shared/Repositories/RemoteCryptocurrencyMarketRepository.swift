@@ -50,8 +50,8 @@ struct DefaultRemoteCryptocurrencyMarketRepository: RemoteCryptocurrencyMarketRe
 #if canImport(Combine)
     func exchanges() -> AnyPublisher<[Exchange], Error> {
         struct Datum: Codable { let data: [Exchange] }
-        let result: AnyPublisher<Datum, Error> = provider.call(to: APIEndpoint.exchanges)
-        return result
+        return provider
+            .call(to: APIEndpoint.exchanges, resultType: Datum.self)
             .map(\.data)
             .eraseToAnyPublisher()
     }

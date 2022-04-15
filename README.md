@@ -19,7 +19,7 @@ So the basic idea of **Networkable** is an ad-hoc network player built on top of
 ## Sample usage
 
 ```swift
-// An object provides methods for interacting with the crytocurrency market data in the remote database.
+/// An object provides methods for interacting with the crytocurrency market data in the remote database.
 struct DefaultRemoteCryptocurrencyMarketRepository: RemoteCryptocurrencyMarketRepository {
     // MARK: Dependencies
     
@@ -45,8 +45,8 @@ struct DefaultRemoteCryptocurrencyMarketRepository: RemoteCryptocurrencyMarketRe
 #if canImport(Combine)
     func exchanges() -> AnyPublisher<[Exchange], Error> {
         struct Datum: Codable { let data: [Exchange] }
-        let result: AnyPublisher<Datum, Error> = provider.call(to: APIEndpoint.exchanges)
-        return result
+        return provider
+            .call(to: APIEndpoint.exchanges, resultType: Datum.self)
             .map(\.data)
             .eraseToAnyPublisher()
     }

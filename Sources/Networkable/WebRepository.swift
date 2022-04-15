@@ -34,7 +34,8 @@ public protocol WebRepository {
         to endpoint: Endpoint,
         executionQueue: DispatchQueue,
         resultQueue: DispatchQueue,
-        decoder: JSONDecoder
+        decoder: JSONDecoder,
+        resultType: T.Type
     ) -> AnyPublisher<T, Error>
     #endif
     
@@ -73,7 +74,8 @@ extension WebRepository {
         to endpoint: Endpoint,
         executionQueue: DispatchQueue = .global(),
         resultQueue: DispatchQueue = .main,
-        decoder: JSONDecoder = JSONDecoder()
+        decoder: JSONDecoder = JSONDecoder(),
+        resultType: T.Type = T.self
     ) -> AnyPublisher<T, Error> {
         do {
             let middlewares = self.middlewares
