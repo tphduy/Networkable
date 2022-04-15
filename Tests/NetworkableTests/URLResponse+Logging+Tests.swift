@@ -28,7 +28,6 @@ final class URLResponse_Logging_Tests: XCTestCase {
             -H "Fizz: Buzz"
             -H "Foo: Bar"
         """
-        print(response.logging())
         XCTAssertEqual(response.logging(), logging)
     }
 }
