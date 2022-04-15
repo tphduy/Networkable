@@ -9,17 +9,18 @@ import XCTest
 @testable import Networkable
 
 final class StatusCodeValidationMiddlewareTests: XCTestCase {
+    // MARK: Misc
     
     var url: URL!
     var request: URLRequest!
-    var response: URLResponse!
     var acceptableStatusCodes: ResponseStatusCodes!
     var sut: StatusCodeValidationMiddleware!
+    
+    // MARK: Life Cycle
 
     override func setUpWithError() throws {
         url = URL(string: "https://apple.com")!
         request = URLRequest(url: url)
-        response = HTTPURLResponse(url: url, statusCode: 200, httpVersion: nil, headerFields: nil)
         acceptableStatusCodes = .success
         sut = StatusCodeValidationMiddleware(acceptableStatusCodes: acceptableStatusCodes)
     }
@@ -27,53 +28,65 @@ final class StatusCodeValidationMiddlewareTests: XCTestCase {
     override func tearDownWithError() throws {
         url = nil
         request = nil
-        response = nil
         acceptableStatusCodes = nil
         sut = nil
     }
     
-    // MARK: - Init
+    // MARK: Test Cases - Init
     
-    func testInit() throws {
+    func test_init() throws {
         XCTAssertEqual(sut.acceptableStatusCodes, acceptableStatusCodes)
     }
     
-    // MARK: - Prepare Request
+    // MARK: Test Cases - prepare(request:)
     
-    func testPrepareRequest() throws {
-        XCTAssertEqual(try sut.prepare(request: request), request)
+    func test_prepareRequest() throws {
+        XCTAssertEqual(request, try sut.prepare(request: request))
     }
     
-    // MARK: - Will Send Request
+    // MARK: Test Cases - willSend(request:)
     
-    func testWillSendRequest() throws {
+    func test_willSendRequest() throws {
         XCTAssertNoThrow(sut.willSend(request: request))
     }
     
-    // MARK: - Did Receive Response And Data
+    // MARK: Test Cases - didReceive(response:data)
 
-    func testDidReceiveResponseAndData_whenItIsNotHTTPResponse() throws {
-        response = URLResponse()
+    func test_didReceiveResponseAndData_whenItIsNotHTTPResponse() throws {
+        let response = URLResponse()
         let expected = NetworkableError.unexpectedResponse(response)
-        let expectedMessage = "expected throwing \(expected)"
 
-        XCTAssertThrowsError(try sut.didReceive(response: response, data: Data()), expectedMessage) { (error: Error) in
+        XCTAssertThrowsError(
+            try sut.didReceive(response: response, data: Data()),
+            "expected throwing \(expected)."
+        ) { (error: Error) in
             XCTAssertEqual(error as! NetworkableError, expected)
         }
     }
 
-    func testDidReceiveResponseAndData_whenStatusCodeIsUnacceptable() throws {
+    func test_didReceiveResponseAndData_whenStatusCodeIsUnacceptable() throws {
         let statusCode = acceptableStatusCodes.upperBound + 1
-        response = HTTPURLResponse(url: url, statusCode: statusCode, httpVersion: nil, headerFields: nil)
+        let response = makeResponse(statusCode: statusCode)
         let expected = NetworkableError.unacceptableStatusCode(statusCode, response)
-        let expectedMessage = "expected throwing \(expected)"
 
-        XCTAssertThrowsError(try sut.didReceive(response: response, data: Data()), expectedMessage) { (error: Error) in
+        XCTAssertThrowsError(
+            try sut.didReceive(response: response, data: Data()),
+            "expected throwing \(expected)."
+        ) { (error: Error) in
             XCTAssertEqual(error as! NetworkableError, expected)
         }
     }
 
-    func testDidReceiveResponseAndData() throws {
+    func test_didReceiveResponseAndData() throws {
+        let response = makeResponse(statusCode: acceptableStatusCodes.lowerBound)
         XCTAssertNoThrow(try sut.didReceive(response: response, data: Data()))
+    }
+}
+
+extension StatusCodeValidationMiddlewareTests {
+    // MARK: Utilities
+    
+    private func makeResponse(statusCode: Int) -> HTTPURLResponse {
+        HTTPURLResponse(url: url, statusCode: statusCode, httpVersion: nil, headerFields: nil)!
     }
 }
