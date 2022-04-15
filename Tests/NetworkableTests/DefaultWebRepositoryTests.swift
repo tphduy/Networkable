@@ -50,7 +50,7 @@ class DefaultWebRepositoryTests: XCTestCase {
         middleware.stubbedPrepareResult = request
         session = .stubbed
         sut = DefaultWebRepository(
-            requestFactory: requestBuilder,
+            requestBuilder: requestBuilder,
             middlewares: [middleware],
             session: session)
     }
@@ -82,7 +82,7 @@ class DefaultWebRepositoryTests: XCTestCase {
     
     // MARK: - Make Request
     
-    func testMakeRequest_whenRequestFactoryThrowsError_itRethrowsThatError() throws {
+    func testMakeRequest_whenRequestBuilderThrowsError_itRethrowsThatError() throws {
         let dummyError = DummyError()
         requestBuilder.stubbedMakeError = dummyError
         
@@ -109,7 +109,7 @@ class DefaultWebRepositoryTests: XCTestCase {
         XCTAssertTrue(middleware.invokedPrepare)
     }
     
-    func testMakeRequest_whenMiddlewaresIsEmpty_itReturnRequestConstructedRequestFactory() throws {
+    func testMakeRequest_whenMiddlewaresIsEmpty_itReturnRequestConstructedRequestBuilder() throws {
         let preparedRequest = try sut.makeRequest(
             endpoint: endpoint,
             middlewares: [])

@@ -7,23 +7,32 @@
 
 import Foundation
 
+/// An ad-hoc network layer that is built on URLSession to perform an HTTP request.
 public struct DefaultWebRepository: WebRepository {
     
     static let shared = DefaultWebRepository()
     
-    // MARK: - Dependencies
+    // MARK: Dependencies
     
     public var requestBuilder: URLRequestBuildable
+    
     public var middlewares: [Middleware]
+    
     public var session: URLSession
     
-    // MARK: - Init
+    // MARK: Init
     
+    /// Initiate an object that performs an HTTP request.
+    /// - Parameters:
+    ///   - requestBuilder: An object that constructs an HTTP request.
+    ///   - middlewares: A list of middlewares that will perform side effects whenever a request is sent or a response is received.
+    ///   - session: An object that coordinates a group of related, network data-transfer tasks.
     public init(
-        requestFactory: URLRequestBuildable = URLRequestBuilder(),
+        requestBuilder: URLRequestBuildable = URLRequestBuilder(),
         middlewares: [Middleware] = [LoggingMiddleware()],
-        session: URLSession = .shared) {
-        self.requestBuilder = requestFactory
+        session: URLSession = .shared
+    ) {
+        self.requestBuilder = requestBuilder
         self.middlewares = middlewares
         self.session = session
     }
