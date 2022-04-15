@@ -9,22 +9,21 @@ import XCTest
 @testable import Networkable
 
 final class URLRequest_Logging_Tests: XCTestCase {
+    // MARK: Misc
     
     var url: URL!
     var method: String!
     var headers: [String: String]!
     var body: Data!
     var sut: URLRequest!
+    
+    // MARK: Life Cycle
 
     override func setUpWithError() throws {
-        url = URL(string: "https://apple.com?foo=bar&id=1")!
-        method = "GET"
-        headers = ["foo": "bar"]
-        body = #"{"data":"some data"}"#.data(using: .utf8)
-        sut = URLRequest(url: url)
-        sut.httpMethod = method
-        sut.allHTTPHeaderFields = headers
-        sut.httpBody = body
+        sut = URLRequest(url: URL(string: "https://apple.com?foo=bar&id=1")!)
+        sut.httpMethod = "GET"
+        sut.allHTTPHeaderFields = ["foo": "bar"]
+        sut.httpBody = #"{"data":"some data"}"#.data(using: .utf8)
     }
 
     override func tearDownWithError() throws {
@@ -35,9 +34,9 @@ final class URLRequest_Logging_Tests: XCTestCase {
         sut = nil
     }
     
-    // MARK: - Logging
+    // MARK: Test Cases - logging()
 
-    func testLogging_whenMissingURL_itReturnAnEmptyString() throws {
+    func test_logging_whenURLIsNone() throws {
         sut.url = nil
         
         let logging = sut.logging()
@@ -45,36 +44,50 @@ final class URLRequest_Logging_Tests: XCTestCase {
         XCTAssertTrue(logging.isEmpty)
     }
 
-    func testLogging_whenMissingMethod_itReturnAStringRepresentingItself() throws {
+    func test_logging_whenMethodIsNone() throws {
         sut.httpMethod = nil
+        
         let logging = """
-        🚀 Request: https://apple.com?foo=bar&id=1\n\t-X GET\n\t-H "foo": "bar"\n\t-d "{"data":"some data"}"
+        🚀 Request: https://apple.com?foo=bar&id=1
+            -X GET
+            -H "foo": "bar"
+            -d "{"data":"some data"}"
         """
         
         XCTAssertEqual(sut.logging(), logging)
     }
     
-    func testLogging_whenMissingHeader_itReturnAStringRepresentingItself() throws {
+    func test_logging_whenHeadersAreNone() throws {
         sut.allHTTPHeaderFields = nil
+        
         let logging = """
-        🚀 Request: https://apple.com?foo=bar&id=1\n\t-X GET\n\t-H "foo": "bar"\n\t-d "{"data":"some data"}"
+        🚀 Request: https://apple.com?foo=bar&id=1
+            -X GET
+            -H "foo": "bar"
+            -d "{"data":"some data"}"
         """
         
         XCTAssertEqual(sut.logging(), logging)
     }
     
-    func testLogging_whenMissingBody_itReturnAStringRepresentingItself() throws {
+    func test_logging_whenBodyIsNone() throws {
         sut.httpBody = nil
+        
         let logging = """
-        🚀 Request: https://apple.com?foo=bar&id=1\n\t-X GET\n\t-H "foo": "bar"
+        🚀 Request: https://apple.com?foo=bar&id=1
+            -X GET
+            -H "foo": "bar"
         """
         
         XCTAssertEqual(sut.logging(), logging)
     }
     
-    func testLogging_itReturnAStringRepresentingItself() throws {
+    func test_logging() throws {
         let logging = """
-        🚀 Request: https://apple.com?foo=bar&id=1\n\t-X GET\n\t-H "foo": "bar"\n\t-d "{"data":"some data"}"
+        🚀 Request: https://apple.com?foo=bar&id=1
+            -X GET
+            -H "foo": "bar"
+            -d "{"data":"some data"}"
         """
         
         XCTAssertEqual(sut.logging(), logging)

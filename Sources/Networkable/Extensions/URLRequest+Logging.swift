@@ -20,7 +20,7 @@ extension URLRequest {
             .map { "-d \"\($0)\"" }
         let result = ([title, method] + headers + [body])
             .compactMap { $0 }
-            .joined(separator: "\n\t")
+            .joined(separator: "\n    ")
         return result
     }
 }

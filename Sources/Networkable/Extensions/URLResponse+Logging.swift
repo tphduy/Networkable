@@ -16,7 +16,7 @@ extension URLResponse {
         guard let response = self as? HTTPURLResponse else { return title }
         let statusCode = "-H \(response.statusCode)"
         let headers = response.allHeaderFields.map { "-H \"\($0): \($1)\"" }
-        let result = ([title, statusCode] + headers).joined(separator: "\n\t")
+        let result = ([title, statusCode] + headers).joined(separator: "\n    ")
         return result
     }
 }

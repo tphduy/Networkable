@@ -3,7 +3,7 @@ import XCTest
 
 final class URL_MIMEType_Tests: XCTestCase {
     
-    func testMIMEType_whenTypeIsApplication() throws {
+    func test_mimeType_whenTypeIsApplication() throws {
         XCTAssertEqual(
             URL(string: "file:///foo/file.json")!.mimeType(),
             "application/json")
@@ -17,7 +17,7 @@ final class URL_MIMEType_Tests: XCTestCase {
             "application/zip")
     }
     
-    func testMIMEType_whenTypeIsAudio() throws {
+    func test_mimeType_whenTypeIsAudio() throws {
         XCTAssertEqual(
             URL(string: "file:///foo/file.wav")!.mimeType(),
             "audio/vnd.wave")
@@ -31,7 +31,7 @@ final class URL_MIMEType_Tests: XCTestCase {
             "audio/flac")
     }
     
-    func testMIMEType_whenTypeIsImage() throws {
+    func test_mimeType_whenTypeIsImage() throws {
         XCTAssertEqual(
             URL(string: "file:///foo/file.jpeg")!.mimeType(),
             "image/jpeg")
@@ -49,7 +49,7 @@ final class URL_MIMEType_Tests: XCTestCase {
             "image/svg+xml")
     }
     
-    func testMIMEType_whenTypeIsVideo() throws {
+    func test_mimeType_whenTypeIsVideo() throws {
         XCTAssertEqual(
             URL(string: "file:///foo/file.mp4")!.mimeType(),
             "video/mp4")
@@ -63,7 +63,7 @@ final class URL_MIMEType_Tests: XCTestCase {
             "video/x-flv")
     }
     
-    func testMIMEType_whenTypeIsUndefined() throws {
+    func test_mimeType_whenTypeIsUndefined() throws {
         XCTAssertNil(URL(string: "https://www.apple.com")?.mimeType())
         XCTAssertNil(URL(string: "file:///foo/file.foo")?.mimeType())
         XCTAssertNil(URL(string: "file:///foo/file.bar")?.mimeType())

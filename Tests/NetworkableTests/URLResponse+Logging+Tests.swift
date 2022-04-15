@@ -8,36 +8,25 @@
 import XCTest
 
 final class URLResponse_Logging_Tests: XCTestCase {
+    // MARK: Test Cases - logging()
     
-    func testLogging_whenURLIsAbsent_itReturnAnEmptyString() throws {
-        let response = URLResponse()
-        
-        XCTAssertTrue(response.logging().isEmpty)
-    }
-    
-    func testLogging_whenURLIsValid_itReturnAStringRepresentingItself() throws {
-        let url = URL(string: "http://apple.com/foo/bar?id=1")!
-        let response = URLResponse(url: url, mimeType: nil, expectedContentLength: 0, textEncodingName: nil)
-        let logging = #"📩 Response: http://apple.com/foo/bar?id=1"#
-        
-        XCTAssertEqual(response.logging(), logging)
-    }
-    
-    func testLogging_whenItIsHTTPURLResponse_andURLIsAbsent_itReturnAnEmptyString() throws {
+    func test_logging_whenURLIsAbsent() throws {
         let response = HTTPURLResponse()
         
         XCTAssertTrue(response.logging().isEmpty)
     }
     
-    func testLogging_whenItIsHTTPURLResponse_andURLIsValid_itReturnAStringRepresentingItself() throws {
-        let url = URL(string: "http://apple.com/foo/bar?id=1")!
-        let statusCode = 200
-        let headers = [
-            "Foo": "Bar"
-        ]
-        let response = HTTPURLResponse(url: url, statusCode: statusCode, httpVersion: nil, headerFields: headers)!
+    func test_logging_() throws {
+        let response = HTTPURLResponse(
+            url: URL(string: "http://apple.com/foo/bar?id=1")!,
+            statusCode: 200,
+            httpVersion: nil,
+            headerFields: ["Foo": "Bar", "Fizz": "Buzz"])!
         let logging = """
-        📩 Response: http://apple.com/foo/bar?id=1\n\t-H 200\n\t-H "Foo: Bar"
+        📩 Response: http://apple.com/foo/bar?id=1
+            -H 200
+            -H "Fizz: Buzz"
+            -H "Foo: Bar"
         """
         
         XCTAssertEqual(response.logging(), logging)
