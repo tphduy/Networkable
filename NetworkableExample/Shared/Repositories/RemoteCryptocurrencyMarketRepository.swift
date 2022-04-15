@@ -35,7 +35,7 @@ struct DefaultRemoteCryptocurrencyMarketRepository: RemoteCryptocurrencyMarketRe
     
     /// Initiate an object provides methods for interacting with the crytocurrency market data in the remote database.
     /// - Parameter provider: An ad-hoc network layer built on URLSession to perform an HTTP request.
-    init(provider: WebRepository = DefaultWebRepository.shared) {
+    init(provider: WebRepository = DefaultWebRepository(requestBuilder: URLRequestBuilder(baseURL: URL(string: "https://api.coincap.io")))) {
         self.provider = provider
     }
     
@@ -66,7 +66,7 @@ struct DefaultRemoteCryptocurrencyMarketRepository: RemoteCryptocurrencyMarketRe
         
         var headers: [String: String]? { nil }
         
-        var url: String { "/exchanges" }
+        var url: String { "/v2/exchanges" }
         
         var method: Method { .get }
         
