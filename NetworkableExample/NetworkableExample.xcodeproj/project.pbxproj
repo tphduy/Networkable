@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3A31814928097FB100AA702E /* RemoteCryptocurrencyMarketRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A31814828097FB100AA702E /* RemoteCryptocurrencyMarketRepository.swift */; };
+		3AB671122809816F001AD29A /* Exchange.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AB671112809816F001AD29A /* Exchange.swift */; };
 		3AC8F3142809773B002C6F4C /* Tests_iOS.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AC8F3132809773B002C6F4C /* Tests_iOS.swift */; };
 		3AC8F3162809773B002C6F4C /* Tests_iOSLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AC8F3152809773B002C6F4C /* Tests_iOSLaunchTests.swift */; };
 		3AC8F3202809773B002C6F4C /* Tests_macOS.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AC8F31F2809773B002C6F4C /* Tests_macOS.swift */; };
@@ -40,6 +42,8 @@
 
 /* Begin PBXFileReference section */
 		2053C962E9F2841257312C79 /* Pods-NetworkableExample (iOS).release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NetworkableExample (iOS).release.xcconfig"; path = "Target Support Files/Pods-NetworkableExample (iOS)/Pods-NetworkableExample (iOS).release.xcconfig"; sourceTree = "<group>"; };
+		3A31814828097FB100AA702E /* RemoteCryptocurrencyMarketRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteCryptocurrencyMarketRepository.swift; sourceTree = "<group>"; };
+		3AB671112809816F001AD29A /* Exchange.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Exchange.swift; sourceTree = "<group>"; };
 		3AC8F2FB28097739002C6F4C /* NetworkableExampleApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkableExampleApp.swift; sourceTree = "<group>"; };
 		3AC8F2FC28097739002C6F4C /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		3AC8F2FD2809773B002C6F4C /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -93,6 +97,29 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		3A31814628097F8300AA702E /* UseCases */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = UseCases;
+			sourceTree = "<group>";
+		};
+		3A31814728097F8D00AA702E /* Repositories */ = {
+			isa = PBXGroup;
+			children = (
+				3A31814828097FB100AA702E /* RemoteCryptocurrencyMarketRepository.swift */,
+			);
+			path = Repositories;
+			sourceTree = "<group>";
+		};
+		3AB671102809812A001AD29A /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				3AB671112809816F001AD29A /* Exchange.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
 		3AC8F2F528097738002C6F4C = {
 			isa = PBXGroup;
 			children = (
@@ -109,6 +136,9 @@
 		3AC8F2FA28097739002C6F4C /* Shared */ = {
 			isa = PBXGroup;
 			children = (
+				3A31814728097F8D00AA702E /* Repositories */,
+				3AB671102809812A001AD29A /* Models */,
+				3A31814628097F8300AA702E /* UseCases */,
 				3AC8F2FB28097739002C6F4C /* NetworkableExampleApp.swift */,
 				3AC8F2FC28097739002C6F4C /* ContentView.swift */,
 				3AC8F2FD2809773B002C6F4C /* Assets.xcassets */,
@@ -416,6 +446,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3AB671122809816F001AD29A /* Exchange.swift in Sources */,
+				3A31814928097FB100AA702E /* RemoteCryptocurrencyMarketRepository.swift in Sources */,
 				3AC8F3252809773B002C6F4C /* ContentView.swift in Sources */,
 				3AC8F3232809773B002C6F4C /* NetworkableExampleApp.swift in Sources */,
 			);
