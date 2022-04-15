@@ -8,13 +8,16 @@
 import Foundation
 
 /// An object abstract an exchange is an organized market where (especially) tradable cryptocurrencies are bought and sold.
-struct Exchange: Codable, Equatable {
-    let exchangeID, name, rank: String
+struct Exchange: Codable, Equatable, Identifiable {
+    let id: String
+    let name: String?
+    let rank: String?
     let exchangeURL: URL?
 
     enum CodingKeys: String, CodingKey {
-        case exchangeID = "exchangeId"
-        case name, rank
+        case id = "exchangeId"
+        case name
+        case rank
         case exchangeURL = "exchangeUrl"
     }
 }
