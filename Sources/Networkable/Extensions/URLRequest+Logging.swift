@@ -14,7 +14,9 @@ extension URLRequest {
         guard let url = url else { return "" }
         let title =  "🚀 Request: \(url.absoluteString)"
         let method = httpMethod.map { "-X \($0)" }
-        let headers = allHTTPHeaderFields?.map { "-H \"\($0)\": \"\($1)\"" } ?? []
+        let headers = allHTTPHeaderFields?
+            .map { "-H \"\($0)\": \"\($1)\"" }
+            .sorted() ?? []
         let body = httpBody
             .map { String(data: $0, encoding: .utf8) }?
             .map { "-d \"\($0)\"" }
