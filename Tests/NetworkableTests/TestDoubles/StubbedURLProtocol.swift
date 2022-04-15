@@ -22,22 +22,15 @@ final class StubbedURLProtocol: URLProtocol {
 
     override func startLoading() {
         if let response = Self.stubbedResponse[request] {
-            client?.urlProtocol(
-                self,
-                didReceive: response,
-                cacheStoragePolicy: .notAllowed)
+            client?.urlProtocol(self, didReceive: response, cacheStoragePolicy: .notAllowed)
         }
 
         if let data = Self.stubbedData[request] {
-            client?.urlProtocol(
-                self,
-                didLoad: data)
+            client?.urlProtocol(self, didLoad: data)
         }
 
         if let error = Self.stubbedResponseError[self.request] {
-            client?.urlProtocol(
-                self,
-                didFailWithError: error)
+            client?.urlProtocol(self, didFailWithError: error)
         }
 
         client?.urlProtocolDidFinishLoading(self)

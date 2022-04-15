@@ -8,5 +8,5 @@
 import Foundation
 
 struct DummyError: Swift.Error, Equatable {
-    let uuid: UUID = UUID()
+    let uuid = UUID()
 }
