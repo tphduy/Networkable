@@ -12,8 +12,7 @@ import os
 
 /// A middleware logs network activities to a logging system.
 public struct LoggingMiddleware: Middleware {
-    
-    // MARK: - Dependencies
+    // MARK: Dependencies
     
     /// The log level to assign to the message.
     public var type: OSLogType
@@ -21,7 +20,7 @@ public struct LoggingMiddleware: Middleware {
     /// The custom log object categorizes the log messages.
     public var log: OSLog
 
-    // MARK: - Init
+    // MARK: Init
     
     /// Initiate a middleware logs network activities to a logging system.
     /// - Parameters:
@@ -35,7 +34,7 @@ public struct LoggingMiddleware: Middleware {
         self.log = log
     }
     
-    // MARK: - Middleware
+    // MARK: Middleware
     
     public func prepare(request: URLRequest) throws -> URLRequest { request }
 
@@ -49,7 +48,7 @@ public struct LoggingMiddleware: Middleware {
         log(message: message)
     }
 
-    // MARK: - Main
+    // MARK: Main
     
     /// Return a `String` representing a request.
     /// - Parameter request: An object abstracts information about the request.
