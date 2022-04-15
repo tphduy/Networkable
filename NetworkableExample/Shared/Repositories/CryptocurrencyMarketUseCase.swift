@@ -53,3 +53,23 @@ struct DefaultCryptocurrencyMarketUseCase: CryptocurrencyMarketUseCase {
     }
 #endif
 }
+
+#if DEBUG
+
+/// A stubbed implementation of `CryptocurrencyMarketUseCase` for preview.
+struct StubbedCryptocurrencyMarketUseCase: CryptocurrencyMarketUseCase {
+    // MARK: CryptocurrencyMarketUseCase
+    
+    func exchanges(promise: @escaping (Result<[Exchange], Error>) -> Void) -> URLSessionDataTask? {
+        promise(.success(Exchange.stubbed))
+        return nil
+    }
+    
+    func exchanges() -> AnyPublisher<[Exchange], Error> {
+        Future<[Exchange], Error> { promise in
+            promise(.success(Exchange.stubbed))
+        }
+        .eraseToAnyPublisher()
+    }
+}
+#endif
