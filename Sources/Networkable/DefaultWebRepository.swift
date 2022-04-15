@@ -10,7 +10,8 @@ import Foundation
 /// An ad-hoc network layer that is built on URLSession to perform an HTTP request.
 public struct DefaultWebRepository: WebRepository {
     
-    static let shared = DefaultWebRepository()
+    /// The shared web repository instance.
+    static public let shared = Self.init()
     
     // MARK: Dependencies
     
