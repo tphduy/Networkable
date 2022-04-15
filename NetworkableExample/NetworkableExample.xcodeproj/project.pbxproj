@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		3A31814928097FB100AA702E /* RemoteCryptocurrencyMarketRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A31814828097FB100AA702E /* RemoteCryptocurrencyMarketRepository.swift */; };
 		3A79B61B28098DA1003727E5 /* CryptocurrencyMarketUseCaseKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A79B61A28098DA1003727E5 /* CryptocurrencyMarketUseCaseKey.swift */; };
+		3A79B62028099D28003727E5 /* ExchangeRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A79B61F28099D28003727E5 /* ExchangeRow.swift */; };
 		3AB671122809816F001AD29A /* Exchange.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AB671112809816F001AD29A /* Exchange.swift */; };
 		3AB67114280985E6001AD29A /* CryptocurrencyMarketUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AB67113280985E6001AD29A /* CryptocurrencyMarketUseCase.swift */; };
 		3AC8F3142809773B002C6F4C /* Tests_iOS.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AC8F3132809773B002C6F4C /* Tests_iOS.swift */; };
@@ -17,8 +18,8 @@
 		3AC8F3222809773B002C6F4C /* Tests_macOSLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AC8F3212809773B002C6F4C /* Tests_macOSLaunchTests.swift */; };
 		3AC8F3232809773B002C6F4C /* NetworkableExampleApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AC8F2FB28097739002C6F4C /* NetworkableExampleApp.swift */; };
 		3AC8F3242809773B002C6F4C /* NetworkableExampleApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AC8F2FB28097739002C6F4C /* NetworkableExampleApp.swift */; };
-		3AC8F3252809773B002C6F4C /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AC8F2FC28097739002C6F4C /* ContentView.swift */; };
-		3AC8F3262809773B002C6F4C /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AC8F2FC28097739002C6F4C /* ContentView.swift */; };
+		3AC8F3252809773B002C6F4C /* ExchangeListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AC8F2FC28097739002C6F4C /* ExchangeListView.swift */; };
+		3AC8F3262809773B002C6F4C /* ExchangeListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AC8F2FC28097739002C6F4C /* ExchangeListView.swift */; };
 		3AC8F3272809773B002C6F4C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3AC8F2FD2809773B002C6F4C /* Assets.xcassets */; };
 		3AC8F3282809773B002C6F4C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3AC8F2FD2809773B002C6F4C /* Assets.xcassets */; };
 		87C61F2150CAD0D49ABB6C57 /* Pods_NetworkableExample__iOS_.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 77D0A9379276A0E23171208E /* Pods_NetworkableExample__iOS_.framework */; };
@@ -46,10 +47,11 @@
 		2053C962E9F2841257312C79 /* Pods-NetworkableExample (iOS).release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NetworkableExample (iOS).release.xcconfig"; path = "Target Support Files/Pods-NetworkableExample (iOS)/Pods-NetworkableExample (iOS).release.xcconfig"; sourceTree = "<group>"; };
 		3A31814828097FB100AA702E /* RemoteCryptocurrencyMarketRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteCryptocurrencyMarketRepository.swift; sourceTree = "<group>"; };
 		3A79B61A28098DA1003727E5 /* CryptocurrencyMarketUseCaseKey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CryptocurrencyMarketUseCaseKey.swift; sourceTree = "<group>"; };
+		3A79B61F28099D28003727E5 /* ExchangeRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExchangeRow.swift; sourceTree = "<group>"; };
 		3AB671112809816F001AD29A /* Exchange.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Exchange.swift; sourceTree = "<group>"; };
 		3AB67113280985E6001AD29A /* CryptocurrencyMarketUseCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CryptocurrencyMarketUseCase.swift; sourceTree = "<group>"; };
 		3AC8F2FB28097739002C6F4C /* NetworkableExampleApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkableExampleApp.swift; sourceTree = "<group>"; };
-		3AC8F2FC28097739002C6F4C /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		3AC8F2FC28097739002C6F4C /* ExchangeListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExchangeListView.swift; sourceTree = "<group>"; };
 		3AC8F2FD2809773B002C6F4C /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		3AC8F3022809773B002C6F4C /* NetworkableExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NetworkableExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3AC8F3082809773B002C6F4C /* NetworkableExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NetworkableExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -125,6 +127,16 @@
 			path = EnvironmentKeys;
 			sourceTree = "<group>";
 		};
+		3A79B61C28099CFE003727E5 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				3AC8F2FB28097739002C6F4C /* NetworkableExampleApp.swift */,
+				3AC8F2FC28097739002C6F4C /* ExchangeListView.swift */,
+				3A79B61F28099D28003727E5 /* ExchangeRow.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
 		3AB671102809812A001AD29A /* Models */ = {
 			isa = PBXGroup;
 			children = (
@@ -149,13 +161,12 @@
 		3AC8F2FA28097739002C6F4C /* Shared */ = {
 			isa = PBXGroup;
 			children = (
-				3A79B61928098D7F003727E5 /* EnvironmentKeys */,
-				3A31814728097F8D00AA702E /* Repositories */,
-				3AB671102809812A001AD29A /* Models */,
-				3A31814628097F8300AA702E /* UseCases */,
-				3AC8F2FB28097739002C6F4C /* NetworkableExampleApp.swift */,
-				3AC8F2FC28097739002C6F4C /* ContentView.swift */,
 				3AC8F2FD2809773B002C6F4C /* Assets.xcassets */,
+				3A79B61928098D7F003727E5 /* EnvironmentKeys */,
+				3AB671102809812A001AD29A /* Models */,
+				3A31814728097F8D00AA702E /* Repositories */,
+				3A31814628097F8300AA702E /* UseCases */,
+				3A79B61C28099CFE003727E5 /* Views */,
 			);
 			path = Shared;
 			sourceTree = "<group>";
@@ -460,11 +471,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3A79B62028099D28003727E5 /* ExchangeRow.swift in Sources */,
 				3AB67114280985E6001AD29A /* CryptocurrencyMarketUseCase.swift in Sources */,
 				3A79B61B28098DA1003727E5 /* CryptocurrencyMarketUseCaseKey.swift in Sources */,
 				3AB671122809816F001AD29A /* Exchange.swift in Sources */,
 				3A31814928097FB100AA702E /* RemoteCryptocurrencyMarketRepository.swift in Sources */,
-				3AC8F3252809773B002C6F4C /* ContentView.swift in Sources */,
+				3AC8F3252809773B002C6F4C /* ExchangeListView.swift in Sources */,
 				3AC8F3232809773B002C6F4C /* NetworkableExampleApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -473,7 +485,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3AC8F3262809773B002C6F4C /* ContentView.swift in Sources */,
+				3AC8F3262809773B002C6F4C /* ExchangeListView.swift in Sources */,
 				3AC8F3242809773B002C6F4C /* NetworkableExampleApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
