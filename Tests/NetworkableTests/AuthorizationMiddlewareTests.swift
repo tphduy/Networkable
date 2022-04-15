@@ -100,7 +100,7 @@ final class AuthorizationMiddlewareTests: XCTestCase {
         XCTAssertNoThrow(sut.willSend(request: request))
     }
     
-    // MARK: Test Cases - didReceive(response:)
+    // MARK: Test Cases - didReceive(response:data)
     
     func test_didReceiveResponse() throws {
         XCTAssertNoThrow(try sut.didReceive(response: response, data: Data()))

@@ -10,27 +10,26 @@ import os.log
 @testable import Networkable
 
 final class LoggingMiddlewareTests: XCTestCase {
+    // MARK: Misc
     
-    var url: URL!
     var request: URLRequest!
     var response: URLResponse!
     var type: OSLogType!
     var log: OSLog!
-
     var sut: LoggingMiddleware!
+    
+    // MARK: Life Cycle
 
     override func setUpWithError() throws {
-        url = URL(string: "https://apple.com")!
+        let url = URL(string: "https://apple.com")!
         request = URLRequest(url: url)
         response = HTTPURLResponse(url: url, statusCode: 200, httpVersion: nil, headerFields: nil)
         type = .info
         log = OSLog(subsystem: "com.duytph.UnitTest", category: "\(Self.self)")
-
         sut = LoggingMiddleware(type: type, log: log)
     }
 
     override func tearDownWithError() throws {
-        url = nil
         request = nil
         response = nil
         type = nil
@@ -38,36 +37,32 @@ final class LoggingMiddlewareTests: XCTestCase {
         sut = nil
     }
     
-    // MARK: - Init
+    // MARK: Test Cases - Init
     
     func testInit() {
         XCTAssertEqual(sut.type, type)
         XCTAssertEqual(sut.log, log)
     }
     
-    // MARK: - Will Send Request
+    // MARK: Test Cases - prepare(request:)
+    
+    func testPrepareRequest() throws {
+        XCTAssertEqual(request, try sut.prepare(request: request))
+    }
+    
+    // MARK: Test Cases - willSend(request:)
     
     func testWillSendRequest() throws {
         XCTAssertNoThrow(sut.willSend(request: request))
     }
     
-    // MARK: - Prepare Request
-    
-    func testPrepareRequest() throws {
-        let preparedRequest = try sut.prepare(request: request)
-        
-        XCTAssertEqual(request, preparedRequest)
-    }
-    
-    // MARK: - Did Receive Response And Data
+    // MARK: Test Cases - didReceive(response:data)
     
     func testDidReceiveResponseAndData() throws {
-        let data = Data()
-        
-        XCTAssertNoThrow(try sut.didReceive(response: response, data: data))
+        XCTAssertNoThrow(try sut.didReceive(response: response, data: Data()))
     }
     
-    // MARK: - Log Request
+    // MARK: Test Cases - log(request:)
 
     func testLogRequest() throws {
         let log = sut.log(request: request)
@@ -76,7 +71,7 @@ final class LoggingMiddlewareTests: XCTestCase {
         XCTAssertEqual(log, expected)
     }
     
-    // MARK: - Log Response
+    // MARK: Test Cases - log(response:data:)
 
     func testLogResponse_whenDataIsEmpty() throws {
         let data = Data()
@@ -90,7 +85,6 @@ final class LoggingMiddlewareTests: XCTestCase {
         let rawData = #"{"lorem":"isplum""#
         let data = rawData.data(using: .utf8)!
         let expected = response.logging() + "\n" + rawData
-        
         let log = sut.log(response: response, data: data)
         
         XCTAssertEqual(log, expected)
