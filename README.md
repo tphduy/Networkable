@@ -13,12 +13,30 @@ So the basic idea of **Networkable** is an ad-hoc network player built on top of
 
 >**Why not Alamofire/Moya?**
 >
->Comparing to them, **Networkable** is a tiny handy library, aimed at the most basic things of a network layer should behave, trigger a request then handle the response.
->If you are the type of developer who wants to manipulate everything under your scope, then an understandable package maybe the thing you favor.
+> Compared to them, **Networkable** is a tiny handy library, aimed at the most basic things of a network layer that should behave, trigger a request then handle the response.
+>If you are the type of developer who wants to manipulate everything under your scope, then an understandable package may be the thing you favor.
 
 ## Sample usage
 
 ```swift
+/// An object provides methods for interacting with the crytocurrency market data in the remote database.
+protocol RemoteCryptocurrencyMarketRepository {
+    /// Get all available exchanges.
+    /// - Parameter promise: A promise to be fulfilled with a result represents either a success or a failure. The success value is the cart data of a store.
+    /// - Returns: A URL session task that returns downloaded data directly to the app in memory.
+    func exchanges(promise: @escaping (Result<[Exchange], Error>) -> Void) -> URLSessionDataTask?
+    
+    /// Get all available exchanges.
+    /// - Returns: An asynchronously-delivered list of exchanges.
+    @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *)
+    func exchanges() async throws -> [Exchange]
+    
+    /// Get all available exchanges.
+    /// - Returns: A publisher emits result of a request.
+    @available(iOS 13.0, macOS 10.15, macCatalyst 13, tvOS 13, watchOS 6, *)
+    func exchanges() -> AnyPublisher<[Exchange], Error>
+}
+
 /// An object provides methods for interacting with the crytocurrency market data in the remote database.
 struct DefaultRemoteCryptocurrencyMarketRepository: RemoteCryptocurrencyMarketRepository {
     // MARK: Dependencies
@@ -35,22 +53,27 @@ struct DefaultRemoteCryptocurrencyMarketRepository: RemoteCryptocurrencyMarketRe
     }
     
     // MARK: RemoteCryptocurrencyMarketRepository
+    
     func exchanges(promise: @escaping (Result<[Exchange], Error>) -> Void) -> URLSessionDataTask? {
-        struct Datum: Codable { let data: [Exchange] }
-        return provider.call(to: APIEndpoint.exchanges) { (result: Result<Datum, Error>) in
+        provider.call(to: APIEndpoint.exchanges) { (result: Result<Datum<[Exchange]>, Error>) in
             promise(result.map({ $0.data }))
         }
     }
     
-#if canImport(Combine)
+    @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *)
+    func exchanges() async throws -> [Exchange] {
+        try await provider
+            .call(to: APIEndpoint.exchanges, resultType: Datum<[Exchange]>.self)
+            .data
+    }
+    
+    @available(iOS 13.0, macOS 10.15, macCatalyst 13, tvOS 13, watchOS 6, *)
     func exchanges() -> AnyPublisher<[Exchange], Error> {
-        struct Datum: Codable { let data: [Exchange] }
-        return provider
-            .call(to: APIEndpoint.exchanges, resultType: Datum.self)
+        provider
+            .call(to: APIEndpoint.exchanges, resultType: Datum<[Exchange]>.self)
             .map(\.data)
             .eraseToAnyPublisher()
     }
-#endif
     
     // MARK: Subtypes - APIEndpoint
     
@@ -84,23 +107,24 @@ open NetworkableExample.xcworkspace
 
 ## Features
 
-1. Combine Support
+1. Combine support
+2. async/await support
 2. Easy-peasy testing
 3. Lets you define a clear usage of different endpoints with associated enum values
 4. Middleware offers the capability of injecting logic
-    - Authenticate request
-    - Localize request
-    - Logging
-    - Error handling
-    - ...
+ - Authorize a request
+ - Localize a request
+ - Logging
+ - Error handling
+ - ...
 
 ## Requirements
-- iOS 10+
+- iOS 10.0+
 - MacOS 10.12+
 - tvOS 10.0+
 - watchOS 3.0+
-- Xcode 12+
-- Swift 5.3+
+- Xcode 13.3.1+
+- Swift 5.6+
 
 ## Installation
 
@@ -110,7 +134,7 @@ Embedded in a package
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/duytph/Networkable"),
+ .package(url: "https://github.com/duytph/Networkable"),
 ]
 ```
 
@@ -136,3 +160,4 @@ duytph, tphduy@gmail.com
 ## License
 
 Networkable is available under the MIT license. See the LICENSE file for more info.
+

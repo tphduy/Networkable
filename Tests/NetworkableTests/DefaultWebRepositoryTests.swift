@@ -57,9 +57,8 @@ class DefaultWebRepositoryTests: XCTestCase {
         let expectation = self.expectation(description: message)
         
         sut.call(to: endpoint) { (result: Result<DummyCodable, Error>) in
-            XCTAssertTrue(Thread.isMainThread)
-            guard case let .failure(error) = result else { return XCTFail(message) }
-            XCTAssertEqual(error as! DummyError, expected)
+            guard case let .failure(error as DummyError) = result else { return XCTFail(message) }
+            XCTAssertEqual(error, expected)
             expectation.fulfill()
         }
         
@@ -74,7 +73,6 @@ class DefaultWebRepositoryTests: XCTestCase {
         let expectation = self.expectation(description: message)
         
         sut.call(to: endpoint) { (result: Result<DummyCodable, Error>) in
-            XCTAssertTrue(Thread.isMainThread)
             guard case let .failure(error as NSError) = result else { return XCTFail(message) }
             XCTAssertTrue(error.domain.contains(String(describing: expected)))
             expectation.fulfill()
@@ -90,7 +88,6 @@ class DefaultWebRepositoryTests: XCTestCase {
         let expectation = self.expectation(description: message)
         
         sut.call(to: endpoint) { (result: Result<DummyCodable, Error>) in
-            XCTAssertTrue(Thread.isMainThread)
             guard case let .failure(error) = result else { return XCTFail(message) }
             XCTAssertTrue(error is DecodingError)
             expectation.fulfill()
@@ -107,7 +104,6 @@ class DefaultWebRepositoryTests: XCTestCase {
         let expectation = self.expectation(description: message)
         
         sut.call(to: endpoint) { (result: Result<DummyCodable, Error>) in
-            XCTAssertTrue(Thread.isMainThread)
             guard case let .failure(error as DummyError) = result else { return XCTFail(message) }
             XCTAssertEqual(error, expected)
             expectation.fulfill()
@@ -124,7 +120,6 @@ class DefaultWebRepositoryTests: XCTestCase {
         let expectation = self.expectation(description: message)
         
         sut.call(to: endpoint) { (result: Result<DummyCodable, Error>) in
-            XCTAssertTrue(Thread.isMainThread)
             guard case let .failure(error as NetworkableError) = result else { return XCTFail(message) }
             XCTAssertEqual(error, expected)
             expectation.fulfill()
@@ -134,33 +129,14 @@ class DefaultWebRepositoryTests: XCTestCase {
     }
     
     func test_call_whenCompleted_withNoData() throws {
-        let expected = NetworkableError.empty
         session.set(stubbedData: nil, for: request)
         
-        let message = "expect throwing \(expected)"
+        let message = "expect throwing \(DecodingError.self)"
         let expectation = self.expectation(description: message)
         
         sut.call(to: endpoint) { (result: Result<DummyCodable, Error>) in
-            XCTAssertTrue(Thread.isMainThread)
-            guard case let .failure(error as NetworkableError) = result else { return XCTFail(message) }
-            XCTAssertEqual(error, expected)
-            expectation.fulfill()
-        }
-        
-        wait(for: [expectation], timeout: 0.1)
-    }
-    
-    func test_call_whenCompleted_withEmptyData() throws {
-        let expected = NetworkableError.empty
-        session.set(stubbedData: Data(), for: request)
-        
-        let message = "expect throwing \(expected)"
-        let expectation = self.expectation(description: message)
-        
-        sut.call(to: endpoint) { (result: Result<DummyCodable, Error>) in
-            XCTAssertTrue(Thread.isMainThread)
             guard case let .failure(error) = result else { return XCTFail(message) }
-            XCTAssertEqual(error as! NetworkableError, expected)
+            XCTAssertTrue(error is DecodingError)
             expectation.fulfill()
         }
         
@@ -172,7 +148,6 @@ class DefaultWebRepositoryTests: XCTestCase {
         let expectation = self.expectation(description: message)
         
         sut.call(to: endpoint) { (result: Result<DummyCodable, Error>) in
-            XCTAssertTrue(Thread.isMainThread)
             guard case .success = result else { return XCTFail(message) }
             expectation.fulfill()
         }

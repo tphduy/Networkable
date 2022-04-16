@@ -17,13 +17,18 @@ protocol CryptocurrencyMarketUseCase {
     /// Get all available exchanges.
     /// - Parameter promise: A promise to be fulfilled with a result represents either a success or a failure. The success value is the cart data of a store.
     /// - Returns: A URL session task that returns downloaded data directly to the app in memory.
-    @discardableResult func exchanges(promise: @escaping (Result<[Exchange], Error>) -> Void) -> URLSessionDataTask?
+    @discardableResult
+    func exchanges(promise: @escaping (Result<[Exchange], Error>) -> Void) -> URLSessionDataTask?
     
-#if canImport(Combine)
+    /// Get all available exchanges.
+    /// - Returns: An asynchronously-delivered list of exchanges.
+    @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *)
+    func exchanges() async throws -> [Exchange]
+    
     /// Get all available exchanges.
     /// - Returns: A publisher emits result of a request.
+    @available(iOS 13.0, macOS 10.15, macCatalyst 13, tvOS 13, watchOS 6, *)
     func exchanges() -> AnyPublisher<[Exchange], Error>
-#endif
 }
 
 /// An object that manages the crytocurrency market data and apply business rules to achive a use case.
@@ -43,15 +48,20 @@ struct DefaultCryptocurrencyMarketUseCase: CryptocurrencyMarketUseCase {
     
     // MARK: CryptocurrencyMarketUseCase
     
-    @discardableResult func exchanges(promise: @escaping (Result<[Exchange], Error>) -> Void) -> URLSessionDataTask? {
+    @discardableResult
+    func exchanges(promise: @escaping (Result<[Exchange], Error>) -> Void) -> URLSessionDataTask? {
         remoteCryptocurrencyMarketRepository.exchanges(promise: promise)
     }
     
-#if canImport(Combine)
+    @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *)
+    func exchanges() async throws -> [Exchange] {
+        try await remoteCryptocurrencyMarketRepository.exchanges()
+    }
+    
+    @available(iOS 13.0, macOS 10.15, macCatalyst 13, tvOS 13, watchOS 6, *)
     func exchanges() -> AnyPublisher<[Exchange], Error> {
         remoteCryptocurrencyMarketRepository.exchanges()
     }
-#endif
 }
 
 #if DEBUG
@@ -60,11 +70,18 @@ struct DefaultCryptocurrencyMarketUseCase: CryptocurrencyMarketUseCase {
 struct StubbedCryptocurrencyMarketUseCase: CryptocurrencyMarketUseCase {
     // MARK: CryptocurrencyMarketUseCase
     
-    @discardableResult  func exchanges(promise: @escaping (Result<[Exchange], Error>) -> Void) -> URLSessionDataTask? {
+    @discardableResult
+    func exchanges(promise: @escaping (Result<[Exchange], Error>) -> Void) -> URLSessionDataTask? {
         promise(.success(.stubbed))
         return nil
     }
     
+    @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *)
+    func exchanges() async throws -> [Exchange] {
+        .stubbed
+    }
+    
+    @available(iOS 13.0, macOS 10.15, macCatalyst 13, tvOS 13, watchOS 6, *)@available(iOS 13.0, macOS 10.15, macCatalyst 13, tvOS 13, watchOS 6, *)
     func exchanges() -> AnyPublisher<[Exchange], Error> {
         Future<[Exchange], Error> { promise in
             promise(.success(.stubbed))
