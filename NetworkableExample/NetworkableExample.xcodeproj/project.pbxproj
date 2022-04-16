@@ -50,6 +50,8 @@
 		3A75CB33280A5110000E1D26 /* Datum.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Datum.swift; sourceTree = "<group>"; };
 		3A79B61A28098DA1003727E5 /* CryptocurrencyMarketUseCaseKey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CryptocurrencyMarketUseCaseKey.swift; sourceTree = "<group>"; };
 		3A79B61F28099D28003727E5 /* ExchangeRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExchangeRow.swift; sourceTree = "<group>"; };
+		3A8C19B1280A81A3006A3750 /* NetworkableExample (iOS).xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = "NetworkableExample (iOS).xctestplan"; sourceTree = "<group>"; };
+		3A8C19B2280A81AB006A3750 /* NetworkableExample (macOS).xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = "NetworkableExample (macOS).xctestplan"; sourceTree = "<group>"; };
 		3AB671112809816F001AD29A /* Exchange.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Exchange.swift; sourceTree = "<group>"; };
 		3AB67113280985E6001AD29A /* CryptocurrencyMarketUseCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CryptocurrencyMarketUseCase.swift; sourceTree = "<group>"; };
 		3AC8F2FB28097739002C6F4C /* NetworkableExampleApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkableExampleApp.swift; sourceTree = "<group>"; };
@@ -151,6 +153,8 @@
 		3AC8F2F528097738002C6F4C = {
 			isa = PBXGroup;
 			children = (
+				3A8C19B1280A81A3006A3750 /* NetworkableExample (iOS).xctestplan */,
+				3A8C19B2280A81AB006A3750 /* NetworkableExample (macOS).xctestplan */,
 				3AC8F2FA28097739002C6F4C /* Shared */,
 				3AC8F3092809773B002C6F4C /* macOS */,
 				3AC8F3122809773B002C6F4C /* Tests iOS */,

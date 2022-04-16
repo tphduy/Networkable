@@ -1,0 +1,28 @@
+{
+  "configurations" : [
+    {
+      "id" : "60AF7616-2DF8-4B03-9C6C-0AB511DE242E",
+      "name" : "Configuration 1",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "targetForVariableExpansion" : {
+      "containerPath" : "container:NetworkableExample.xcodeproj",
+      "identifier" : "3AC8F3072809773B002C6F4C",
+      "name" : "NetworkableExample (macOS)"
+    }
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:NetworkableExample.xcodeproj",
+        "identifier" : "3AC8F31A2809773B002C6F4C",
+        "name" : "Tests macOS"
+      }
+    }
+  ],
+  "version" : 1
+}
