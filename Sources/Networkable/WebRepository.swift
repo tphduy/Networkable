@@ -191,7 +191,6 @@ extension WebRepository {
         resultType: T.Type = T.self
     ) async throws -> T {
         let data: Data = try await call(to: endpoint)
-        guard !data.isEmpty else { throw NetworkableError.empty }
         let result = try decoder.decode(resultType, from: data)
         return result
     }
