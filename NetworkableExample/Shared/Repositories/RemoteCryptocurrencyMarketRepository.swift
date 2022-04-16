@@ -40,17 +40,16 @@ struct DefaultRemoteCryptocurrencyMarketRepository: RemoteCryptocurrencyMarketRe
     }
     
     // MARK: RemoteCryptocurrencyMarketRepository
+    
     func exchanges(promise: @escaping (Result<[Exchange], Error>) -> Void) -> URLSessionDataTask? {
-        struct Datum: Codable { let data: [Exchange] }
-        return provider.call(to: APIEndpoint.exchanges) { (result: Result<Datum, Error>) in
+        provider.call(to: APIEndpoint.exchanges) { (result: Result<Datum, Error>) in
             promise(result.map({ $0.data }))
         }
     }
     
 #if canImport(Combine)
     func exchanges() -> AnyPublisher<[Exchange], Error> {
-        struct Datum: Codable { let data: [Exchange] }
-        return provider
+        provider
             .call(to: APIEndpoint.exchanges, resultType: Datum.self)
             .map(\.data)
             .eraseToAnyPublisher()
