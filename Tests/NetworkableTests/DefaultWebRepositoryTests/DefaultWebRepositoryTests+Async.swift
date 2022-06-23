@@ -17,7 +17,7 @@ final class DefaultWebRepositoryTests_Async: DefaultWebRepositoryTests {
         middleware.stubbedPrepareError = expected
         
         do {
-            let _ = try await sut.call(to: endpoint, resultType: DummyCodable.self)
+            let _: DummyCodable = try await sut.call(to: endpoint)
         } catch {
             XCTAssertEqual(middleware.invokedPrepareCount, 1)
             XCTAssertEqual(middleware.invokedPrepareParameters?.request, request)
@@ -27,7 +27,7 @@ final class DefaultWebRepositoryTests_Async: DefaultWebRepositoryTests {
         }
         
         do {
-            try await sut.call(to: endpoint)
+            let _: DummyCodable = try await sut.call(to: endpoint)
         } catch {
             XCTAssertEqual(error as! DummyError, expected)
             XCTAssertEqual(middleware.invokedPrepareCount, 2)
@@ -41,9 +41,8 @@ final class DefaultWebRepositoryTests_Async: DefaultWebRepositoryTests {
         session.set(stubbedResponseError: DummyError(), for: request)
         
         do {
-            let _ = try await sut.call(to: endpoint, resultType: DummyCodable.self)
+            let _: DummyCodable = try await sut.call(to: endpoint)
         } catch {
-            XCTAssertTrue(true)
             XCTAssertEqual(middleware.invokedPrepareCount, 1)
             XCTAssertEqual(middleware.invokedPrepareParameters?.request, request)
             XCTAssertEqual(middleware.invokedWillSendCount, 1)
@@ -52,9 +51,8 @@ final class DefaultWebRepositoryTests_Async: DefaultWebRepositoryTests {
         }
         
         do {
-            try await sut.call(to: endpoint)
+            let _: DummyCodable = try await sut.call(to: endpoint)
         } catch {
-            XCTAssertTrue(true)
             XCTAssertEqual(middleware.invokedPrepareCount, 2)
             XCTAssertEqual(middleware.invokedPrepareParametersList.map({ $0.request }), [request, request])
             XCTAssertEqual(middleware.invokedWillSendCount, 2)
@@ -68,7 +66,7 @@ final class DefaultWebRepositoryTests_Async: DefaultWebRepositoryTests {
         session.set(stubbedData: data, for: request)
         
         do {
-            let _ = try await sut.call(to: endpoint, resultType: DummyCodable.self)
+            let _: DummyCodable = try await sut.call(to: endpoint)
         } catch {
             XCTAssertTrue(error is DecodingError)
             XCTAssertEqual(middleware.invokedPrepareCount, 1)
@@ -79,12 +77,6 @@ final class DefaultWebRepositoryTests_Async: DefaultWebRepositoryTests {
             XCTAssertEqual(middleware.invokedDidReceiveParameters?.response.url, response.url)
             XCTAssertEqual(middleware.invokedDidReceiveParameters?.data, data)
         }
-        
-        do {
-            try await sut.call(to: endpoint)
-        } catch {
-            XCTFail("expected not throwing")
-        }
     }
     
     func test_call_whenCompleted_andThrowingMiddlewareError() async throws {
@@ -92,7 +84,7 @@ final class DefaultWebRepositoryTests_Async: DefaultWebRepositoryTests {
         middleware.stubbedDidReceiveError = expected
         
         do {
-            let _ = try await sut.call(to: endpoint, resultType: DummyCodable.self)
+            let _: DummyCodable = try await sut.call(to: endpoint)
         } catch {
             XCTAssertEqual(error as! DummyError, expected)
             XCTAssertEqual(middleware.invokedPrepareCount, 1)
@@ -105,7 +97,7 @@ final class DefaultWebRepositoryTests_Async: DefaultWebRepositoryTests {
         }
         
         do {
-            try await sut.call(to: endpoint)
+            let _: DummyCodable = try await sut.call(to: endpoint)
         } catch {
             XCTAssertEqual(error as! DummyError, expected)
             XCTAssertEqual(middleware.invokedPrepareCount, 2)
@@ -120,7 +112,7 @@ final class DefaultWebRepositoryTests_Async: DefaultWebRepositoryTests {
     
     func test_call_whenCompleted() async throws {
         do {
-            let _ = try await sut.call(to: endpoint, resultType: DummyCodable.self)
+            let _: DummyCodable = try await sut.call(to: endpoint)
             XCTAssertEqual(middleware.invokedPrepareCount, 1)
             XCTAssertEqual(middleware.invokedPrepareParameters?.request, request)
             XCTAssertEqual(middleware.invokedWillSendCount, 1)
@@ -133,7 +125,7 @@ final class DefaultWebRepositoryTests_Async: DefaultWebRepositoryTests {
         }
         
         do {
-            try await sut.call(to: endpoint)
+            let _: DummyCodable = try await sut.call(to: endpoint)
             XCTAssertEqual(middleware.invokedPrepareCount, 2)
             XCTAssertEqual(middleware.invokedPrepareParametersList.map({ $0.request }), [request, request])
             XCTAssertEqual(middleware.invokedWillSendCount, 2)

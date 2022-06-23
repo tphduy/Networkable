@@ -68,7 +68,7 @@ public protocol WebRepository {
     /// - Parameters:
     ///   - endpoint: An object abstracts a HTTP request.
     @available(iOS 15.0, macOS 12.0, macCatalyst 15.0, tvOS 15.0, watchOS 8.0, *)
-    func call(to endpoint: Endpoint) async throws
+    func call<T: Decodable>(to endpoint: Endpoint) async throws -> T
     
 #if canImport(Combine)
     /// Call to a web resource specified by an endpoint.
@@ -195,8 +195,11 @@ extension WebRepository {
         return result
     }
     
-    public func call(to endpoint: Endpoint) async throws {
-        let _: Data = try await call(to: endpoint)
+    public func call<T: Decodable>(to endpoint: Endpoint) async throws -> T {
+        try await call(
+            to: endpoint,
+            decoder: JSONDecoder(),
+            resultType: T.self)
     }
 }
 
