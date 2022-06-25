@@ -13,7 +13,10 @@ let package = Package(
     products: [
         .library(
             name: "Networkable",
-            targets: ["Networkable"])
+            targets: ["Networkable"]),
+        .library(
+            name: "Reachability",
+            targets: ["Reachability"]),
     ],
     dependencies: [],
     targets: [
@@ -22,6 +25,12 @@ let package = Package(
             dependencies: []),
         .testTarget(
             name: "NetworkableTests",
-            dependencies: ["Networkable"])
+            dependencies: ["Networkable"]),
+        .target(
+            name: "Reachability",
+            dependencies: []),
+        .testTarget(
+            name: "ReachabilityTests",
+            dependencies: ["Reachability"]),
     ]
 )
