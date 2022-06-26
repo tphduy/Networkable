@@ -16,8 +16,20 @@ public enum NetworkableError: Error, Equatable {
     case invalidURL(String, relativeURL: URL?)
     
     /// An unexpected response is received.
-    case unexpectedResponse(URLResponse)
+    case unexpectedResponse(URLResponse, Data)
     
     /// A response with an unacceptable status code is received.
-    case unacceptableStatusCode(Int, URLResponse)
+    case unacceptableStatusCode(HTTPURLResponse, Data)
+    
+    // MARK: Utilities
+    
+    /// The data was returned along with the response.
+    public var data: Data? {
+        switch self {
+        case let .unexpectedResponse(_, data), let .unacceptableStatusCode(_, data):
+            return data
+        default:
+            return nil
+        }
+    }
 }

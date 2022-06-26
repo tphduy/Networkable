@@ -54,10 +54,11 @@ final class StatusCodeValidationMiddlewareTests: XCTestCase {
 
     func test_didReceiveResponseAndData_whenItIsNotHTTPResponse() throws {
         let response = URLResponse()
-        let expected = NetworkableError.unexpectedResponse(response)
+        let data = Data()
+        let expected = NetworkableError.unexpectedResponse(response, data)
 
         XCTAssertThrowsError(
-            try sut.didReceive(response: response, data: Data()),
+            try sut.didReceive(response: response, data: data),
             "expected throwing \(expected)."
         ) { (error: Error) in
             XCTAssertEqual(error as! NetworkableError, expected)
@@ -67,10 +68,11 @@ final class StatusCodeValidationMiddlewareTests: XCTestCase {
     func test_didReceiveResponseAndData_whenStatusCodeIsUnacceptable() throws {
         let statusCode = acceptableStatusCodes.upperBound + 1
         let response = makeResponse(statusCode: statusCode)
-        let expected = NetworkableError.unacceptableStatusCode(statusCode, response)
+        let data = Data()
+        let expected = NetworkableError.unacceptableStatusCode(response, data)
 
         XCTAssertThrowsError(
-            try sut.didReceive(response: response, data: Data()),
+            try sut.didReceive(response: response, data: data),
             "expected throwing \(expected)."
         ) { (error: Error) in
             XCTAssertEqual(error as! NetworkableError, expected)

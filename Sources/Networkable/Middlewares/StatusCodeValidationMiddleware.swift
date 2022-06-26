@@ -29,21 +29,23 @@ public struct StatusCodeValidationMiddleware: Middleware {
     public func willSend(request: URLRequest) {}
     
     public func didReceive(response: URLResponse, data: Data) throws {
-        try validate(response: response)
+        try validate(response: response, data: data)
     }
     
     // MARK: Main
     
     /// Validate a response whether it is an HTTP response and its status code is acceptable.
-    /// - Parameter response: An object abstracts informations about a response. It's must be an instance of `HTTPURLResponse`.
+    /// - Parameters:
+    ///   - response: An object abstracts informations about a response. It's must be an instance of `HTTPURLResponse`.
+    ///   - data: The data returned by the server.
     /// - Throws: An unexpected response error if the response is not HTTP response, or an unacceptable code error if the response's status code is not acceptable.
-    func validate(response: URLResponse) throws {
-        guard let code = (response as? HTTPURLResponse)?.statusCode else {
-            throw NetworkableError.unexpectedResponse(response)
+    func validate(response: URLResponse, data: Data) throws {
+        guard let response = response as? HTTPURLResponse else {
+            throw NetworkableError.unexpectedResponse(response, data)
         }
         
-        guard acceptableStatusCodes.contains(code) else {
-            throw NetworkableError.unacceptableStatusCode(code, response)
+        guard acceptableStatusCodes.contains(response.statusCode) else {
+            throw NetworkableError.unacceptableStatusCode(response, data)
         }
     }
 }
