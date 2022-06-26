@@ -22,91 +22,34 @@ public final class Reachability {
     /// An observer that you use to monitor and react to network changes.
     private let monitor: NWPathMonitor
     
-    /// A queue to starts monitoring path changes.
-    private let monitorQueue: DispatchQueue
-    
     /// A notification dispatch mechanism that is used to observe the application life cycle notifications.
     private let notificationCenter: NotificationCenter
-    
-    /// A queue to observe the application life cycle notifications.
-    private let notificationObservationQueue: OperationQueue?
-    
-    // MARK: Misc
-    
-    /// An object that keeps a reference to the `UIApplication.willEnterForegroundNotification` observation.
-    private(set) var willEnterForegroundObservation: NSObjectProtocol?
-    
-    /// An object that keeps a reference to the `UIApplication.didEnterBackgroundNotification` observation.
-    private(set) var didEnterBackgroundObservation: NSObjectProtocol?
     
     // MARK: Init
     
     /// Initiate an object that observes to the network path status and report the changes to a notification center.
     /// - Parameters:
     ///   - monitor: An observer that you use to monitor and react to network changes.
-    ///   - monitorQueue: A queue to starts monitoring path changes. The default value is `.global(qos: .background)`
     ///   - notificationCenter: A notification dispatch mechanism that is used to observe the application life cycle notifications. The default value is `.default`
-    ///   - notificationObservationQueue: A queue to observe the application life cycle notifications. The default value is `none`.
     public init(
         monitor: NWPathMonitor = NWPathMonitor(),
-        monitorQueue: DispatchQueue = .global(qos: .background),
-        notificationCenter: NotificationCenter = .default,
-        notificationObservationQueue: OperationQueue? = nil
+        notificationCenter: NotificationCenter = .default
     ) {
         self.monitor = monitor
-        self.monitorQueue = monitorQueue
         self.notificationCenter = notificationCenter
-        self.notificationObservationQueue = notificationObservationQueue
     }
     
     // MARK: Side Effects
     
-#if !os(watchOS) && !os(macOS)
-    /// Observe to the `UIApplication.willEnterForegroundNotification` notification if it hasn't been done before.
-    ///
-    /// it will start monitoring the network path status when the application is about to enter foreground.
-    private func observeApplicationWillEnterForegroundIfNeeded() {
-        guard willEnterForegroundObservation == nil else { return }
-        willEnterForegroundObservation = notificationCenter.addObserver(
-            forName: UIApplication.willEnterForegroundNotification,
-            object: nil,
-            queue: nil
-        ) { [weak self] (_: Notification) in
-            self?.start()
-        }
-    }
-    
-    /// Observe to the `UIApplication.didEnterBackgroundNotification` notification if it hasn't been done before.
-    ///
-    /// it will stop monitoring the network path status when the application did enter background.
-    private func observeApplicationDidEnterBackgroundIfNeeded() {
-        guard didEnterBackgroundObservation == nil else { return }
-        didEnterBackgroundObservation = notificationCenter.addObserver(
-            forName: UIApplication.didEnterBackgroundNotification,
-            object: nil,
-            queue: nil
-        ) { [weak self] (_: Notification) in
-            self?.cancel()
-        }
-    }
-#endif
-    
-    /// Perform any necessary task and observe to the application life cycle events for start/stop monitoring network path status.
-    public func bootstrap() {
-#if !os(watchOS) && !os(macOS)
-        observeApplicationWillEnterForegroundIfNeeded()
-        observeApplicationDidEnterBackgroundIfNeeded()
-#endif
-    }
-    
     /// Start monitoring path changes on `monitorQueue`.
-    public func start() {
+    /// - Parameter queue: A queue to starts monitoring path changes.
+    public func start(queue: DispatchQueue = .global(qos: .background)) {
         monitor.pathUpdateHandler = { [weak self] (path: NWPath) in
             guard let self = self else { return }
             let name = self.notificationName(for: path.status)
             self.notificationCenter.post(name: name, object: self)
         }
-        monitor.start(queue: monitorQueue)
+        monitor.start(queue: queue)
     }
     
     /// Stop monitoring network path updates.

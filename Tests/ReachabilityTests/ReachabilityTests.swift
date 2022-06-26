@@ -14,51 +14,32 @@ final class ReachabilityTests: XCTestCase {
     // MARK: Misc
     
     private var monitor: NWPathMonitor!
-    private var monitorQueue: DispatchQueue!
     private var notificationCenter: NotificationCenter!
-    private var notificationObservationQueue: OperationQueue!
     private var sut: Reachability!
     
     // MARK: Life Cycle
     
     override func setUpWithError() throws {
         monitor = NWPathMonitor()
-        monitorQueue = DispatchQueue(label: String(describing: Self.self), qos: .background)
         notificationCenter = NotificationCenter()
-        notificationObservationQueue =  OperationQueue()
-        sut = Reachability(
-            monitor: monitor,
-            monitorQueue: monitorQueue,
-            notificationCenter: notificationCenter,
-            notificationObservationQueue: notificationObservationQueue)
+        sut = Reachability(monitor: monitor, notificationCenter: notificationCenter)
     }
     
     override func tearDownWithError() throws {
         monitor = nil
-        monitorQueue = nil
         notificationCenter = nil
-        notificationObservationQueue = nil
         sut = nil
-    }
-    
-    // MARK: Test Case - boostrap()
-    
-    func test_bootstrap() throws {
-        sut.bootstrap()
-        
-#if !os(watchOS) && !os(macOS)
-        XCTAssertNotNil(sut.willEnterForegroundObservation)
-        XCTAssertNotNil(sut.didEnterBackgroundObservation)
-#endif
     }
     
     // MARK: Test Case - start()
     
     func test_start() throws {
-        sut.start()
+        let queue = DispatchQueue.global()
+        
+        sut.start(queue: queue)
         
         XCTAssertNotNil(monitor.pathUpdateHandler)
-        XCTAssertEqual(monitor.queue, monitorQueue)
+        XCTAssertEqual(monitor.queue, queue)
     }
     
     // MARK: Test Case - cancel()
