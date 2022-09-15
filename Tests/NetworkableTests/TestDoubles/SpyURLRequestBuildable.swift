@@ -78,12 +78,12 @@ final class SpyURLRequestBuildable: URLRequestBuildable {
 
     var invokedMake = false
     var invokedMakeCount = 0
-    var invokedMakeParameters: (endpoint: Endpoint, Void)?
-    var invokedMakeParametersList = [(endpoint: Endpoint, Void)]()
+    var invokedMakeParameters: (endpoint: Request, Void)?
+    var invokedMakeParametersList = [(endpoint: Request, Void)]()
     var stubbedMakeError: Error?
     var stubbedMakeResult: URLRequest!
 
-    func build(endpoint: Endpoint) throws -> URLRequest {
+    func build(endpoint: Request) throws -> URLRequest {
         invokedMake = true
         invokedMakeCount += 1
         invokedMakeParameters = (endpoint, ())

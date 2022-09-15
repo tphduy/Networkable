@@ -1,5 +1,5 @@
 //
-//  Endpoint.swift
+//  Request.swift
 //  Networkable
 //
 //  Created by Duy Tran on 7/12/20.
@@ -8,7 +8,7 @@
 import Foundation
 
 /// An object abstracts a HTTP request.
-public protocol Endpoint {
+public protocol Request {
     /// A list of HTTP headers that let the client pass additional information with a request.
     ///
     /// https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers).

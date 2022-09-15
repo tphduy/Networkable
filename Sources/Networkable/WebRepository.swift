@@ -31,7 +31,7 @@ public protocol WebRepository {
     /// - Returns: An URL session task that returns downloaded data directly to the app in memory.
     @discardableResult
     func call<T: Decodable>(
-        to endpoint: Endpoint,
+        to endpoint: Request,
         resultQueue: DispatchQueue?,
         decoder: JSONDecoder,
         resultType: T.Type,
@@ -46,7 +46,7 @@ public protocol WebRepository {
     /// - Returns: An URL session task that returns downloaded data directly to the app in memory.
     @discardableResult
     func call(
-        to endpoint: Endpoint,
+        to endpoint: Request,
         resultQueue: DispatchQueue?,
         promise: @escaping (Result<Void, Error>) -> Void
     ) -> URLSessionDataTask?
@@ -59,7 +59,7 @@ public protocol WebRepository {
     /// - Returns: A value of the specified type, if the decoder can parse the data.
     @available(iOS 15.0, macOS 12.0, macCatalyst 15.0, tvOS 15.0, watchOS 8.0, *)
     func call<T: Decodable>(
-        to endpoint: Endpoint,
+        to endpoint: Request,
         decoder: JSONDecoder,
         resultType: T.Type
     ) async throws -> T
@@ -68,7 +68,7 @@ public protocol WebRepository {
     /// - Parameters:
     ///   - endpoint: An object abstracts a HTTP request.
     @available(iOS 15.0, macOS 12.0, macCatalyst 15.0, tvOS 15.0, watchOS 8.0, *)
-    func call<T: Decodable>(to endpoint: Endpoint) async throws -> T
+    func call<T: Decodable>(to endpoint: Request) async throws -> T
     
 #if canImport(Combine)
     /// Call to a web resource specified by an endpoint.
@@ -79,7 +79,7 @@ public protocol WebRepository {
     /// - Returns: A publisher emits result of a request.
     @available(iOS 13.0, macOS 10.15, macCatalyst 13, tvOS 13, watchOS 6, *)
     func call<T: Decodable>(
-        to endpoint: Endpoint,
+        to endpoint: Request,
         decoder: JSONDecoder,
         resultType: T.Type
     ) -> AnyPublisher<T, Error>
@@ -89,7 +89,7 @@ public protocol WebRepository {
     ///   - endpoint: An object abstracts a HTTP request.
     /// - Returns: A publisher emits result of a request.
     @available(iOS 13.0, macOS 10.15, macCatalyst 13, tvOS 13, watchOS 6, *)
-    func call(to endpoint: Endpoint) -> AnyPublisher<Void, Error>
+    func call(to endpoint: Request) -> AnyPublisher<Void, Error>
 #endif
 }
 
@@ -101,7 +101,7 @@ extension WebRepository {
     ///   - endpoint: An object abstracts a HTTP request.
     ///   - middlewares: A list of middlewares that will perform side effects whenever a request is sent or a response is received.
     /// - Returns: A request that was cooked by a list of middlewares.
-    private func makeRequest(endpoint: Endpoint, middlewares: [Middleware]) throws -> URLRequest {
+    private func makeRequest(endpoint: Request, middlewares: [Middleware]) throws -> URLRequest {
         try middlewares.reduce(try requestBuilder.build(endpoint: endpoint)) { (partialResult: URLRequest, middleware: Middleware) in
             try middleware.prepare(request: partialResult)
         }
@@ -113,7 +113,7 @@ extension WebRepository {
     ///   - promise: A promise to be fulfilled with a result represents either a success or a failure.
     /// - Returns: An URL session task that returns downloaded data directly to the app in memory.
     private func call(
-        to endpoint: Endpoint,
+        to endpoint: Request,
         promise: @escaping (Result<Data, Error>) -> Void
     ) -> URLSessionDataTask? {
         do {
@@ -140,7 +140,7 @@ extension WebRepository {
     
     @discardableResult
     public func call<T: Decodable>(
-        to endpoint: Endpoint,
+        to endpoint: Request,
         resultQueue: DispatchQueue? = nil,
         decoder: JSONDecoder = JSONDecoder(),
         resultType: T.Type = T.self,
@@ -157,7 +157,7 @@ extension WebRepository {
     
     @discardableResult
     public func call(
-        to endpoint: Endpoint,
+        to endpoint: Request,
         resultQueue: DispatchQueue? = nil,
         promise: @escaping (Result<Void, Error>) -> Void
     ) -> URLSessionDataTask? {
@@ -177,7 +177,7 @@ extension WebRepository {
     /// - Parameters:
     ///   - endpoint: An object abstracts a HTTP request.
     /// - Returns: The data returned by the server.
-    private func call(to endpoint: Endpoint) async throws -> Data {
+    private func call(to endpoint: Request) async throws -> Data {
         let request = try makeRequest(endpoint: endpoint, middlewares: middlewares)
         middlewares.forEach { $0.willSend(request: request) }
         let (data, response) = try await session.data(for: request)
@@ -186,7 +186,7 @@ extension WebRepository {
     }
     
     public func call<T: Decodable>(
-        to endpoint: Endpoint,
+        to endpoint: Request,
         decoder: JSONDecoder = JSONDecoder(),
         resultType: T.Type = T.self
     ) async throws -> T {
@@ -195,7 +195,7 @@ extension WebRepository {
         return result
     }
     
-    public func call<T: Decodable>(to endpoint: Endpoint) async throws -> T {
+    public func call<T: Decodable>(to endpoint: Request) async throws -> T {
         try await call(
             to: endpoint,
             decoder: JSONDecoder(),
@@ -212,7 +212,7 @@ extension WebRepository {
     /// - Parameters:
     ///   - endpoint: An object abstracts a HTTP request.
     /// - Returns: A publisher emits result of a request.
-    private func call(to endpoint: Endpoint) -> AnyPublisher<Data, Error> {
+    private func call(to endpoint: Request) -> AnyPublisher<Data, Error> {
         do {
             let middlewares = middlewares
             let request = try makeRequest(endpoint: endpoint, middlewares: middlewares)
@@ -232,7 +232,7 @@ extension WebRepository {
     }
     
     public func call<T: Decodable>(
-        to endpoint: Endpoint,
+        to endpoint: Request,
         decoder: JSONDecoder = JSONDecoder(),
         resultType: T.Type = T.self
     ) -> AnyPublisher<T, Error> {
@@ -243,7 +243,7 @@ extension WebRepository {
             .eraseToAnyPublisher()
     }
     
-    public func call(to endpoint: Endpoint) -> AnyPublisher<Void, Error> {
+    public func call(to endpoint: Request) -> AnyPublisher<Void, Error> {
         call(to: endpoint)
             .map { (_: Data) in () }
             .eraseToAnyPublisher()
