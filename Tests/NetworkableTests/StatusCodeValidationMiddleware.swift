@@ -11,28 +11,25 @@ import XCTest
 final class StatusCodeValidationMiddlewareTests: XCTestCase {
     // MARK: Misc
     
-    var url: URL!
-    var request: URLRequest!
-    var acceptableStatusCodes: ResponseStatusCodes!
-    var sut: StatusCodeValidationMiddleware!
+    private var request: URLRequest!
+    private var acceptableStatusCodes: ResponseStatusCodes!
+    private var sut: StatusCodeValidationMiddleware!
     
     // MARK: Life Cycle
 
     override func setUpWithError() throws {
-        url = URL(string: "https://apple.com")!
-        request = URLRequest(url: url)
+        request = makeRequest()
         acceptableStatusCodes = .success
         sut = StatusCodeValidationMiddleware(acceptableStatusCodes: acceptableStatusCodes)
     }
 
     override func tearDownWithError() throws {
-        url = nil
         request = nil
         acceptableStatusCodes = nil
         sut = nil
     }
     
-    // MARK: Test Cases - Init
+    // MARK: Test Cases - init(acceptableStatusCodes:)
     
     func test_init() throws {
         XCTAssertEqual(sut.acceptableStatusCodes, acceptableStatusCodes)
@@ -41,13 +38,13 @@ final class StatusCodeValidationMiddlewareTests: XCTestCase {
     // MARK: Test Cases - prepare(request:)
     
     func test_prepareRequest() throws {
-        XCTAssertEqual(request, try sut.prepare(request: request))
+        XCTAssertEqual(try! sut.prepare(request: request), request)
     }
     
     // MARK: Test Cases - willSend(request:)
     
-    func test_willSendRequest() throws {
-        XCTAssertNoThrow(sut.willSend(request: request))
+    func willSend(request: URLRequest) {
+        sut.willSend(request: request)
     }
     
     // MARK: Test Cases - didReceive(response:data)
@@ -81,14 +78,33 @@ final class StatusCodeValidationMiddlewareTests: XCTestCase {
 
     func test_didReceiveResponseAndData() throws {
         let response = makeResponse(statusCode: acceptableStatusCodes.lowerBound)
+        
         XCTAssertNoThrow(try sut.didReceive(response: response, data: Data()))
+    }
+    
+    // MARK: Test Cases - didReceive(error:of:)
+    
+    func didReceive(error: Error, of request: URLRequest) {
+        sut.didReceive(error: DummyError(), of: request)
     }
 }
 
 extension StatusCodeValidationMiddlewareTests {
     // MARK: Utilities
     
+    private func makeURL() -> URL {
+        URL(string: "https://apple.com")!
+    }
+    
+    private func makeRequest() -> URLRequest {
+        URLRequest(url: makeURL())
+    }
+    
     private func makeResponse(statusCode: Int) -> HTTPURLResponse {
-        HTTPURLResponse(url: url, statusCode: statusCode, httpVersion: nil, headerFields: nil)!
+        HTTPURLResponse(
+            url: makeURL(),
+            statusCode: statusCode,
+            httpVersion: nil,
+            headerFields: nil)!
     }
 }

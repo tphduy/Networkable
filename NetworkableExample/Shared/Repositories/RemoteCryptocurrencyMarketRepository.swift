@@ -68,7 +68,7 @@ struct DefaultRemoteCryptocurrencyMarketRepository: RemoteCryptocurrencyMarketRe
     
     // MARK: Subtypes - APIEndpoint
     
-    /// An object abstracts a HTTP request.
+    /// An object abstracts an HTTP request.
     enum APIEndpoint: Endpoint {
         /// Get all available exchanges.
         case exchanges

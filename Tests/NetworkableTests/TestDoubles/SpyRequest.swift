@@ -1,5 +1,5 @@
 //
-//  SpyEndpoint.swift
+//  SpyRequest.swift
 //  NetworkableTests
 //
 //  Created by Duy Tran on 7/12/20.
@@ -8,7 +8,7 @@
 import Foundation
 @testable import Networkable
 
-final class SpyEndpoint: Request {
+final class SpyRequest: Request {
 
     var invokedHeadersGetter = false
     var invokedHeadersGetterCount = 0

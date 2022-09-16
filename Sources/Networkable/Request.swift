@@ -7,7 +7,7 @@
 
 import Foundation
 
-/// An object abstracts a HTTP request.
+/// An object abstracts an HTTP request.
 public protocol Request {
     /// A list of HTTP headers that let the client pass additional information with a request.
     ///

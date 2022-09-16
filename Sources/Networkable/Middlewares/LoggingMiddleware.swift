@@ -6,11 +6,9 @@
 //
 
 import Foundation
-#if canImport(os)
 import os
-#endif
 
-/// A middleware logs network activities to a logging system.
+/// A middleware that logs network activities to a logging system.
 public struct LoggingMiddleware: Middleware {
     // MARK: Dependencies
     
@@ -22,7 +20,7 @@ public struct LoggingMiddleware: Middleware {
 
     // MARK: Init
     
-    /// Initiate a middleware logs network activities to a logging system.
+    /// Initiate a middleware that logs network activities to a logging system.
     /// - Parameters:
     ///   - type: The log level to assign to the message. The default value is `.default`.
     ///   - log: The custom log object categorizes the log message. The default value is `.default`.
@@ -33,28 +31,53 @@ public struct LoggingMiddleware: Middleware {
         self.type = type
         self.log = log
     }
-    
-    // MARK: Middleware
-    
-    public func prepare(request: URLRequest) throws -> URLRequest { request }
 
-    public func willSend(request: URLRequest) {
-        let message = log(request: request)
-        log(message: message)
+    // MARK: Utilities
+    
+    /// Returns a text that represents an URL load request .
+    /// - Parameter request: A URL load request that is independent of protocol or URL scheme.
+    /// - Returns: An empty text if the URL of request is invalid, otherwise, a non-empty text.
+    func makeDescription(request: URLRequest) -> String {
+        guard let url = request.url else { return "" }
+        let title = "🚀 Request: \(url.absoluteString)"
+        let method = request.httpMethod.map { "-X \($0)" }
+        let headers = request.allHTTPHeaderFields?
+            .map { "-H \"\($0)\": \"\($1)\"" }
+            .sorted() ?? []
+        let body = request.httpBody
+            .map { String(data: $0, encoding: .utf8) }?
+            .map { "-d \"\($0)\"" }
+        let result = ([title, method] + headers + [body])
+            .compactMap { $0 }
+            .joined(separator: "\n    ")
+        return result
     }
-
-    public func didReceive(response: URLResponse, data: Data) throws {
-        let message = log(response: response, data: data)
-        log(message: message)
-    }
-
-    // MARK: Main
     
-    /// Return a `String` representing a request.
-    /// - Parameter request: An object abstracts information about the request.
-    /// - Returns:  a `String` representing a request.
-    func log(request: URLRequest) -> String {
-        request.logging()
+    /// Returns a text that represents an URL load request .
+    /// - Parameters:
+    ///   - request: A URL load request that is independent of protocol or URL scheme.
+    ///   - error: An error that interrupted the request loading.
+    /// - Returns: An empty text if the URL of request is invalid, otherwise, a non-empty text.
+    func makeDescription(request: URLRequest, error: Error) -> String {
+        guard let url = request.url else { return "" }
+        let result = "📌 Request: \(url.absoluteString) did encounter an error: \(error.localizedDescription)"
+        return result
+    }
+     
+    /// Returns a text t.hat represents the metadata associated with the response to a URL load reques
+    /// - Parameter response: The metadata associated with the response to a URL load request, independent of protocol and URL scheme.
+    /// - Returns: An empty text if the URL of response is invalid, otherwise, a non-empty text.
+    func makeDescription(response: URLResponse) -> String {
+        guard let url = response.url else { return "" }
+        let title = "📩 Response: \(url.absoluteString)"
+        guard let response = response as? HTTPURLResponse else { return title }
+        let statusCode = "-H \(response.statusCode)"
+        let headers = response.allHeaderFields
+            .map { "-H \"\($0): \($1)\"" }
+            .sorted()
+        let result = ([title, statusCode] + headers)
+            .joined(separator: "\n    ")
+        return result
     }
     
     /// Return a `String` representing a response with the data returned by the server.
@@ -62,12 +85,17 @@ public struct LoggingMiddleware: Middleware {
     ///   - response: An object abstracts information about a response.
     ///   - data: The data returned by the server.
     /// - Returns: A `String` representing a response with the data returned by the server.
-    func log(response: URLResponse, data: Data) -> String {
-        [response.logging(), String(data: data, encoding: .utf8)]
+    func makeDescription(response: URLResponse, withData data: Data) -> String {
+        let response = makeDescription(response: response)
+        let data = String(data: data, encoding: .utf8)
+        let result = [response, data]
             .compactMap { $0 }
             .filter { !$0.isEmpty }
             .joined(separator: "\n")
+        return result
     }
+    
+    // MARK: Side Effects
     
     /// Log a message to logging system.
     /// - Parameter message: A message to log.
@@ -77,5 +105,26 @@ public struct LoggingMiddleware: Middleware {
         } else {
             debugPrint(message)
         }
+    }
+    
+    // MARK: Middleware
+    
+    public func prepare(request: URLRequest) throws -> URLRequest {
+        request
+    }
+
+    public func willSend(request: URLRequest) {
+        let message = makeDescription(request: request)
+        log(message: message)
+    }
+
+    public func didReceive(response: URLResponse, data: Data) throws {
+        let message = makeDescription(response: response, withData: data)
+        log(message: message)
+    }
+    
+    public func didReceive(error: Error, of request: URLRequest) {
+        let message = makeDescription(request: request, error: error)
+        log(message: message)
     }
 }

@@ -9,13 +9,13 @@ import Foundation
 @testable import Networkable
 
 final class SpyMiddleware: Middleware, Equatable {
-
+    
     static func == (lhs: SpyMiddleware, rhs: SpyMiddleware) -> Bool {
-        lhs.uuid == rhs.uuid
+        lhs.id == rhs.id
     }
 
-    let uuid = UUID()
-
+    private let id = UUID()
+    
     var invokedPrepare = false
     var invokedPrepareCount = 0
     var invokedPrepareParameters: (request: URLRequest, Void)?
@@ -46,19 +46,31 @@ final class SpyMiddleware: Middleware, Equatable {
         invokedWillSendParametersList.append((request, ()))
     }
 
-    var invokedDidReceive = false
-    var invokedDidReceiveCount = 0
-    var invokedDidReceiveParameters: (response: URLResponse, data: Data)?
-    var invokedDidReceiveParametersList = [(response: URLResponse, data: Data)]()
-    var stubbedDidReceiveError: Error?
+    var invokedDidReceiveResponse = false
+    var invokedDidReceiveResponseCount = 0
+    var invokedDidReceiveResponseParameters: (response: URLResponse, data: Data)?
+    var invokedDidReceiveResponseParametersList = [(response: URLResponse, data: Data)]()
+    var stubbedDidReceiveResponseError: Error?
 
     func didReceive(response: URLResponse, data: Data) throws {
-        invokedDidReceive = true
-        invokedDidReceiveCount += 1
-        invokedDidReceiveParameters = (response, data)
-        invokedDidReceiveParametersList.append((response, data))
-        if let error = stubbedDidReceiveError {
+        invokedDidReceiveResponse = true
+        invokedDidReceiveResponseCount += 1
+        invokedDidReceiveResponseParameters = (response, data)
+        invokedDidReceiveResponseParametersList.append((response, data))
+        if let error = stubbedDidReceiveResponseError {
             throw error
         }
+    }
+
+    var invokedDidReceiveError = false
+    var invokedDidReceiveErrorCount = 0
+    var invokedDidReceiveErrorParameters: (error: Error, request: URLRequest)?
+    var invokedDidReceiveErrorParametersList = [(error: Error, request: URLRequest)]()
+
+    func didReceive(error: Error, of request: URLRequest) {
+        invokedDidReceiveError = true
+        invokedDidReceiveErrorCount += 1
+        invokedDidReceiveErrorParameters = (error, request)
+        invokedDidReceiveErrorParametersList.append((error, request))
     }
 }

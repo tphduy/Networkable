@@ -11,16 +11,16 @@ import XCTest
 final class URLRequestBuilderTests: XCTestCase {
     // MARK: Misc
     
-    var endpoint: SpyEndpoint!
-    var baseURL: URL!
-    var cachePolicy: URLRequest.CachePolicy!
-    var timeoutInterval: TimeInterval!
-    var sut: URLRequestBuilder!
+    private var request: SpyRequest!
+    private var baseURL: URL!
+    private var cachePolicy: URLRequest.CachePolicy!
+    private var timeoutInterval: TimeInterval!
+    private var sut: URLRequestBuilder!
     
     // MARK: Life Cycle
 
     override func setUpWithError() throws {
-        endpoint = makeEndpoint()
+        request = makeRequest()
         baseURL = URL(string: "https://api.foo.bar")
         cachePolicy = .useProtocolCachePolicy
         timeoutInterval = 60
@@ -31,7 +31,7 @@ final class URLRequestBuilderTests: XCTestCase {
     }
 
     override func tearDownWithError() throws {
-        endpoint = nil
+        request = nil
         baseURL = nil
         cachePolicy = nil
         timeoutInterval = nil
@@ -46,67 +46,67 @@ final class URLRequestBuilderTests: XCTestCase {
         XCTAssertEqual(sut.timeoutInterval, timeoutInterval)
     }
     
-     // MARK: Test Cases - build(endpoint:)
+     // MARK: Test Cases - build(request:)
     
     func test_build_whenURLIsInvalid() throws {
-        endpoint.stubbedUrl = ""
+        request.stubbedUrl = ""
         
-        XCTAssertThrowsError(try sut.build(endpoint: endpoint)) { (error: Error) in
+        XCTAssertThrowsError(try sut.build(request: request)) { (error: Error) in
             XCTAssertEqual(
-                error as? NetworkableError,
-                .invalidURL(endpoint.stubbedUrl, relativeURL: baseURL))
+                error as! NetworkableError,
+                .invalidURL(request.stubbedUrl, relativeURL: baseURL))
         }
     }
     
     func test_build_whenURLIsAbsoblute() throws {
-        endpoint.stubbedUrl = "https://www.fizz.buzz/path?string=String&int=0&bool=true"
+        request.stubbedUrl = "https://www.fizz.buzz/path?string=String&int=0&bool=true"
         
-        let result = try sut.build(endpoint: endpoint)
+        let result = try sut.build(request: request)
         
         XCTAssertNotNil(sut.baseURL)
         XCTAssertNotEqual(result.url?.host, sut.baseURL?.host)
-        XCTAssertEqual(result.url, URL(string: endpoint.stubbedUrl))
+        XCTAssertEqual(result.url, URL(string: request.stubbedUrl))
         XCTAssertEqual(result.cachePolicy, cachePolicy)
         XCTAssertEqual(result.timeoutInterval, timeoutInterval)
-        XCTAssertEqual(result.allHTTPHeaderFields, endpoint.stubbedHeaders)
-        XCTAssertEqual(result.httpMethod, endpoint.stubbedMethod.rawValue.uppercased())
-        XCTAssertEqual(result.httpBody, endpoint.stubbedBodyResult)
+        XCTAssertEqual(result.allHTTPHeaderFields, request.stubbedHeaders)
+        XCTAssertEqual(result.httpMethod, request.stubbedMethod.rawValue.uppercased())
+        XCTAssertEqual(result.httpBody, request.stubbedBodyResult)
     }
     
     func test_build_whenURLIsRelative_andBaseURLIsSome() throws {
-        endpoint.stubbedUrl = "/path?string=String&int=0&bool=true"
+        request.stubbedUrl = "/path?string=String&int=0&bool=true"
         
-        let result = try sut.build(endpoint: endpoint)
+        let result = try sut.build(request: request)
         
         XCTAssertNotNil(sut.baseURL)
         XCTAssertEqual(result.url?.host, sut.baseURL?.host)
-        XCTAssertEqual(result.url, URL(string: endpoint.stubbedUrl, relativeTo: baseURL)?.absoluteURL)
+        XCTAssertEqual(result.url, URL(string: request.stubbedUrl, relativeTo: baseURL)?.absoluteURL)
         XCTAssertEqual(result.cachePolicy, cachePolicy)
         XCTAssertEqual(result.timeoutInterval, timeoutInterval)
-        XCTAssertEqual(result.allHTTPHeaderFields, endpoint.stubbedHeaders)
-        XCTAssertEqual(result.httpMethod, endpoint.stubbedMethod.rawValue.uppercased())
-        XCTAssertEqual(result.httpBody, endpoint.stubbedBodyResult)
+        XCTAssertEqual(result.allHTTPHeaderFields, request.stubbedHeaders)
+        XCTAssertEqual(result.httpMethod, request.stubbedMethod.rawValue.uppercased())
+        XCTAssertEqual(result.httpBody, request.stubbedBodyResult)
     }
     
     func test_build_whenURLIsRelative_andBaseURLIsNone() throws {
-        endpoint.stubbedUrl = "/path?string=String&int=0&bool=true"
+        request.stubbedUrl = "/path?string=String&int=0&bool=true"
         sut.baseURL = nil
         
-        let result = try sut.build(endpoint: endpoint)
+        let result = try sut.build(request: request)
         
-        XCTAssertEqual(result.url, URL(string: endpoint.stubbedUrl))
+        XCTAssertEqual(result.url, URL(string: request.stubbedUrl))
         XCTAssertEqual(result.cachePolicy, cachePolicy)
         XCTAssertEqual(result.timeoutInterval, timeoutInterval)
-        XCTAssertEqual(result.allHTTPHeaderFields, endpoint.stubbedHeaders)
-        XCTAssertEqual(result.httpMethod, endpoint.stubbedMethod.rawValue.uppercased())
-        XCTAssertEqual(result.httpBody, endpoint.stubbedBodyResult)
+        XCTAssertEqual(result.allHTTPHeaderFields, request.stubbedHeaders)
+        XCTAssertEqual(result.httpMethod, request.stubbedMethod.rawValue.uppercased())
+        XCTAssertEqual(result.httpBody, request.stubbedBodyResult)
     }
     
     func test_build_whenBodyThrowsError() throws {
         let bodyError = DummyError()
-        endpoint.stubbedBodyError = bodyError
+        request.stubbedBodyError = bodyError
         
-        XCTAssertThrowsError(try sut.build(endpoint: endpoint)) { (error: Error) in
+        XCTAssertThrowsError(try sut.build(request: request)) { (error: Error) in
             XCTAssertEqual(error as? DummyError, bodyError)
         }
     }
@@ -115,8 +115,8 @@ final class URLRequestBuilderTests: XCTestCase {
 extension URLRequestBuilderTests {
     // MARK: Utilities
     
-    private func makeEndpoint() -> SpyEndpoint {
-        let result = SpyEndpoint()
+    private func makeRequest() -> SpyRequest {
+        let result = SpyRequest()
         result.stubbedHeaders = ["key": "value"]
         result.stubbedUrl = #"/path?string=String&int=0&bool=true"#
         result.stubbedMethod = .get

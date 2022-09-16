@@ -7,7 +7,7 @@
 
 import Foundation
 
-/// A middleware authorizes an outgoing request.
+/// A middleware that authorizes an outgoing request.
 public struct AuthorizationMiddleware: Middleware {
     
     /// An enum abstracts where the authorization components will be added within a request.
@@ -32,7 +32,7 @@ public struct AuthorizationMiddleware: Middleware {
     
     // MARK: Init
     
-    /// Initiate a middleware authorizes an outgoing request.
+    /// Initiate a middleware that authorizes an outgoing request.
     /// - Parameters:
     ///   - key: The key that specifies the authorization components.
     ///   - value: The authorization component.
@@ -47,6 +47,43 @@ public struct AuthorizationMiddleware: Middleware {
         self.place = place
     }
     
+    // MARK: Utilities
+    
+    /// Return an authorized request from the origin request.
+    /// - Parameter request: An object abstracts information about the request.
+    /// - Returns: A request with embedded authorization components.
+    func authorize(request: URLRequest) -> URLRequest {
+        // Verifies the key and values are not empty.
+        guard
+            !key.isEmpty,
+            !value.isEmpty
+        else {
+            // Return the result.
+            return request
+        }
+        // Appends the authorization components.
+        var result = request
+        switch place {
+        case .header:
+            // Appends to request's header.
+            result.addValue(value, forHTTPHeaderField: key)
+        case .query:
+            // Verifies the URL of request are valid.
+            guard
+                let url = request.url,
+                var components = URLComponents(url: url, resolvingAgainstBaseURL: true)
+            else {
+                break
+            }
+            // Appends to the request's query items.
+            let queryItem = URLQueryItem(name: key, value: value)
+            components.queryItems = (components.queryItems ?? []) + [queryItem]
+            result.url = components.url
+        }
+        // Return the result.
+        return result
+    }
+    
     // MARK: Middleware
 
     public func prepare(request: URLRequest) throws -> URLRequest {
@@ -57,23 +94,5 @@ public struct AuthorizationMiddleware: Middleware {
     
     public func didReceive(response: URLResponse, data: Data) throws {}
     
-    // MARK: Utilities
-    
-    /// Return an authorized request from the origin request.
-    /// - Parameter request: An object abstracts information about the request.
-    /// - Returns: A request with embedded authorization components.
-    func authorize(request: URLRequest) -> URLRequest {
-        guard !key.isEmpty, !value.isEmpty else { return request }
-        var result = request
-        switch place {
-        case .header:
-            result.addValue(value, forHTTPHeaderField: key)
-        case .query:
-            guard let url = request.url, var components = URLComponents(url: url, resolvingAgainstBaseURL: true) else { break }
-            let queryItem = URLQueryItem(name: key, value: value)
-            components.queryItems = (components.queryItems ?? []) + [queryItem]
-            result.url = components.url
-        }
-        return result
-    }
+    public func didReceive(error: Error, of request: URLRequest) {}
 }

@@ -11,24 +11,27 @@ import XCTest
 final class AuthorizationMiddlewareTests: XCTestCase {
     // MARK: Misc
     
-    var urlComponents: URLComponents!
-    var request: URLRequest!
-    var response: URLResponse!
-    var key: String!
-    var value: String!
-    var place: AuthorizationMiddleware.Place!
-    var sut: AuthorizationMiddleware!
+    private var urlComponents: URLComponents!
+    private var request: URLRequest!
+    private var response: URLResponse!
+    private var key: String!
+    private var value: String!
+    private var place: AuthorizationMiddleware.Place!
+    private var sut: AuthorizationMiddleware!
     
     // MARK: Life Cycle
 
     override func setUpWithError() throws {
         urlComponents = makeURLComponents()
         request = makeRequest()
-        response = HTTPURLResponse(url: urlComponents.url!, statusCode: 200, httpVersion: nil, headerFields: nil)
+        response = makeResponse()
         key = "Authorization"
         value = "Bearer L8qq9PZyRg6ieKGEKhZolGC0vJWLw8iEJ88DRdyOg"
         place = .header
-        sut = AuthorizationMiddleware(key: key, value: value, place: place)
+        sut = AuthorizationMiddleware(
+            key: key,
+            value: value,
+            place: place)
     }
 
     override func tearDownWithError() throws {
@@ -41,7 +44,7 @@ final class AuthorizationMiddlewareTests: XCTestCase {
         sut = nil
     }
     
-    // MARK: Test Cases - Init
+    // MARK: Test Cases - init(key:value:place)
 
     func testInit() throws {
         XCTAssertEqual(sut.key, key)
@@ -68,7 +71,9 @@ final class AuthorizationMiddlewareTests: XCTestCase {
         
         let result = try sut.prepare(request: request)
         let resultHeaders = result.allHTTPHeaderFields
-        let expectedHeaders = request.allHTTPHeaderFields?.merging([key: value], uniquingKeysWith: { $1 })
+        let expectedHeaders = request
+            .allHTTPHeaderFields?
+            .merging([key: value], uniquingKeysWith: { $1 })
         
         XCTAssertNotEqual(result, request)
         XCTAssertEqual(resultHeaders, expectedHeaders)
@@ -82,40 +87,44 @@ final class AuthorizationMiddlewareTests: XCTestCase {
         let resultQuery = URLComponents(url: result.url!, resolvingAgainstBaseURL: true)!
             .queryItems?
             .sorted(by: predicate)
-        let expectedQuery = URLComponents(url: request.url!, resolvingAgainstBaseURL: false)
-            .flatMap { (source: URLComponents) -> [URLQueryItem]? in
-                var urlComponents = source
-                urlComponents.queryItems?.append(URLQueryItem(name: key, value: value))
-                return urlComponents.queryItems
-            }?
+        let expectedQuery = (makeQueryItems() + [URLQueryItem(name: key, value: value)])
             .sorted(by: predicate)
-        
         XCTAssertNotEqual(result, request)
         XCTAssertEqual(resultQuery, expectedQuery)
     }
     
     // MARK: Test Cases - willSend(request:)
     
-    func test_willSendRequest() throws {
-        XCTAssertNoThrow(sut.willSend(request: request))
+    func willSend(request: URLRequest) {
+        sut.willSend(request: request)
     }
     
-    // MARK: Test Cases - didReceive(response:data)
+    // MARK: Test Cases - didReceive(response:data:)
     
-    func test_didReceiveResponse() throws {
-        XCTAssertNoThrow(try sut.didReceive(response: response, data: Data()))
+    func didReceive(response: URLResponse, data: Data) throws {
+        XCTAssertNoThrow(try sut.didReceive(response: response, data: data))
+    }
+    
+    // MARK: Test Cases - didReceive(error:of:)
+    
+    func didReceive(error: Error, of request: URLRequest) {
+        sut.didReceive(error: DummyError(), of: request)
     }
 }
 
 extension AuthorizationMiddlewareTests {
     // MARK: Utilities
     
-    private func makeURLComponents() -> URLComponents {
-        var result = URLComponents(string: "https://apple.com/foo/bar")!
-        result.queryItems = [
+    private func makeQueryItems() -> [URLQueryItem] {
+        [
             URLQueryItem(name: "foo", value: "bar"),
             URLQueryItem(name: "fizz", value: "buzz"),
         ]
+    }
+    
+    private func makeURLComponents() -> URLComponents {
+        var result = URLComponents(string: "https://apple.com/foo/bar")!
+        result.queryItems = makeQueryItems()
         return result
     }
     

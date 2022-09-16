@@ -6,29 +6,28 @@
 //
 
 import XCTest
-import os.log
+import os
 @testable import Networkable
 
 final class LoggingMiddlewareTests: XCTestCase {
     // MARK: Misc
     
-    var request: URLRequest!
-    var response: URLResponse!
-    var type: OSLogType!
-    var log: OSLog!
-    var sut: LoggingMiddleware!
+    private var request: URLRequest!
+    private var response: URLResponse!
+    private var type: OSLogType!
+    private var log: OSLog!
+    private var sut: LoggingMiddleware!
     
     // MARK: Life Cycle
-
+    
     override func setUpWithError() throws {
-        let url = URL(string: "https://apple.com")!
-        request = URLRequest(url: url)
-        response = HTTPURLResponse(url: url, statusCode: 200, httpVersion: nil, headerFields: nil)
-        type = .info
-        log = OSLog(subsystem: "com.duytph.UnitTest", category: "\(Self.self)")
+        request = makeRequest()
+        response = makeResponse(statusCode: 200)
+        type = .debug
+        log = .disabled
         sut = LoggingMiddleware(type: type, log: log)
     }
-
+    
     override func tearDownWithError() throws {
         request = nil
         response = nil
@@ -37,56 +36,125 @@ final class LoggingMiddlewareTests: XCTestCase {
         sut = nil
     }
     
-    // MARK: Test Cases - Init
+    // MARK: Test Cases - init(type:log)
     
-    func test_init() {
-        XCTAssertEqual(sut.type, type)
-        XCTAssertEqual(sut.log, log)
+    func test_init() throws {
+        XCTAssertEqual(type, sut.type)
+        XCTAssertEqual(log, sut.log)
+    }
+    
+    // MARK: Test Cases - makeDescription(request:)
+    
+    func test_makeDescriptionOfRequest() throws {
+        let result = sut.makeDescription(request: request)
+        let expected = """
+        🚀 Request: https://foo.bar/foo/bar?foo=bar?fizz=buzz
+            -X POST
+            -H "bar": "foo"
+            -H "buzz": "fizz"
+            -d "{"foo":"bar"}"
+        """
+        
+        XCTAssertEqual(result, expected)
+    }
+    
+    // MARK: Test Cases - makeDescription(request:error)
+    
+    func test_makeDescriptionOfRequestAndError() throws {
+        let error = DummyError()
+        let result = sut.makeDescription(request: request, error: error)
+        let expected = """
+        📌 Request: https://foo.bar/foo/bar?foo=bar?fizz=buzz did encounter an error: \(error.localizedDescription)
+        """
+        
+        XCTAssertEqual(result, expected)
+    }
+    
+    // MARK: Test Cases - makeDescription(response:)
+    
+    func test_makeDescriptionOfResponse() throws {
+        let result = sut.makeDescription(response: response)
+        let expected = """
+        📩 Response: https://foo.bar/foo/bar?foo=bar?fizz=buzz
+            -H 200
+            -H "fizz: buzz"
+            -H "foo: bar"
+        """
+        
+        XCTAssertEqual(result, expected)
+    }
+    
+    // MARK: Test Cases -  makeDescription(response:withData)
+    
+    func test_makeDescriptionOfResponseWithData() throws {
+        let data = makeBody().data(using: .utf8)!
+        let result = sut.makeDescription(response: response, withData: data)
+        let expected = """
+        📩 Response: https://foo.bar/foo/bar?foo=bar?fizz=buzz
+            -H 200
+            -H "fizz: buzz"
+            -H "foo: bar"
+        {"foo":"bar"}
+        """
+        
+        XCTAssertEqual(result, expected)
     }
     
     // MARK: Test Cases - prepare(request:)
     
     func test_prepareRequest() throws {
-        XCTAssertEqual(request, try sut.prepare(request: request))
+        XCTAssertEqual(try! sut.prepare(request: request), request)
     }
     
     // MARK: Test Cases - willSend(request:)
     
-    func test_willSendRequest() throws {
-        XCTAssertNoThrow(sut.willSend(request: request))
+    func willSend(request: URLRequest) {
+        sut.willSend(request: request)
     }
     
     // MARK: Test Cases - didReceive(response:data)
-    
+
     func test_didReceiveResponseAndData() throws {
-        XCTAssertNoThrow(try sut.didReceive(response: response, data: Data()))
+        try sut.didReceive(response: makeResponse(statusCode: 200), data: Data())
     }
     
-    // MARK: Test Cases - log(request:)
+    // MARK: Test Cases - didReceive(error:of:)
+    
+    func didReceive(error: Error, of request: URLRequest) {
+        sut.didReceive(error: DummyError(), of: request)
+    }
+}
 
-    func test_logRequest() throws {
-        let log = sut.log(request: request)
-        let expected = request.logging()
-        
-        XCTAssertEqual(log, expected)
+extension LoggingMiddlewareTests {
+    // MARK: Utilities
+    
+    private func makeURL() -> URL {
+        URL(string: "https://foo.bar/foo/bar?foo=bar?fizz=buzz")!
     }
     
-    // MARK: Test Cases - log(response:data:)
-
-    func test_logResponse_whenDataIsEmpty() throws {
-        let data = Data()
-        let expected = response.logging()
-        let log = sut.log(response: response, data: data)
-        
-        XCTAssertEqual(log, expected)
+    private func makeBody() -> String {
+        """
+        {"foo":"bar"}
+        """
     }
-
-    func test_logResponse() throws {
-        let rawData = #"{"lorem":"isplum""#
-        let data = rawData.data(using: .utf8)!
-        let expected = response.logging() + "\n" + rawData
-        let log = sut.log(response: response, data: data)
-        
-        XCTAssertEqual(log, expected)
+    
+    private func makeRequest() -> URLRequest {
+        var result = URLRequest(url: makeURL())
+        result.httpMethod = "POST"
+        result.addValue("foo", forHTTPHeaderField: "bar")
+        result.addValue("fizz", forHTTPHeaderField: "buzz")
+        result.httpBody = makeBody().data(using: .utf8)
+        return result
+    }
+    
+    private func makeResponse(statusCode: Int) -> HTTPURLResponse {
+        HTTPURLResponse(
+            url: makeURL(),
+            statusCode: statusCode,
+            httpVersion: nil,
+            headerFields: [
+                "foo": "bar",
+                "fizz": "buzz"
+            ])!
     }
 }

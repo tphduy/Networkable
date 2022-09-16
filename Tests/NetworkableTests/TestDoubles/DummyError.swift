@@ -7,6 +7,11 @@
 
 import Foundation
 
-struct DummyError: Swift.Error, Equatable {
-    let uuid = UUID()
+struct DummyError: LocalizedError, Equatable {
+    
+    let id = UUID()
+    
+    var errorDescription: String? {
+        id.uuidString
+    }
 }

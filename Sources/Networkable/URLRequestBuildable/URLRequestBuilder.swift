@@ -11,10 +11,17 @@ import Foundation
 public struct URLRequestBuilder: URLRequestBuildable {
     // MARK: Dependencies
     
+    /// The base URL of the request.
+    ///
+    /// Example: https://api.foo.bar/v1.
     public var baseURL: URL?
     
+    /// An enum specifies the interaction with the cached responses.
     public var cachePolicy: URLRequest.CachePolicy
     
+    /// The timeout interval in seconds for the request.
+    ///
+    /// If during a connection attempt the request remains idle for longer than the timeout interval, the request is considered to have timed out.
     public var timeoutInterval: TimeInterval
     
     // MARK: Init
@@ -36,23 +43,14 @@ public struct URLRequestBuilder: URLRequestBuildable {
     
     // MARK: URLRequestBuildable
     
-    /// Creates and initializes a URL request with the given endpoint. If the URL of the endpoint is absolute, the base URL takes no effect.
-    /// - Parameter endpoint: The endpoint of the request.
-    /// - Throws: `NetworkableError.invalidURL` if the URL of the endpoint is invalid
-    /// - Returns: An URL request.
-    public func build(endpoint: Endpoint) throws -> URLRequest {
-        guard
-            let url = URL(string: endpoint.url, relativeTo: baseURL)
-        else {
-            throw NetworkableError.invalidURL(endpoint.url, relativeURL: baseURL)
+    public func build(request: Request) throws -> URLRequest {
+        guard let url = URL(string: request.url, relativeTo: baseURL) else {
+            throw NetworkableError.invalidURL(request.url, relativeURL: baseURL)
         }
-        var request = URLRequest(
-            url: url,
-            cachePolicy: cachePolicy,
-            timeoutInterval: timeoutInterval)
-        request.allHTTPHeaderFields = endpoint.headers
-        request.httpMethod = endpoint.method.rawValue.uppercased()
-        request.httpBody = try endpoint.body()
-        return request
+        var result = URLRequest(url: url, cachePolicy: cachePolicy, timeoutInterval: timeoutInterval)
+        result.allHTTPHeaderFields = request.headers
+        result.httpMethod = request.method.rawValue.uppercased()
+        result.httpBody = try request.body()
+        return result
     }
 }
