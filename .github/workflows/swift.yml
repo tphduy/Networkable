@@ -15,7 +15,7 @@ jobs:
     - name: Installs latest stable Xcode
       uses: maxim-lobanov/setup-xcode@v1
       with:
-        xcode-version: latest
+        xcode-version: '14.0.0'
     - name: Builds
       run: swift build -v
     - name: Runs tests
