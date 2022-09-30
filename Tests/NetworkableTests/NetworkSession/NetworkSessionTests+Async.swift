@@ -8,7 +8,7 @@
 import XCTest
 @testable import Networkable
 
-@available(iOS 13.0, *)
+@available(macOS 12.0, macCatalyst 15.0, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 final class NetworkSessionTests_Async: NetworkSessionTests {
     // MARK: Test Cases - data(for:decoder)
     

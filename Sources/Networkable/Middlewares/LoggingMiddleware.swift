@@ -9,6 +9,7 @@ import Foundation
 import os
 
 /// A middleware that logs network activities to a logging system.
+@available(macOS 10.12, macCatalyst 13.0, iOS 10.0, tvOS 10.0, watchOS 3.0, *)
 public struct LoggingMiddleware: Middleware {
     // MARK: Dependencies
     
@@ -17,7 +18,7 @@ public struct LoggingMiddleware: Middleware {
     
     /// The custom log object categorizes the log messages.
     public var log: OSLog
-
+    
     // MARK: Init
     
     /// Initiate a middleware that logs network activities to a logging system.
@@ -31,7 +32,7 @@ public struct LoggingMiddleware: Middleware {
         self.type = type
         self.log = log
     }
-
+    
     // MARK: Utilities
     
     /// Returns a text that represents an URL load request .
@@ -63,7 +64,7 @@ public struct LoggingMiddleware: Middleware {
         let result = "📌 Request: \(url.absoluteString) did encounter an error: \(error.localizedDescription)"
         return result
     }
-     
+    
     /// Returns a text t.hat represents the metadata associated with the response to a URL load reques
     /// - Parameter response: The metadata associated with the response to a URL load request, independent of protocol and URL scheme.
     /// - Returns: An empty text if the URL of response is invalid, otherwise, a non-empty text.
@@ -95,36 +96,24 @@ public struct LoggingMiddleware: Middleware {
         return result
     }
     
-    // MARK: Side Effects
-    
-    /// Log a message to logging system.
-    /// - Parameter message: A message to log.
-    func log(message: String) {
-        if #available(iOS 10, macOS 10.12, macCatalyst 13.0, tvOS 10.0, watchOS 3.0, *) {
-            os_log("%@", log: log, type: type, message)
-        } else {
-            debugPrint(message)
-        }
-    }
-    
     // MARK: Middleware
     
     public func prepare(request: URLRequest) throws -> URLRequest {
         request
     }
-
+    
     public func willSend(request: URLRequest) {
         let message = makeDescription(request: request)
-        log(message: message)
+        os_log("%@", log: log, type: type, message)
     }
-
+    
     public func didReceive(response: URLResponse, data: Data) throws {
         let message = makeDescription(response: response, withData: data)
-        log(message: message)
+        os_log("%@", log: log, type: type, message)
     }
     
     public func didReceive(error: Error, of request: URLRequest) {
         let message = makeDescription(request: request, error: error)
-        log(message: message)
+        os_log("%@", log: log, type: type, message)
     }
 }

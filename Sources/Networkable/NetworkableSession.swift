@@ -51,7 +51,7 @@ public protocol NetworkableSession {
     ///   - resultQueue: A queue on which the promise will be fulfilled.
     ///   - decoder: An object decodes the data to result from JSON objects.
     /// - Returns: A publisher publishes decoded data when the task completes, or terminates if the task fails with an error.
-    @available(iOS 13.0, *)
+    @available(macOS 10.15, macCatalyst 13.0, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
     func dataTaskPublisher<T>(
         for request: Request,
         resultQueue: DispatchQueue?,
@@ -63,7 +63,7 @@ public protocol NetworkableSession {
     ///   - request: An object abstracts an HTTP request.
     ///   - resultQueue: A queue on which the promise will be fulfilled.
     /// - Returns: A publisher publishes decoded data when the task completes, or terminates if the task fails with an error.
-    @available(iOS 13.0, *)
+    @available(macOS 10.15, macCatalyst 13.0, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
     func dataTaskPublisher(
         for request: Request,
         resultQueue: DispatchQueue?
@@ -77,7 +77,7 @@ public protocol NetworkableSession {
     ///   - request: An object abstracts an HTTP request.
     ///   - decoder: An object decodes the data to result from JSON objects.
     /// - Returns: The decoded data.
-    @available(iOS 13.0, *)
+    @available(macOS 12.0, macCatalyst 15.0, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
     func data<T>(
         for request: Request,
         decoder: JSONDecoder
@@ -86,6 +86,6 @@ public protocol NetworkableSession {
     /// Retrieves the contents that is specified by an HTTP request asynchronously.
     /// - Parameters:
     ///   - request: An object abstracts an HTTP request.
-    @available(iOS 13.0, *)
+    @available(macOS 12.0, macCatalyst 15.0, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
     func data(for request: Request) async throws
 }

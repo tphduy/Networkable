@@ -32,7 +32,7 @@ public final class NetworkSession: NetworkableSession {
     ///   - session: An object that coordinates a group of related, network data-transfer tasks.
     public init(
         requestBuilder: URLRequestBuildable = URLRequestBuilder(),
-        middlewares: [Middleware] = [LoggingMiddleware()],
+        middlewares: [Middleware] = [],
         session: URLSession = .shared
     ) {
         self.requestBuilder = requestBuilder
@@ -165,7 +165,7 @@ public final class NetworkSession: NetworkableSession {
 #if canImport(Combine)
     // MARK: NetworkableSession - Publiser
     
-    @available(iOS 13.0, *)
+    @available(macOS 10.15, macCatalyst 13.0, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
     private func dataTaskPublisher(
         for request: Request,
         resultQueue: DispatchQueue?
@@ -213,7 +213,7 @@ public final class NetworkSession: NetworkableSession {
         }
     }
     
-    @available(iOS 13.0, *)
+    @available(macOS 10.15, macCatalyst 13.0, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
     public func dataTaskPublisher<T>(
         for request: Request,
         resultQueue: DispatchQueue? = nil,
@@ -225,7 +225,7 @@ public final class NetworkSession: NetworkableSession {
             .eraseToAnyPublisher()
     }
     
-    @available(iOS 13.0, *)
+    @available(macOS 10.15, macCatalyst 13.0, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
     public func dataTaskPublisher(
         for request: Request,
         resultQueue: DispatchQueue?
@@ -239,7 +239,7 @@ public final class NetworkSession: NetworkableSession {
     
     // MARK: NetworkableSession - Async
     
-    @available(iOS 13.0, *)
+    @available(macOS 12.0, macCatalyst 15.0, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
     private func data(for request: Request) async throws -> Data {
         // Makes an URL load request.
         let request = try makeRequest(of: request, middlewares: middlewares)
@@ -272,7 +272,7 @@ public final class NetworkSession: NetworkableSession {
         }
     }
     
-    @available(iOS 13.0, *)
+    @available(macOS 12.0, macCatalyst 15.0, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
     public func data<T>(
         for request: Request,
         decoder: JSONDecoder
@@ -285,7 +285,7 @@ public final class NetworkSession: NetworkableSession {
         return result
     }
     
-    @available(iOS 13.0, *)
+    @available(macOS 12.0, macCatalyst 15.0, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
     public func data(for request: Request) async throws {
         // Makes an URL load request.
         let _ = try await data(for: request) as Data
