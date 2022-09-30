@@ -22,31 +22,34 @@ struct ExchangeListView: View {
     var body: some View {
         List(exchanges, rowContent: ExchangeRow.init(exchange:))
             .navigationTitle(NSLocalizedString("Exchanges", comment: "Exchanges"))
-            .onAppear(perform: reloadDataIfNeeded)
+            .task(reloadDataIfNeeded)
     }
     
     // MARK: Side Effects
     
     /// Reload all data if data is empty.
-    func reloadDataIfNeeded() {
+    @Sendable
+    private func reloadDataIfNeeded() async {
         guard exchanges.isEmpty else { return }
-        reloadData()
+        await reloadData()
     }
     
     /// Reload all data.
-    func reloadData() {
-        cryptocurrencyMarketUseCase.exchanges { (result: Result<[Exchange], Error>) in
-            exchanges = (try? result.get()) ?? []
-        }
+    private func reloadData() async {
+        let result = try? await cryptocurrencyMarketUseCase.exchanges()
+        exchanges = result ?? []
     }
 }
 
 #if DEBUG
 struct ExchangeListView_Previews: PreviewProvider {
+    
     static var previews: some View {
         NavigationView {
             ExchangeListView()
-                .environment(\.cryptocurrencyMarketUseCase, StubbedCryptocurrencyMarketUseCase())
+                .environment(
+                    \.cryptocurrencyMarketUseCase,
+                     StubbedCryptocurrencyMarketUseCase())
         }
     }
 }

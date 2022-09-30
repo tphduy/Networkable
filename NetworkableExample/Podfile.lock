@@ -1,5 +1,5 @@
 PODS:
-  - Networkable (1.1.0)
+  - Networkable (2.0.0)
 
 DEPENDENCIES:
   - Networkable (from `../`)
@@ -9,8 +9,8 @@ EXTERNAL SOURCES:
     :path: "../"
 
 SPEC CHECKSUMS:
-  Networkable: c4504625581930430745c844cb77eff7e17c6713
+  Networkable: 25f8b79b676d2f9ffacde88b5b77f5f635114364
 
-PODFILE CHECKSUM: 89eb2c071e1299bdb6dcb4c54b3f6f2bf5015039
+PODFILE CHECKSUM: 069e743ef1cd8912c7250ade40905c45ddfe2247
 
 COCOAPODS: 1.11.3

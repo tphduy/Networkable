@@ -1,11 +1,11 @@
 target 'NetworkableExample (iOS)' do
-  platform :ios, '15.4'
+  platform :ios, '16'
   use_frameworks!
   pod 'Networkable', :path => '../'
 end
 
 target 'NetworkableExample (macOS)' do
-  platform :osx, '12.3'
+  platform :osx, '12.6'
   use_frameworks!
   pod 'Networkable', :path => '../'
 end

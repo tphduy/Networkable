@@ -5,79 +5,91 @@
 //  Created by Duy Tran on 15/04/2022.
 //
 
+import Foundation
+import Networkable
 #if canImport(Combine)
 import Combine
 #endif
-import Networkable
 
 /// An object provides methods for interacting with the crytocurrency market data in the remote database.
 protocol RemoteCryptocurrencyMarketRepository {
     /// Get all available exchanges.
-    /// - Parameter promise: A promise to be fulfilled with a result represents either a success or a failure. The success value is the cart data of a store.
+    /// - Parameter promise: A promise to be fulfilled with a result represents either a success or a failure.
     /// - Returns: A URL session task that returns downloaded data directly to the app in memory.
-    func exchanges(promise: @escaping (Result<[Exchange], Error>) -> Void) -> URLSessionDataTask?
+    @discardableResult
+    func exchangesTask(promise: @escaping (Result<[Exchange], Error>) -> Void) -> URLSessionDataTask?
+    
+    /// Get all available exchanges.
+    /// - Returns: A publisher emits a list of exchanges
+    @available(macOS 10.15, macCatalyst 13.0, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
+    func exchangesPublisher() -> AnyPublisher<[Exchange], Error>
     
     /// Get all available exchanges.
     /// - Returns: An asynchronously-delivered list of exchanges.
-    @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *)
+    @available(macOS 12.0, macCatalyst 15.0, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
     func exchanges() async throws -> [Exchange]
-    
-    /// Get all available exchanges.
-    /// - Returns: A publisher emits result of a request.
-    @available(iOS 13.0, macOS 10.15, macCatalyst 13, tvOS 13, watchOS 6, *)
-    func exchanges() -> AnyPublisher<[Exchange], Error>
 }
 
 /// An object provides methods for interacting with the crytocurrency market data in the remote database.
-struct DefaultRemoteCryptocurrencyMarketRepository: RemoteCryptocurrencyMarketRepository {
+final class DefaultRemoteCryptocurrencyMarketRepository: RemoteCryptocurrencyMarketRepository {
     // MARK: Dependencies
     
-    /// An ad-hoc network layer built on URLSession to perform an HTTP request.
-    let provider: WebRepository
+    /// An ad-hoc network layer that is built on `URLSession` to perform an HTTP request.
+    let session: NetworkableSession
     
     // MARK: Init
     
     /// Initiate an object provides methods for interacting with the crytocurrency market data in the remote database.
-    /// - Parameter provider: An ad-hoc network layer built on URLSession to perform an HTTP request.
-    init(provider: WebRepository = DefaultWebRepository(requestBuilder: URLRequestBuilder(baseURL: URL(string: "https://api.coincap.io")))) {
-        self.provider = provider
+    /// - Parameter session: An ad-hoc network layer that is built on `URLSession` to perform an HTTP request.
+    init(session: NetworkableSession = NetworkSession.coincap) {
+        self.session = session
     }
     
     // MARK: RemoteCryptocurrencyMarketRepository
     
-    func exchanges(promise: @escaping (Result<[Exchange], Error>) -> Void) -> URLSessionDataTask? {
-        provider.call(to: APIEndpoint.exchanges) { (result: Result<Datum<[Exchange]>, Error>) in
-            promise(result.map({ $0.data }))
+    @discardableResult
+    func exchangesTask(promise: @escaping (Result<[Exchange], Error>) -> Void) -> URLSessionDataTask? {
+        session.dataTask(
+            for: API.exchanges,
+            resultQueue: nil,
+            decoder: JSONDecoder()
+        ) { (result: Result<Datum<[Exchange]>, Error>) in
+            let exchanges = result.map { $0.data }
+            promise(exchanges)
         }
     }
     
-    @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *)
-    func exchanges() async throws -> [Exchange] {
-        try await provider
-            .call(to: APIEndpoint.exchanges, resultType: Datum<[Exchange]>.self)
-            .data
-    }
-    
-    @available(iOS 13.0, macOS 10.15, macCatalyst 13, tvOS 13, watchOS 6, *)
-    func exchanges() -> AnyPublisher<[Exchange], Error> {
-        provider
-            .call(to: APIEndpoint.exchanges, resultType: Datum<[Exchange]>.self)
-            .map(\.data)
+    @available(macOS 10.15, macCatalyst 13.0, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
+    func exchangesPublisher() -> AnyPublisher<[Exchange], Error> {
+        session
+            .dataTaskPublisher(
+                for: API.exchanges,
+                resultQueue: nil,
+                decoder: JSONDecoder())
+            .map(\Datum<[Exchange]>.data)
             .eraseToAnyPublisher()
     }
     
-    // MARK: Subtypes - APIEndpoint
+    @available(macOS 12.0, macCatalyst 15.0, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
+    func exchanges() async throws -> [Exchange] {
+        let datum = try await session.data(for: API.exchanges, decoder: JSONDecoder()) as Datum<[Exchange]>
+        return datum.data
+    }
+    
+    // MARK: Subtypes - API
     
     /// An object abstracts an HTTP request.
-    enum APIEndpoint: Endpoint {
+    private enum API: Request {
         /// Get all available exchanges.
         case exchanges
+        
+        // MARK: Request
         
         var headers: [String: String]? { nil }
         
         var url: String { "/v2/exchanges" }
         
-        var method: Method { .get }
+        var method: Networkable.Method { .get }
         
         func body() throws -> Data? { nil }
     }
