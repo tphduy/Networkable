@@ -1,4 +1,4 @@
-![Cover](Assets/Cover.png)
+![Cover](Assets/Cover@1x.png)
 
 # Networkable
 
