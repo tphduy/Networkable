@@ -14,7 +14,7 @@ extension NetworkSession {
     static var coincap: NetworkSession {
         let baseURL = URL(string: "https://api.coincap.io")
         let requestBuilder = URLRequestBuilder(baseURL: baseURL)
-        let logging = LoggingMiddleware(type: .info)
+        let logging = LoggingMiddleware(type: .info, log: .network)
         let middlewares = [logging]
         let result = NetworkSession(requestBuilder: requestBuilder, middlewares: middlewares)
         return result

@@ -6,3 +6,5 @@ xcuserdata/
 .swiftpm/xcode/package.xcworkspace/contents.xcworkspacedata
 .swiftpm/xcode/xcshareddata/xcschemes/Networkable.xcscheme
 **/Pods/
+NetworkableExample/NetworkableExample.xcodeproj/project.xcworkspace/contents.xcworkspacedata
+NetworkableExample/NetworkableExample.xcodeproj/project.xcworkspace/xcshareddata/IDEWorkspaceChecks.plist

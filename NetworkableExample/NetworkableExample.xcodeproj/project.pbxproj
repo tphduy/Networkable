@@ -25,6 +25,7 @@
 		3AC8F3272809773B002C6F4C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3AC8F2FD2809773B002C6F4C /* Assets.xcassets */; };
 		3AC8F3282809773B002C6F4C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3AC8F2FD2809773B002C6F4C /* Assets.xcassets */; };
 		57AE91E5A61495EF2D2DC516 /* Pods_NetworkableExample__macOS_.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E2C79CF71E153EE66EED6DD2 /* Pods_NetworkableExample__macOS_.framework */; };
+		96B08BF0292BAE380037DD85 /* OSLog+Network.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96B08BEF292BAE380037DD85 /* OSLog+Network.swift */; };
 		A3681C8433348EEE365E6186 /* Pods_NetworkableExample__iOS_.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9DC13A9BE777A10FD04E9083 /* Pods_NetworkableExample__iOS_.framework */; };
 /* End PBXBuildFile section */
 
@@ -69,6 +70,7 @@
 		3AC8F31F2809773B002C6F4C /* Tests_macOS.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tests_macOS.swift; sourceTree = "<group>"; };
 		3AC8F3212809773B002C6F4C /* Tests_macOSLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tests_macOSLaunchTests.swift; sourceTree = "<group>"; };
 		8BA09842F96581E1F66A4224 /* Pods-NetworkableExample (macOS).release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NetworkableExample (macOS).release.xcconfig"; path = "Target Support Files/Pods-NetworkableExample (macOS)/Pods-NetworkableExample (macOS).release.xcconfig"; sourceTree = "<group>"; };
+		96B08BEF292BAE380037DD85 /* OSLog+Network.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "OSLog+Network.swift"; sourceTree = "<group>"; };
 		9DC13A9BE777A10FD04E9083 /* Pods_NetworkableExample__iOS_.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_NetworkableExample__iOS_.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		BCD65E7B675A0898F2D09A5C /* Pods-NetworkableExample (iOS).release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NetworkableExample (iOS).release.xcconfig"; path = "Target Support Files/Pods-NetworkableExample (iOS)/Pods-NetworkableExample (iOS).release.xcconfig"; sourceTree = "<group>"; };
 		E2C79CF71E153EE66EED6DD2 /* Pods_NetworkableExample__macOS_.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_NetworkableExample__macOS_.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -123,6 +125,7 @@
 			children = (
 				3A79B61928098D7F003727E5 /* EnvironmentKeys */,
 				3A2F2FFE28E6F00600EBA107 /* NetworkSession+CoinCap.swift */,
+				96B08BEF292BAE380037DD85 /* OSLog+Network.swift */,
 			);
 			path = Extension;
 			sourceTree = "<group>";
@@ -487,6 +490,7 @@
 				3AB67114280985E6001AD29A /* CryptocurrencyMarketUseCase.swift in Sources */,
 				3A79B61B28098DA1003727E5 /* CryptocurrencyMarketUseCaseKey.swift in Sources */,
 				3AB671122809816F001AD29A /* Exchange.swift in Sources */,
+				96B08BF0292BAE380037DD85 /* OSLog+Network.swift in Sources */,
 				3A31814928097FB100AA702E /* RemoteCryptocurrencyMarketRepository.swift in Sources */,
 				3AC8F3252809773B002C6F4C /* ExchangeListView.swift in Sources */,
 				3AC8F3232809773B002C6F4C /* NetworkableExampleApp.swift in Sources */,
