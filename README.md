@@ -7,6 +7,18 @@
 [![License](https://img.shields.io/cocoapods/l/Networkable.svg?style=flat)](https://cocoapods.org/pods/Networkable)
 [![Platform](https://img.shields.io/cocoapods/p/Networkable.svg?style=flat)](https://cocoapods.org/pods/Networkable)
 
+- [Overview](#overview)
+- [Sample usage](#sample-usage)
+- [Sample project](#sample-project)
+- [Features](#features)
+- [Requirements](#requirements)
+- [Installation](#installation)
+    - [Swift Package Manager](#swift-package-manager)
+    - [Cocoapods](#cocoapods)
+    - [Carthage](#carthage)
+- [Author](#author)
+- [License](#license)
+
 ## Overview
 
 So the basic idea of **Networkable** is an ad-hoc network player built on top of `URLSession`. It should be simple enough that common things are easy but comprehensive enough that complicated things are also easy.
