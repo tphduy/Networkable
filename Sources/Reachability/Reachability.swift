@@ -7,9 +7,6 @@
 
 import Foundation
 import Network
-#if canImport(UIKit)
-import UIKit
-#endif
 
 /// An object that observes to the network path status and report the changes to a notification center.
 @available(iOS 12.0, macOS 10.14, tvOS 12.0, watchOS 5.0, *)

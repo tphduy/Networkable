@@ -7,7 +7,7 @@
 
 import Foundation
 
-/// An object that constructs an HTTP request.
+/// An object can build an URL load request that is independent of protocol or URL scheme.
 public struct URLRequestBuilder: URLRequestBuildable {
     // MARK: Dependencies
     
@@ -26,7 +26,7 @@ public struct URLRequestBuilder: URLRequestBuildable {
     
     // MARK: Init
     
-    /// Initiate a builder that constructs an HTTP request.
+    /// Initiates an object that can build an URL load request.
     /// - Parameters:
     ///   - baseURL: The base URL of the request. The default value is `nil`.
     ///   - cachePolicy: An enum specifies the interaction with the cached responses. The default value is `useProtocolCachePolicy`.
@@ -44,6 +44,7 @@ public struct URLRequestBuilder: URLRequestBuildable {
     // MARK: URLRequestBuildable
     
     public func build(request: Request) throws -> URLRequest {
+        // If `request.url` is absolute, the host of `baseURL` will be overriden.
         guard let url = URL(string: request.url, relativeTo: baseURL) else {
             throw NetworkableError.invalidURL(request.url, relativeURL: baseURL)
         }

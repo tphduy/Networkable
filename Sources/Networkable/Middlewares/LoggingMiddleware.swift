@@ -21,7 +21,7 @@ public struct LoggingMiddleware: Middleware {
     
     // MARK: Init
     
-    /// Initiate a middleware that logs network activities to a logging system.
+    /// Initiates a middleware that logs network activities to a logging system.
     /// - Parameters:
     ///   - type: The log level to assign to the message. The default value is `.default`.
     ///   - log: The custom log object categorizes the log message. The default value is `.default`.
@@ -81,12 +81,12 @@ public struct LoggingMiddleware: Middleware {
         return result
     }
     
-    /// Return a `String` representing a response with the data returned by the server.
+    /// Returns a `String` representing a response with the data returned by the server.
     /// - Parameters:
-    ///   - response: An object abstracts information about a response.
-    ///   - data: The data returned by the server.
-    /// - Returns: A `String` representing a response with the data returned by the server.
-    func makeDescription(response: URLResponse, withData data: Data) -> String {
+    ///   - response: The metadata associated with the response to a URL load request, independent of protocol and URL scheme.
+    ///   - data: The data that was returned by the server.
+    /// - Returns: A `String` representing a response with the data that was returned by the server.
+    func makeDescription(response: URLResponse, data: Data) -> String {
         let response = makeDescription(response: response)
         let data = String(data: data, encoding: .utf8)
         let result = [response, data]
@@ -108,7 +108,7 @@ public struct LoggingMiddleware: Middleware {
     }
     
     public func didReceive(response: URLResponse, data: Data) throws {
-        let message = makeDescription(response: response, withData: data)
+        let message = makeDescription(response: response, data: data)
         os_log("%@", log: log, type: type, message)
     }
     

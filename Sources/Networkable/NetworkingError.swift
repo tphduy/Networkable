@@ -7,7 +7,7 @@
 
 import Foundation
 
-/// The possible errors may be thrown during sending a request and processing a response.
+/// A type that defines the possible errors may be thrown during sending a request and processing a response.
 public enum NetworkableError: Error, Equatable {
     /// The text represents an URL of an invalid request.
     case invalidURL(String, relativeURL: URL?)

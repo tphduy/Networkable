@@ -7,9 +7,9 @@
 
 import Foundation
 
-/// The object re-presents the HTTP methods to indicate the desired action to be performed for a given resource
+/// A type that defines a list of HTTP methods, each method indicates a desired action to be performed for a given resource
 ///
-/// https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods.
+/// Reads more at [Mozilla](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods).
 public enum Method: String, Hashable, CaseIterable {
     /// Requests a representation of the specified resource. Requests using GET should only retrieve data.
     case get

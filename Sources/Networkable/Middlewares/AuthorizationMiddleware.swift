@@ -10,7 +10,7 @@ import Foundation
 /// A middleware that authorizes an outgoing request.
 public struct AuthorizationMiddleware: Middleware {
     
-    /// An enum abstracts where the authorization components will be added within a request.
+    /// A type that defines a list of places to append the authorization components.
     public enum Place: Equatable, Hashable {
         /// The request's header.
         case header
@@ -32,11 +32,11 @@ public struct AuthorizationMiddleware: Middleware {
     
     // MARK: Init
     
-    /// Initiate a middleware that authorizes an outgoing request.
+    /// Initiates a middleware that authorizes an outgoing request.
     /// - Parameters:
     ///   - key: The key that specifies the authorization components.
     ///   - value: The authorization component.
-    ///   - place: A place where the authorization components will be added within a request. The default value is `.header`
+    ///   - place: A type that defines a list of places to append the authorization components. The default value is `.header`
     public init(
         key: String,
         value: String,
@@ -49,9 +49,9 @@ public struct AuthorizationMiddleware: Middleware {
     
     // MARK: Utilities
     
-    /// Return an authorized request from the origin request.
-    /// - Parameter request: An object abstracts information about the request.
-    /// - Returns: A request with embedded authorization components.
+    /// Returns an authorized request from the origin request.
+    /// - Parameter request: A URL load request that is independent of protocol or URL scheme.
+    /// - Returns: An authorized URL load request that is independent of protocol or URL scheme.
     func authorize(request: URLRequest) -> URLRequest {
         // Verifies the key and values are not empty.
         guard

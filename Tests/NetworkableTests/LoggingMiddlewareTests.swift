@@ -88,7 +88,7 @@ final class LoggingMiddlewareTests: XCTestCase {
     
     func test_makeDescriptionOfResponseWithData() throws {
         let data = makeBody().data(using: .utf8)!
-        let result = sut.makeDescription(response: response, withData: data)
+        let result = sut.makeDescription(response: response, data: data)
         let expected = """
         📩 Response: https://foo.bar/foo/bar?foo=bar?fizz=buzz
             -H 200

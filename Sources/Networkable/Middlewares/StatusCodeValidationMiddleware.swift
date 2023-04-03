@@ -16,7 +16,7 @@ public struct StatusCodeValidationMiddleware: Middleware {
     
     // MARK: Init
     
-    /// Initiate a middleware determines whether a response is valid by verifying its status code.
+    /// Initiates a middleware determines whether a response is valid by verifying its status code.
     /// - Parameter acceptableStatusCodes: A range of HTTP response status codes that specifies a response is valid.
     public init(acceptableStatusCodes: ResponseStatusCodes = .success) {
         self.acceptableStatusCodes = acceptableStatusCodes
@@ -24,11 +24,11 @@ public struct StatusCodeValidationMiddleware: Middleware {
     
     // MARK: Utilities
     
-    /// Validate a response whether it is an HTTP response and its status code is acceptable.
+    /// Validates a response whether it is an HTTP response and its status code is acceptable.
     /// - Parameters:
-    ///   - response: An object abstracts informations about a response. It's must be an instance of `HTTPURLResponse`.
-    ///   - data: The data returned by the server.
-    /// - Throws: An unexpected response error if the response is not HTTP response, or an unacceptable code error if the response's status code is not acceptable.
+    ///   - response: The metadata associated with the response to a URL load request, independent of protocol and URL scheme. It's must be an instance of `HTTPURLResponse`.
+    ///   - data: The data that was returned by the server.
+    /// - Throws: An unexpected response error if the response is not an HTTP response, or an unacceptable code error if the response's status code is unacceptable.
     func validate(response: URLResponse, data: Data) throws {
         // Verifies the response is an instance of `HTTPURLResponse`.
         guard let response = response as? HTTPURLResponse else {

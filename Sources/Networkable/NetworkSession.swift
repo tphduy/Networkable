@@ -14,7 +14,7 @@ import Combine
 public final class NetworkSession: NetworkableSession {
     // MARK: Dependencies
     
-    /// A builder that constructs an HTTP request.
+    /// A type can build an URL load request that is independent of protocol or URL scheme.
     let requestBuilder: URLRequestBuildable
     
     /// A list of middlewares that will perform side effects whenever a request is sent or a response is received.
@@ -27,7 +27,7 @@ public final class NetworkSession: NetworkableSession {
     
     /// Initiates an ad-hoc network layer that is built on URLSession to perform an HTTP request.
     /// - Parameters:
-    ///   - requestBuilder: An object that constructs an HTTP request.
+    ///   - requestBuilder: A type can build an URL load request that is independent of protocol or URL scheme.
     ///   - middlewares: A list of middlewares that will perform side effects whenever a request is sent or a response is received.
     ///   - session: An object that coordinates a group of related, network data-transfer tasks.
     public init(
@@ -47,7 +47,7 @@ public final class NetworkSession: NetworkableSession {
     /// It will invoke the middlewares to perform side effects leading the final result.
     ///
     /// - Parameters:
-    ///   - request: An object abstracts an HTTP request.
+    ///   - request: A type that abstracts an HTTP request.
     ///   - middlewares: A list of middlewares that will perform side effects whenever a request is sent or a response is received.
     /// - Returns: An URL load request that is independent of protocol or URL scheme.
     private func makeRequest(
