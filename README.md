@@ -2,11 +2,6 @@
 
 # Networkable
 
-![Swift](https://github.com/duytph/Networkable/workflows/Swift/badge.svg)
-[![Version](https://img.shields.io/cocoapods/v/Networkable.svg?style=flat)](https://cocoapods.org/pods/Networkable)
-[![License](https://img.shields.io/cocoapods/l/Networkable.svg?style=flat)](https://cocoapods.org/pods/Networkable)
-[![Platform](https://img.shields.io/cocoapods/p/Networkable.svg?style=flat)](https://cocoapods.org/pods/Networkable)
-
 - [Overview](#overview)
 - [Sample usage](#sample-usage)
 - [Sample project](#sample-project)
@@ -182,4 +177,4 @@ Duy Tran (tphduy@gmail.com)
 
 ## License
 
-Networkable is available under the MIT license. See the LICENSE file for more info.
+Networkable is available under the MIT license. See the [LICENSE file](LICENSE) for more info.
